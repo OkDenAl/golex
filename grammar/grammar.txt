@@ -1,0 +1,22 @@
+Program         ::= (NamedRegExpr)* (NewLine)* (State)? (NewLine)* Rules
+NamedRegExpr    ::= RegularName RegExpr NewLine
+State           ::= "%x" (StateName)+ NewLine
+NewLine         ::= Nl
+Rules           ::= "%%" (NewLine)+ (Rule)+ (NewLine)+ "%%"
+Rule            ::= "/" RegExpr "/" TagRuleName
+
+RegExpr         ::= Union | SimpleExpr
+Union           ::= SimpleExpr "|" RegExpr
+SimpleExpr      ::= Concatenation | BasicExpr
+Concatenation   ::= BasicExpr SimpleExpr
+BasicExpr       ::= Element ("*"|"+"|"?")?
+Element         ::= Group | Set | Escape | Base
+Group           ::= "(" RegExpr ")"
+Escape          ::= "\" Base
+Set             ::= "[" ("^")? FirstSetItem SetItems "]"
+SetItems        ::= SetItem SetItems
+SetItem         ::= Range | Escape | Base
+SetItem         ::= Range | Escape | Base<without ]>
+Range           ::= Base "-" Character
+
+Base ::= <any>
