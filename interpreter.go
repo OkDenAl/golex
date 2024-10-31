@@ -75,7 +75,7 @@ func (e *Element) Compile() *FiniteState {
 	}
 
 	if e.character != nil {
-		return Create([]rune(e.character.val))
+		return e.character.Compile()
 	}
 
 	if e.escape != nil {
@@ -140,7 +140,7 @@ func (s *SetItem) Compile() *FiniteState {
 	}
 
 	if s.base != nil {
-		return Create([]rune(s.base.val))
+		return s.base.Compile()
 	}
 
 	if s.escape != nil {
@@ -162,5 +162,15 @@ func (r *Range) Compile() *FiniteState {
 
 // Compile a Character into a Finite State Machine
 func (c *Character) Compile() *FiniteState {
-	return Create([]rune(c.base.val))
+	return c.base.Compile()
+}
+
+var anySymbol rune = -1
+
+func (t *Token) Compile() *FiniteState {
+	if t.tag == TagAnyCharacter {
+		return Create([]rune{anySymbol})
+	}
+
+	return Create([]rune(t.val))
 }

@@ -44,8 +44,10 @@ func (p *Parser) rules() (*Rules, error) {
 // Rule            ::= "/" RegExpr "/" TagRuleName NL
 func (p *Parser) rule() (*Rule, error) {
 	p.mustExpectTags(TagRegularMarker)
+	reset := p.reset()
 	expr, ok := p.regExpr()
 	if !ok {
+		reset()
 		return nil, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor])
 	}
 	p.mustExpectTags(TagRegularMarker)
@@ -87,7 +89,6 @@ func (p *Parser) union() (*Union, bool) {
 	}
 
 	regex, ok := p.regExpr()
-
 	if !ok {
 		return nil, false
 	}
@@ -177,14 +178,13 @@ func (p *Parser) group() (*Group, bool) {
 	if _, ok := p.expectTags(TagOpenParen); !ok {
 		return nil, false
 	}
-
+	reset := p.reset()
+	defer p.mustExpectTags(TagCloseParen)
 	regex, ok := p.regExpr()
-
 	if !ok {
+		reset()
 		return nil, false
 	}
-
-	p.mustExpectTags(TagCloseParen)
 	return &Group{regex}, true
 }
 
@@ -194,7 +194,7 @@ func (p *Parser) escape() (*Escape, bool) {
 		return nil, false
 	}
 
-	base, ok := p.token()
+	base, ok := p.setItemToken()
 	if !ok {
 		return nil, false
 	}
@@ -274,7 +274,7 @@ func (p *Parser) setItem(isFirst bool) (*SetItem, bool) {
 }
 
 func (p *Parser) rangeExpr() (*Range, bool) {
-	start, ok := p.token()
+	start, ok := p.setItemToken()
 
 	if !ok {
 		return nil, false
@@ -284,10 +284,11 @@ func (p *Parser) rangeExpr() (*Range, bool) {
 		return nil, false
 	}
 
+	reset := p.reset()
 	end, ok := p.character()
-
 	if !ok {
-		return nil, false
+		reset()
+		panic("unexpected token " + p.tokens[p.cursor].String())
 	}
 
 	return &Range{start, end}, true

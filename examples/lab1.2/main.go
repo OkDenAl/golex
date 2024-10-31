@@ -33,6 +33,7 @@ type MyHandler struct {
 }
 
 func (m MyHandler) Skip(text []rune, start, end golexgen.Position) *golexgen.Token {
+	fmt.Println("skip " + string(text[start.Index():end.Index()]))
 	return nil
 }
 

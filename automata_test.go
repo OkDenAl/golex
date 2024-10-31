@@ -53,8 +53,20 @@ func TestFiniteState_Execute(t *testing.T) {
 			maxLen: 10,
 		},
 		{
-			name:   "[^\\n\\t ]*((a|b)|(abc)*)",
-			args:   args{reg: "[^1 ]*"},
+			name:   "(([A-Za-z0-9]+\\{[0-9]+\\})|[0-9]+)",
+			args:   args{reg: "([A-Za-z0-9]+\\{[0-9]+\\})|я"},
+			count:  10,
+			maxLen: 10,
+		},
+		{
+			name:   "(\\()(a|b*)\\)",
+			args:   args{reg: "(\\()(a|b*)\\)"},
+			count:  10,
+			maxLen: 10,
+		},
+		{
+			name:   "[\\^1 ]*",
+			args:   args{reg: "[\\^1 ]*"},
 			count:  10,
 			maxLen: 10,
 		},
@@ -70,6 +82,7 @@ func TestFiniteState_Execute(t *testing.T) {
 			for i := 1; i < tt.maxLen; i++ {
 				for j := 0; j < tt.count; j++ {
 					str, err := Generate(tt.args.reg, i)
+					fmt.Println(str)
 					require.Nil(t, err)
 					if sut.Execute(str) != r.MatchString(str) {
 						f += 1

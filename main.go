@@ -37,9 +37,8 @@ func main() {
 		rule.expr.Print("")
 		automatas = append(automatas, rule.expr.Compile())
 	}
-
-	fmt.Println(automatas[0])
-	fmt.Println(automatas[0].Execute("p"))
+	automatas[0].ToGraph(os.Stdout)
+	fmt.Println(automatas[0].Execute("a"))
 
 	fmt.Println(parse)
 

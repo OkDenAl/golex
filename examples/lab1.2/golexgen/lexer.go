@@ -17,7 +17,7 @@ func (f *FiniteState) FindMatchEndIndex(input string) int {
 	f.CurrentState = 0
 	i := 0
 	for _, ch := range input {
-		if !f.consume(ch) {
+		if !f.canMoveBy(ch) {
 			break
 		}
 		i++
@@ -30,15 +30,18 @@ func (f *FiniteState) FindMatchEndIndex(input string) int {
 	return 0
 }
 
-func (f *FiniteState) consume(ch rune) bool {
-	return f.transition(f.CurrentState, ch)
-}
-
-func (f *FiniteState) transition(from int, ch rune) bool {
-
+func (f *FiniteState) canMoveBy(ch rune) bool {
+	from := f.CurrentState
 	if to, ok := f.Transitions[from][ch]; ok {
 		f.CurrentState = to
 		return true
+	}
+
+	for k, to := range f.Transitions[from] {
+		if k == -1 {
+			f.CurrentState = to
+			return true
+		}
 	}
 
 	return false
@@ -56,17 +59,11 @@ func (f *FiniteState) isTerminal(state int) bool {
 var (
 	automataSkip *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []int{1, 2, 7, 8, 5, 0},
+		TerminalStates: []int{4},
 		Transitions: map[int]map[rune]int{
-			0: {48: 8, 49: 8, 50: 8, 51: 8, 52: 8, 53: 8, 54: 8, 55: 8, 56: 8, 57: 8, 97: 3, 98: 2, 112: 7},
-			1: {48: 8, 49: 8, 50: 8, 51: 8, 52: 8, 53: 8, 54: 8, 55: 8, 56: 8, 57: 8},
-			2: {48: 8, 49: 8, 50: 8, 51: 8, 52: 8, 53: 8, 54: 8, 55: 8, 56: 8, 57: 8},
-			3: {98: 4},
-			4: {99: 5},
-			5: {48: 8, 49: 8, 50: 8, 51: 8, 52: 8, 53: 8, 54: 8, 55: 8, 56: 8, 57: 8, 97: 3},
-			6: {},
-			7: {48: 8, 49: 8, 50: 8, 51: 8, 52: 8, 53: 8, 54: 8, 55: 8, 56: 8, 57: 8},
-			8: {48: 8, 49: 8, 50: 8, 51: 8, 52: 8, 53: 8, 54: 8, 55: 8, 56: 8, 57: 8},
+			0: {97: 1},
+			1: {-1: 2, 98: 4},
+			2: {-1: 2, 98: 4},
 		},
 	}
 )

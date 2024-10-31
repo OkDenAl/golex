@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"sort"
 )
 
@@ -50,8 +51,6 @@ func (f *FiniteState) AddTransition(from, to int, chars []rune) {
 		f.nextState = to + 1
 	}
 
-	// If we have a transition set from this state already
-	// then add/update
 	if transitionsFrom, ok := f.Transitions[from]; ok {
 		for _, ch := range chars {
 			if f.isTerminal(transitionsFrom[ch]) {
@@ -230,10 +229,27 @@ func (f *FiniteState) String() string {
 	return str
 }
 
+func (f *FiniteState) ToGraph(out io.Writer) {
+	fmt.Fprintln(out, "digraph {")
+	fmt.Fprintln(out, "0 [color=\"green\"]")
+
+	for _, state := range f.TerminalStates {
+		fmt.Fprintf(out, "%d [peripheries = 2]\n", state)
+	}
+
+	for from, trans := range f.Transitions {
+		for label, to := range trans {
+			fmt.Fprintf(out, "%d -> %d [label=\"%c\"]\n", from, to, label)
+		}
+	}
+
+	fmt.Fprintln(out, "}")
+}
+
 func (f *FiniteState) Execute(input string) bool {
 	f.CurrentState = 0
 	for _, ch := range input {
-		if !f.consume(ch) {
+		if !f.canMoveBy(ch) {
 			return false
 		}
 	}
@@ -244,7 +260,7 @@ func (f *FiniteState) FindMatchEndIndex(input string) int {
 	f.CurrentState = 0
 	i := 0
 	for _, ch := range input {
-		if !f.consume(ch) {
+		if !f.canMoveBy(ch) {
 			break
 		}
 		i++
@@ -257,15 +273,18 @@ func (f *FiniteState) FindMatchEndIndex(input string) int {
 	return 0
 }
 
-func (f *FiniteState) consume(ch rune) bool {
-	return f.transition(f.CurrentState, ch)
-}
-
-func (f *FiniteState) transition(from int, ch rune) bool {
-
+func (f *FiniteState) canMoveBy(ch rune) bool {
+	from := f.CurrentState
 	if to, ok := f.Transitions[from][ch]; ok {
 		f.CurrentState = to
 		return true
+	}
+
+	for k, to := range f.Transitions[from] {
+		if k == -1 {
+			f.CurrentState = to
+			return true
+		}
 	}
 
 	return false
