@@ -56,7 +56,7 @@ func (f *FiniteState) isTerminal(state int) bool {
 var (
 	automataSkip *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []int{8, 7, 2, 5, 0, 1},
+		TerminalStates: []int{1, 2, 7, 8, 5, 0},
 		Transitions: map[int]map[rune]int{
 			0: {48: 8, 49: 8, 50: 8, 51: 8, 52: 8, 53: 8, 54: 8, 55: 8, 56: 8, 57: 8, 97: 3, 98: 2, 112: 7},
 			1: {48: 8, 49: 8, 50: 8, 51: 8, 52: 8, 53: 8, 54: 8, 55: 8, 56: 8, 57: 8},

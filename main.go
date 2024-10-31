@@ -39,7 +39,7 @@ func main() {
 	}
 
 	fmt.Println(automatas[0])
-	fmt.Println(automatas[0].Execute("abcabc"))
+	fmt.Println(automatas[0].Execute("p"))
 
 	fmt.Println(parse)
 

@@ -117,7 +117,7 @@ func (f *FiniteState) Append(other *FiniteState) {
 			result.Transitions[state+len(f.Transitions)][symbol] = nextState + len(f.Transitions)
 		}
 	}
-	
+
 	newFinalStates := make(map[int]struct{})
 	for _, finalState := range other.TerminalStates {
 		if finalState == 0 {
@@ -152,12 +152,12 @@ func (f *FiniteState) Union(other *FiniteState) {
 	}
 
 	for state, transitions := range other.Transitions {
-		newFSM.Transitions[state+len(f.Transitions)] = make(map[rune]int)
 		if state == 0 {
 			for symbol, nextState := range transitions {
 				newFSM.Transitions[state][symbol] = nextState + len(f.Transitions)
 			}
 		} else {
+			newFSM.Transitions[state+len(f.Transitions)] = make(map[rune]int)
 			for symbol, nextState := range transitions {
 				newFSM.Transitions[state+len(f.Transitions)][symbol] = nextState + len(f.Transitions)
 			}

@@ -262,7 +262,7 @@ func (p *Parser) setItem(isFirst bool) (*SetItem, bool) {
 	}
 
 	reset()
-	token, ok := p.token()
+	token, ok := p.setItemToken()
 	if ok {
 		if token.Tag() != TagCloseBracket || isFirst {
 			return &SetItem{base: token}, true
@@ -345,6 +345,19 @@ func (p *Parser) token() (*Token, bool) {
 	return &token, true
 }
 
+func (p *Parser) setItemToken() (*Token, bool) {
+	token, ok := p.nextToken()
+	if !ok {
+		return nil, false
+	}
+
+	if token.Tag() == TagRegularMarker {
+		return nil, false
+	}
+
+	return &token, true
+}
+
 func (p *Parser) nextToken() (Token, bool) {
 	if p.cursor == len(p.tokens) {
 		if len(p.tokens) == 0 {
@@ -364,9 +377,10 @@ func (p *Parser) mustExpectTags(tags ...DomainTag) Token {
 		if p.tokens[p.cursor].tag == tag {
 			token := p.tokens[p.cursor]
 			p.cursor = p.cursor + 1
-			if p.tokens[p.cursor].tag == TagErr {
+			if p.cursor != len(p.tokens) && p.tokens[p.cursor].tag == TagErr {
 				panic(fmt.Sprintf("parse error: unexpected token"))
 			}
+
 			return token
 		}
 	}

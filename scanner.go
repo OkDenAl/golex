@@ -166,7 +166,6 @@ func GetTokens(scn Scanner) []Token {
 		}
 		t = scn.NextToken()
 	}
-	tokens = append(tokens, t)
 
 	if len(scn.compiler.messages) != 0 {
 		scn.compiler.OutputMessages()
