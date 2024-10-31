@@ -38,7 +38,10 @@ func main() {
 		automatas = append(automatas, rule.expr.Compile())
 	}
 	automatas[0].ToGraph(os.Stdout)
-	fmt.Println(automatas[0].Execute("a"))
+	if automatas[0].Execute("iuq2JgJR{75}") == false {
+		automatas[0].Execute("iuq2JgJR{75}")
+	}
+	fmt.Println(automatas[0].Execute("iuq2JgJR{75}"))
 
 	fmt.Println(parse)
 

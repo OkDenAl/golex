@@ -54,7 +54,13 @@ func TestFiniteState_Execute(t *testing.T) {
 		},
 		{
 			name:   "(([A-Za-z0-9]+\\{[0-9]+\\})|[0-9]+)",
-			args:   args{reg: "([A-Za-z0-9]+\\{[0-9]+\\})|я"},
+			args:   args{reg: "(([A-Za-z0-9]+\\{[0-9]+\\})|[0-9]+)"},
+			count:  100,
+			maxLen: 100,
+		},
+		{
+			name:   "(\\'[A-Za-z ]*\\')",
+			args:   args{reg: "(\\'[A-Za-z ]*\\')"},
 			count:  10,
 			maxLen: 10,
 		},
@@ -70,6 +76,18 @@ func TestFiniteState_Execute(t *testing.T) {
 			count:  10,
 			maxLen: 10,
 		},
+		{
+			name:   "(ab)*ac",
+			args:   args{reg: "(ab)*ac"},
+			count:  10,
+			maxLen: 10,
+		},
+		{
+			name:   "[A-Da-d]+a\\{",
+			args:   args{reg: "[A-Da-d]+a\\{"},
+			count:  100,
+			maxLen: 100,
+		},
 	}
 
 	for _, tt := range tests {
@@ -82,10 +100,10 @@ func TestFiniteState_Execute(t *testing.T) {
 			for i := 1; i < tt.maxLen; i++ {
 				for j := 0; j < tt.count; j++ {
 					str, err := Generate(tt.args.reg, i)
-					fmt.Println(str)
 					require.Nil(t, err)
 					if sut.Execute(str) != r.MatchString(str) {
 						f += 1
+						fmt.Println(sut.Execute(str), r.MatchString(str))
 						fmt.Println(tt.args.reg, str)
 					}
 				}
