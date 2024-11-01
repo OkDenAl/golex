@@ -174,18 +174,25 @@ func (scn *Scanner) nextTokenRegular() Token {
 	return NewToken(TagEOP, scn.curPos, scn.curPos, "")
 }
 
-func (scn *Scanner) scanName() ([]Token, bool) {
-	t := scn.nextToken()
+func (scn *Scanner) scanNameTokens(curToken Token) []Token {
 	var name string
+	var tokens []Token
+	tokens = append(tokens, curToken)
+	t := scn.nextToken()
 	for t.Tag() != TagEOP && t.Tag() != TagCloseBrace {
 		if t.Tag() != TagErr {
 			name += t.val
+			tokens = append(tokens, t)
 		}
 		t = scn.nextToken()
 	}
 	res, ok := scn.compiler.namesTokens[name]
+	if !ok {
+		tokens = append(tokens, t)
+		return tokens
+	}
 
-	return res, ok
+	return res
 }
 
 func (scn *Scanner) GetTokens() []Token {
@@ -193,16 +200,11 @@ func (scn *Scanner) GetTokens() []Token {
 	var tokens []Token
 	for t.Tag() != TagEOP {
 		if t.Tag() == TagOpenBrace {
-			copyScn := *scn
-			if res, ok := scn.scanName(); ok {
-				tokens = append(tokens, res...)
-			} else {
-				tokens = append(tokens, t)
-				*scn = copyScn
-			}
+			tokens = append(tokens, scn.scanNameTokens(t)...)
 		} else if t.Tag() != TagErr {
 			tokens = append(tokens, t)
 		}
+
 		t = scn.nextToken()
 	}
 

@@ -65,7 +65,7 @@ func (p *Parser) namedRegExpr() (NamedRegExpr, error) {
 	expr, ok := p.regExpr()
 	if !ok {
 		reset()
-		return NamedRegExpr{}, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor])
+		return NamedRegExpr{}, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor].String())
 	}
 	p.mustExpectTags(TagRegularMarker)
 	p.mustExpectTags(TagNL)
@@ -116,7 +116,7 @@ func (p *Parser) rule() (Rule, error) {
 	expr, ok := p.regExpr()
 	if !ok {
 		reset()
-		return Rule{}, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor])
+		return Rule{}, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor].String())
 	}
 	p.mustExpectTags(TagRegularMarker)
 	token := p.mustExpectTags(TagName)
@@ -458,7 +458,7 @@ func (p *Parser) mustExpectTags(tags ...DomainTag) Token {
 		}
 	}
 
-	panic(fmt.Sprintf("parse error: expected %s, but got %s", tags, p.tokens[p.cursor]))
+	panic(fmt.Sprintf("parse error: expected %s, but got %s", tags, p.tokens[p.cursor].String()))
 }
 
 func (p *Parser) expectTags(tags ...DomainTag) (Token, bool) {

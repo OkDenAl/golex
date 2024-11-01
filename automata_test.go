@@ -13,7 +13,7 @@ import (
 func setup(t *testing.T, regexp string) *FiniteState {
 	scn := NewScanner(bufio.NewReader(strings.NewReader(regexp)), NewCompiler())
 	scn.regularMode = true
-	tokens := GetTokens(scn)
+	tokens := scn.GetTokens()
 	parser := New(tokens)
 
 	expr, ok := parser.regExpr()
