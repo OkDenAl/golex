@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"sort"
-	"strings"
 )
 
 func SortedMapKeys(m map[Position]Message) (keyList []Position) {
@@ -21,36 +20,24 @@ func SortedMapKeys(m map[Position]Message) (keyList []Position) {
 }
 
 type Compiler struct {
-	messages  map[Position]Message
-	nameCodes map[string]int
-	names     []string
+	messages    map[Position]Message
+	namesTokens map[string][]Token
 }
 
 func NewCompiler() *Compiler {
-	return &Compiler{nameCodes: make(map[string]int), messages: make(map[Position]Message)}
+	return &Compiler{namesTokens: map[string][]Token{}, messages: make(map[Position]Message)}
 }
 
-func (c *Compiler) GetIdentsNames() {
-	fmt.Println("IDENTs:")
-	for i, name := range c.names {
-		fmt.Printf("%d: %s\n", i, name)
+func (c *Compiler) AddToken(name string, token Token) {
+	if _, ok := c.namesTokens[name]; !ok {
+		c.namesTokens[name] = make([]Token, 0)
 	}
-	fmt.Println()
+	c.namesTokens[name] = append(c.namesTokens[name], token)
 }
 
-func (c *Compiler) AddName(name string) int {
-	name1 := strings.ToLower(name)
-	if code, ok := c.nameCodes[name1]; ok {
-		return code
-	}
-	code := len(c.names)
-	c.names = append(c.names, name)
-	c.nameCodes[name1] = code
-	return code
-}
-
-func (c *Compiler) Name(code int) string {
-	return c.names[code]
+func (c *Compiler) HasName(name string) bool {
+	_, ok := c.namesTokens[name]
+	return ok
 }
 
 func (c *Compiler) AddMessage(isErr bool, p Position, text string) {

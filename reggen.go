@@ -38,6 +38,9 @@ func (g *Generator) generate(s *state, re *syntax.Regexp) string {
 			for _, r := range re.Rune {
 				res += string(r)
 				if g.rand.Float64() > 0.8 {
+					c := printableChars[g.rand.Intn(len(printableChars))]
+					res += string(c)
+				} else if g.rand.Float64() > 0.7 {
 					res += string(r)
 				}
 			}

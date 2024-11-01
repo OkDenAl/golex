@@ -9,7 +9,7 @@ const (
 	TagCode DomainTag = iota
 	TagRulesMarker
 	TagStateMarker
-	TagRuleName
+	TagName
 	Tag
 	TagRegexp
 	TagNL
@@ -32,6 +32,7 @@ const (
 	TagErr
 	TagEOP
 	TagRegularMarker
+	TagStateName
 )
 
 type Token struct {
@@ -44,11 +45,11 @@ func NewToken(tag DomainTag, starting, following Position, val string) Token {
 	return Token{tag: tag, coords: NewFragment(starting, following), val: val}
 }
 
-func (t Token) String() string {
+func (t *Token) String() string {
 	return fmt.Sprintf("%s %s: %s", t.tag, t.coords, t.val)
 }
 
-func (t Token) Tag() DomainTag {
+func (t *Token) Tag() DomainTag {
 	return t.tag
 }
 

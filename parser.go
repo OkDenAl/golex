@@ -15,49 +15,117 @@ func New(tokens []Token) *Parser {
 }
 
 // Parse a list of tokens into an executable
-func (p *Parser) Parse() (*Rules, error) {
-	return p.rules()
+func (p *Parser) Parse() (Program, error) {
+	return p.program()
+}
+
+// Program         ::= (NamedRegExpr)* (NewLine)* (State)? (NewLine)* Rules
+func (p *Parser) program() (Program, error) {
+	var namedExpr []NamedRegExpr
+	for p.tokens[p.cursor].Tag() == TagName {
+		expr, err := p.namedRegExpr()
+		if err != nil {
+			return Program{}, err
+		}
+		namedExpr = append(namedExpr, expr)
+	}
+
+	for p.tokens[p.cursor].tag == TagNL {
+		p.mustExpectTags(TagNL)
+	}
+
+	var (
+		st  *State
+		err error
+	)
+	if p.tokens[p.cursor].Tag() == TagStateMarker {
+		st, err = p.state()
+		if err != nil {
+			return Program{}, err
+		}
+	}
+
+	for p.tokens[p.cursor].tag == TagNL {
+		p.mustExpectTags(TagNL)
+	}
+
+	rules, err := p.rules()
+	if err != nil {
+		return Program{}, err
+	}
+
+	return Program{namedRegExprs: namedExpr, state: st, rules: rules}, nil
+}
+
+// NamedRegExpr    ::= RegularName "/" RegExpr "/" NewLine
+func (p *Parser) namedRegExpr() (NamedRegExpr, error) {
+	name := p.mustExpectTags(TagName)
+	p.mustExpectTags(TagRegularMarker)
+	reset := p.reset()
+	expr, ok := p.regExpr()
+	if !ok {
+		reset()
+		return NamedRegExpr{}, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor])
+	}
+	p.mustExpectTags(TagRegularMarker)
+	p.mustExpectTags(TagNL)
+
+	return NamedRegExpr{name: name, expr: expr}, nil
+}
+
+// State           ::= "%x" (StateName)+ NewLine
+func (p *Parser) state() (*State, error) {
+	p.mustExpectTags(TagStateMarker)
+
+	var names []Token
+	for p.tokens[p.cursor].tag == TagName {
+		names = append(names, p.tokens[p.cursor])
+	}
+
+	p.mustExpectTags(TagNL)
+
+	return &State{names: names}, nil
 }
 
 // Rules           ::= "%%" (NewLine)+ (Rule)+ "%%"
-func (p *Parser) rules() (*Rules, error) {
+func (p *Parser) rules() (Rules, error) {
 	p.mustExpectTags(TagRulesMarker)
 	p.mustExpectTags(TagNL)
 	for p.tokens[p.cursor].tag == TagNL {
 		p.mustExpectTags(TagNL)
 	}
 
-	var rules []*Rule
+	var rules []Rule
 	for p.tokens[p.cursor].tag == TagRegularMarker {
 		rule, err := p.rule()
 		if err != nil {
-			return nil, err
+			return Rules{}, err
 		}
 		rules = append(rules, rule)
 	}
 
 	p.mustExpectTags(TagRulesMarker)
 
-	return &Rules{rules: rules}, nil
+	return Rules{ruleArr: rules}, nil
 }
 
-// Rule            ::= "/" RegExpr "/" TagRuleName NL
-func (p *Parser) rule() (*Rule, error) {
+// Rule            ::= ("/" RegExpr "/" | "{" TagName "}" TagName NL
+func (p *Parser) rule() (Rule, error) {
 	p.mustExpectTags(TagRegularMarker)
 	reset := p.reset()
 	expr, ok := p.regExpr()
 	if !ok {
 		reset()
-		return nil, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor])
+		return Rule{}, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor])
 	}
 	p.mustExpectTags(TagRegularMarker)
-	token := p.mustExpectTags(TagRuleName)
+	token := p.mustExpectTags(TagName)
 	p.mustExpectTags(TagNL)
 	for p.tokens[p.cursor].tag == TagNL {
 		p.mustExpectTags(TagNL)
 	}
 
-	return &Rule{expr: expr, name: &token}, nil
+	return Rule{expr: *expr, name: token}, nil
 }
 
 // RegExpr         ::= Union | SimpleExpr
@@ -354,6 +422,10 @@ func (p *Parser) setItemToken() (*Token, bool) {
 
 	if token.Tag() == TagRegularMarker {
 		return nil, false
+	}
+
+	if token.Tag() == TagAnyCharacter {
+		token.tag = TagCharacter
 	}
 
 	return &token, true

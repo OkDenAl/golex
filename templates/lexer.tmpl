@@ -37,13 +37,6 @@ func (f *FiniteState) canMoveBy(ch rune) bool {
 		return true
 	}
 
-	for k,to := range f.Transitions[from] {
-		if k == -1 {
-			f.CurrentState = to
-			return true
-		}
-	}
-
 	return false
 }
 

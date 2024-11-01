@@ -24,7 +24,7 @@ func main() {
 	defer file.Close()
 
 	scn := NewScanner(bufio.NewReader(file), NewCompiler())
-	tokens := GetTokens(scn)
+	tokens := scn.GetTokens()
 	parser := New(tokens)
 
 	parse, err := parser.Parse()
@@ -33,15 +33,11 @@ func main() {
 	}
 
 	var automatas []*FiniteState
-	for _, rule := range parse.rules {
+	for _, rule := range parse.rules.ruleArr {
 		rule.expr.Print("")
 		automatas = append(automatas, rule.expr.Compile())
 	}
-	automatas[0].ToGraph(os.Stdout)
-	if automatas[0].Execute("iuq2JgJR{75}") == false {
-		automatas[0].Execute("iuq2JgJR{75}")
-	}
-	fmt.Println(automatas[0].Execute("iuq2JgJR{75}"))
+	fmt.Println(automatas[0].Execute("aaaaaaa."))
 
 	fmt.Println(parse)
 

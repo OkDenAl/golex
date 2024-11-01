@@ -11,7 +11,7 @@ func _() {
 	_ = x[TagCode-0]
 	_ = x[TagRulesMarker-1]
 	_ = x[TagStateMarker-2]
-	_ = x[TagRuleName-3]
+	_ = x[TagName-3]
 	_ = x[Tag-4]
 	_ = x[TagRegexp-5]
 	_ = x[TagNL-6]

@@ -1,7 +1,6 @@
 Program         ::= (NamedRegExpr)* (NewLine)* (State)? (NewLine)* Rules
 NamedRegExpr    ::= RegularName RegExpr NewLine
 State           ::= "%x" (StateName)+ NewLine
-NewLine         ::= Nl
 Rules           ::= "%%" (NewLine)+ (Rule)+ (NewLine)+ "%%"
 Rule            ::= "/" RegExpr "/" TagRuleName
 

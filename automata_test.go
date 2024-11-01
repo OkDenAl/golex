@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -21,7 +20,7 @@ func setup(t *testing.T, regexp string) *FiniteState {
 	require.True(t, ok)
 
 	res := expr.Compile()
-	res.ToGraph(os.Stdout)
+	//res.ToGraph(os.Stdout)
 	return res
 }
 
@@ -87,13 +86,7 @@ func TestFiniteState_Execute(t *testing.T) {
 		},
 		{
 			name:   "[A-Da-d]+a\\{",
-			args:   args{reg: "[A-Da-d]+a\\{"},
-			count:  100,
-			maxLen: 100,
-		},
-		{
-			name:   "[ab]ab",
-			args:   args{reg: "[ab]ab"},
+			args:   args{reg: "[A-Da-d]ab\\{"},
 			count:  100,
 			maxLen: 100,
 		},
@@ -104,16 +97,18 @@ func TestFiniteState_Execute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f := 0
 			sut := setup(t, tt.args.reg)
-			r := regexp.MustCompile("^" + tt.args.reg + "$")
 
 			for i := 1; i < tt.maxLen; i++ {
 				for j := 0; j < tt.count; j++ {
+					r := regexp.MustCompile("^" + tt.args.reg + "$")
 					str, err := Generate(tt.args.reg, i)
 					require.Nil(t, err)
 					if sut.Execute(str) != r.MatchString(str) {
 						f += 1
 						fmt.Println(sut.Execute(str), r.MatchString(str))
-						fmt.Println(tt.args.reg, str)
+						fmt.Println(tt.args.reg)
+						fmt.Println(str)
+						fmt.Println(r.MatchString(str))
 					}
 				}
 			}

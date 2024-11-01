@@ -1,26 +1,30 @@
 package main
 
+// Program         ::= (NamedRegExpr)* (NewLine)* (State)? (NewLine)* Rules
+type Program struct {
+	namedRegExprs []NamedRegExpr
+	state         *State
+	rules         Rules
+}
+
 type NamedRegExpr struct {
-	name *Token
+	name Token
 	expr *RegExpr
-	nl   *NewLine
 }
 
+// State           ::= "%x" (StateName)+ NewLine
 type State struct {
-	names []*Token
+	names []Token
 }
 
-type NewLine struct {
-	base Token
-}
-
+// Rules           ::= "%%" (NewLine)+ (Rule)+ (NewLine)+ "%%"
 type Rules struct {
-	rules []*Rule
+	ruleArr []Rule
 }
 
 type Rule struct {
-	name *Token
-	expr *RegExpr
+	name Token
+	expr RegExpr
 }
 
 // RegExpr ::= Union | SimpleExpr
