@@ -33,8 +33,18 @@ func (g *Generator) generate(s *state, re *syntax.Regexp) string {
 		return ""
 	case syntax.OpLiteral:
 		res := ""
-		for _, r := range re.Rune {
-			res += string(r)
+		r := g.rand.Float64()
+		if r > 0.2 {
+			for _, r := range re.Rune {
+				res += string(r)
+				if g.rand.Float64() > 0.8 {
+					res += string(r)
+				}
+			}
+		} else {
+			for _, r := range re.Rune {
+				res = string(r) + res
+			}
 		}
 		return res
 	case syntax.OpCharClass:

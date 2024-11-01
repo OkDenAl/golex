@@ -166,10 +166,24 @@ func (c *Character) Compile() *FiniteState {
 }
 
 var anySymbol rune = -1
+var anyRuneNotNL = genAnyRuneNotNL()
+
+func genAnyRuneNotNL() []rune {
+	var res []rune
+	var i rune
+	for i = 97; i < '\n'; i++ {
+		res = append(res, i)
+	}
+	for i = '\n' + 1; i < 127; i++ {
+		res = append(res, i)
+	}
+
+	return res
+}
 
 func (t *Token) Compile() *FiniteState {
 	if t.tag == TagAnyCharacter {
-		return Create([]rune{anySymbol})
+		return Create(anyRuneNotNL)
 	}
 
 	return Create([]rune(t.val))

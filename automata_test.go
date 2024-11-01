@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -19,7 +20,9 @@ func setup(t *testing.T, regexp string) *FiniteState {
 	expr, ok := parser.regExpr()
 	require.True(t, ok)
 
-	return expr.Compile()
+	res := expr.Compile()
+	res.ToGraph(os.Stdout)
+	return res
 }
 
 func TestFiniteState_Execute(t *testing.T) {
@@ -37,20 +40,20 @@ func TestFiniteState_Execute(t *testing.T) {
 		{
 			name:   "(((a|b)|(abc)*)|p)[0-9]*",
 			args:   args{reg: "(((a|b)|(abc)*)|p)[0-9]*"},
-			count:  10,
-			maxLen: 10,
+			count:  100,
+			maxLen: 100,
 		},
 		{
 			name:   "[(((a|b)|(abc)*)|p)[0-9]*]",
 			args:   args{reg: "[(((a|b)|(abc)*)|p)[0-9]*]"},
-			count:  10,
-			maxLen: 10,
+			count:  100,
+			maxLen: 100,
 		},
 		{
 			name:   "[\\n\\t ]*",
 			args:   args{reg: "[\\n\\t ]*"},
-			count:  10,
-			maxLen: 10,
+			count:  100,
+			maxLen: 100,
 		},
 		{
 			name:   "(([A-Za-z0-9]+\\{[0-9]+\\})|[0-9]+)",
@@ -61,30 +64,36 @@ func TestFiniteState_Execute(t *testing.T) {
 		{
 			name:   "(\\'[A-Za-z ]*\\')",
 			args:   args{reg: "(\\'[A-Za-z ]*\\')"},
-			count:  10,
-			maxLen: 10,
+			count:  100,
+			maxLen: 100,
 		},
 		{
 			name:   "(\\()(a|b*)\\)",
 			args:   args{reg: "(\\()(a|b*)\\)"},
-			count:  10,
-			maxLen: 10,
+			count:  100,
+			maxLen: 100,
 		},
 		{
 			name:   "[\\^1 ]*",
 			args:   args{reg: "[\\^1 ]*"},
-			count:  10,
-			maxLen: 10,
+			count:  100,
+			maxLen: 100,
 		},
 		{
 			name:   "(ab)*ac",
-			args:   args{reg: "(ab)*ac"},
-			count:  10,
-			maxLen: 10,
+			args:   args{reg: "(ab)*acge"},
+			count:  100,
+			maxLen: 100,
 		},
 		{
 			name:   "[A-Da-d]+a\\{",
 			args:   args{reg: "[A-Da-d]+a\\{"},
+			count:  100,
+			maxLen: 100,
+		},
+		{
+			name:   "[ab]ab",
+			args:   args{reg: "[ab]ab"},
 			count:  100,
 			maxLen: 100,
 		},
@@ -95,7 +104,7 @@ func TestFiniteState_Execute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f := 0
 			sut := setup(t, tt.args.reg)
-			r := regexp.MustCompile(tt.args.reg)
+			r := regexp.MustCompile("^" + tt.args.reg + "$")
 
 			for i := 1; i < tt.maxLen; i++ {
 				for j := 0; j < tt.count; j++ {

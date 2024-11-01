@@ -83,21 +83,23 @@ func (f *FiniteState) AddTransition(from, to int, chars []rune) {
 }
 
 func (f *FiniteState) Append(other *FiniteState) {
-	if (len(f.TerminalStates) == 0 && len(f.Transitions) == 0) ||
-		(len(other.TerminalStates) == 0 && len(other.Transitions) == 0) {
+	statesNumF := f.nextState
+	statesNumOther := other.nextState
+	if (len(f.TerminalStates) == 0 && statesNumF == 0) ||
+		(len(other.TerminalStates) == 0 && statesNumOther == 0) {
 		*f = FiniteState{}
 		return
 	}
-	if len(f.Transitions) == 0 && len(f.TerminalStates) > 0 {
+	if statesNumF == 0 && len(f.TerminalStates) > 0 {
 		*f = *other
 		return
 	}
-	if len(other.Transitions) == 0 && len(other.TerminalStates) > 0 {
+	if statesNumOther == 0 && len(other.TerminalStates) > 0 {
 		return
 	}
 
 	result := &FiniteState{
-		nextState:      len(f.Transitions) + len(other.Transitions),
+		nextState:      statesNumF + statesNumOther,
 		CurrentState:   0,
 		Transitions:    make(map[int]map[rune]int),
 		TerminalStates: make([]int, 0),
@@ -111,7 +113,7 @@ func (f *FiniteState) Append(other *FiniteState) {
 				newFinalStates[fs] = struct{}{}
 			}
 		}
-		newFinalStates[finalState+len(f.Transitions)] = struct{}{}
+		newFinalStates[finalState+statesNumF] = struct{}{}
 	}
 
 	for finalState := range newFinalStates {
@@ -127,7 +129,7 @@ func (f *FiniteState) Append(other *FiniteState) {
 	for _, finalState := range f.TerminalStates {
 		if transitions, ok := other.Transitions[0]; ok {
 			for symbol, nextState := range transitions {
-				result.AddTransition(finalState, nextState+len(f.Transitions), []rune{symbol})
+				result.AddTransition(finalState, nextState+statesNumF, []rune{symbol})
 			}
 		}
 	}
@@ -138,7 +140,7 @@ func (f *FiniteState) Append(other *FiniteState) {
 			continue
 		}
 		for symbol, nextState := range other.Transitions[state] {
-			result.AddTransition(state+len(f.Transitions), nextState+len(f.Transitions), []rune{symbol})
+			result.AddTransition(state+statesNumF, nextState+statesNumF, []rune{symbol})
 		}
 	}
 
@@ -160,9 +162,10 @@ func GetSortedKeys(m map[int]map[rune]int) []int {
 }
 
 func (f *FiniteState) Union(other *FiniteState) {
-	numStates := len(f.Transitions) + len(other.Transitions)
+	statesNumF := f.nextState
+	statesNumOther := other.nextState
 	newFSM := &FiniteState{
-		nextState:      numStates,
+		nextState:      statesNumF + statesNumOther,
 		CurrentState:   0,
 		TerminalStates: []int{},
 		Transitions:    make(map[int]map[rune]int),
@@ -174,7 +177,7 @@ func (f *FiniteState) Union(other *FiniteState) {
 		if tState == 0 {
 			newFSM.TerminalStates = append(newFSM.TerminalStates, tState)
 		} else {
-			newFSM.TerminalStates = append(newFSM.TerminalStates, tState+len(f.Transitions))
+			newFSM.TerminalStates = append(newFSM.TerminalStates, tState+statesNumF)
 		}
 	}
 
@@ -197,11 +200,11 @@ func (f *FiniteState) Union(other *FiniteState) {
 	for _, state := range keys {
 		if state == 0 {
 			for symbol, nextState := range other.Transitions[state] {
-				newFSM.AddTransition(state, nextState+len(f.Transitions), []rune{symbol})
+				newFSM.AddTransition(state, nextState+statesNumF, []rune{symbol})
 			}
 		} else {
 			for symbol, nextState := range other.Transitions[state] {
-				newFSM.AddTransition(state+len(f.Transitions), nextState+len(f.Transitions), []rune{symbol})
+				newFSM.AddTransition(state+statesNumF, nextState+statesNumF, []rune{symbol})
 			}
 		}
 	}
