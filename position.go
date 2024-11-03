@@ -47,6 +47,10 @@ func (p *Position) IsLetter() bool {
 	return unicode.IsLetter(p.symb)
 }
 
+func (p *Position) IsDigit() bool {
+	return unicode.IsDigit(p.symb)
+}
+
 func (p *Position) IsUpperLetter() bool {
 	return unicode.IsLetter(p.symb) && unicode.IsUpper(p.symb)
 }

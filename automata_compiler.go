@@ -13,7 +13,8 @@ func (r *RegExpr) Compile() *FiniteState {
 		return r.simple.Compile()
 	}
 
-	panic("invalid")
+	// impossible case
+	return nil
 }
 
 func (u *Union) Compile() *FiniteState {
@@ -32,7 +33,8 @@ func (s *SimpleExpr) Compile() *FiniteState {
 		return s.basic.Compile()
 	}
 
-	panic("invalid")
+	// impossible case
+	return nil
 }
 
 func (c *Concatenation) Compile() *FiniteState {
@@ -77,7 +79,8 @@ func (e *Element) Compile() *FiniteState {
 		return e.escape.Compile()
 	}
 
-	panic("invalid")
+	// impossible case
+	return nil
 }
 
 func (g *Group) Compile() *FiniteState {
@@ -110,7 +113,8 @@ func (s *Set) Compile() *FiniteState {
 		return a
 	}
 
-	panic("invalid")
+	// impossible case
+	return nil
 }
 
 func (s *SetItems) Compile() *FiniteState {
@@ -137,7 +141,8 @@ func (s *SetItem) Compile() *FiniteState {
 		return s.escape.Compile()
 	}
 
-	panic("invalid")
+	// impossible case
+	return nil
 }
 
 func (r *Range) Compile() *FiniteState {

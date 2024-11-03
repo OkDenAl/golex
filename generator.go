@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -25,23 +26,22 @@ func readFileContent(filename string) (string, error) {
 	return contentString, nil
 }
 
-func generateFile(templateFile, generateFile string, data interface{}) {
+func generateFile(templateFile, generateFile string, data interface{}, regen bool) {
 	tmplString, err := readFileContent(templateFile)
 	if err != nil {
 		fmt.Println("Ошибка при прочтении файла: "+templateFile, err)
 		os.Exit(ErrTmplReadCode)
 	}
 
-	tmpl, err := template.New(templateFile).Funcs(template.FuncMap{
-		"getTerminalStates": func(f *FiniteState) []int {
-			return f.TerminalStates
-		},
-	}).Parse(tmplString)
+	tmpl, err := template.New(templateFile).Parse(tmplString)
 	if err != nil {
 		fmt.Println("Ошибка при создании шаблона:", err)
 		os.Exit(ErrTmplCreationCode)
 	}
-
+	// if file main.go exists --> probably user already changed it
+	if _, err := os.Stat(generateFile); !errors.Is(err, os.ErrNotExist) && !regen {
+		return
+	}
 	file, err := os.Create(generateFile)
 	if err != nil {
 		fmt.Println("Ошибка при создании файла:", err)

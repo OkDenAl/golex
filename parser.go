@@ -109,7 +109,7 @@ func (p *Parser) rules() (Rules, error) {
 	return Rules{ruleArr: rules}, nil
 }
 
-// Rule            ::= ("/" RegExpr "/" | "{" TagName "}" TagName NL
+// Rule            ::= ("/" RegExpr "/" | "{" TagName "}" TagName (NewLine)+
 func (p *Parser) rule() (Rule, error) {
 	p.mustExpectTags(TagRegularMarker)
 	reset := p.reset()
@@ -264,6 +264,7 @@ func (p *Parser) escape() (*Escape, bool) {
 
 	base, ok := p.setItemToken()
 	if !ok {
+		panic("Escape: no character")
 		return nil, false
 	}
 

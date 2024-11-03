@@ -32,10 +32,6 @@ func Create(chars []rune) *FiniteState {
 	return f
 }
 
-func (f *FiniteState) GetTerminalStates() []int {
-	return f.TerminalStates
-}
-
 func (f *FiniteState) addTerminal(terminal int) {
 	for _, val := range f.TerminalStates {
 		if val == terminal {
@@ -134,7 +130,7 @@ func (f *FiniteState) Append(other *FiniteState) {
 		}
 	}
 
-	keys := GetSortedKeys(other.Transitions)
+	keys := getSortedIntKeys(other.Transitions)
 	for _, state := range keys {
 		if state == 0 {
 			continue
@@ -145,20 +141,6 @@ func (f *FiniteState) Append(other *FiniteState) {
 	}
 
 	*f = *result
-}
-
-func GetSortedKeys(m map[int]map[rune]int) []int {
-	keys := make([]int, 0, len(m))
-
-	// Добавляем ключи мапы в срез
-	for key := range m {
-		keys = append(keys, key)
-	}
-
-	// Сортируем ключи в возрастающем порядке
-	sort.Ints(keys)
-
-	return keys
 }
 
 func (f *FiniteState) Union(other *FiniteState) {
@@ -196,7 +178,7 @@ func (f *FiniteState) Union(other *FiniteState) {
 		}
 	}
 
-	keys := GetSortedKeys(other.Transitions)
+	keys := getSortedIntKeys(other.Transitions)
 	for _, state := range keys {
 		if state == 0 {
 			for symbol, nextState := range other.Transitions[state] {
@@ -274,7 +256,7 @@ func (f *FiniteState) ToGraph(out io.Writer) {
 	fmt.Fprintln(out, "}")
 }
 
-func (f *FiniteState) Execute(input string) bool {
+func (f *FiniteState) MatchString(input string) bool {
 	f.CurrentState = 0
 	for _, ch := range input {
 		if !f.canMoveBy(ch) {

@@ -90,6 +90,12 @@ func TestFiniteState_Execute(t *testing.T) {
 			count:  100,
 			maxLen: 100,
 		},
+		{
+			name:   "\"[A-Za-z]?\"",
+			args:   args{reg: "\"[A-Za-z]?\""},
+			count:  100,
+			maxLen: 100,
+		},
 	}
 
 	for _, tt := range tests {
@@ -103,9 +109,9 @@ func TestFiniteState_Execute(t *testing.T) {
 					r := regexp.MustCompile("^" + tt.args.reg + "$")
 					str, err := Generate(tt.args.reg, i)
 					require.Nil(t, err)
-					if sut.Execute(str) != r.MatchString(str) {
+					if sut.MatchString(str) != r.MatchString(str) {
 						f += 1
-						fmt.Println(sut.Execute(str), r.MatchString(str))
+						fmt.Println(sut.MatchString(str), r.MatchString(str))
 						fmt.Println(tt.args.reg)
 						fmt.Println(str)
 						fmt.Println(r.MatchString(str))

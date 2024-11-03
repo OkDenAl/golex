@@ -26,6 +26,7 @@ type Scanner struct {
 
 	regularMode bool
 	prevToken   Token
+	wasEscape   bool
 }
 
 func NewScanner(programFile *bufio.Reader, compiler *Compiler) Scanner {
@@ -39,7 +40,7 @@ func (scn *Scanner) printComments() {
 }
 
 func (scn *Scanner) nextToken() Token {
-	if scn.regularMode && scn.curPos.Cp() != '/' {
+	if scn.regularMode && (scn.wasEscape || scn.curPos.Cp() != '/') {
 		return scn.nextTokenRegular()
 	}
 	for scn.curPos.Cp() != -1 {
@@ -60,7 +61,7 @@ func (scn *Scanner) nextToken() Token {
 			scn.curPos.Next()
 
 			if scn.curPos.Cp() == -1 || (scn.curPos.GetSymbol() != 'x' && scn.curPos.GetSymbol() != '%') {
-				scn.compiler.AddMessage(true, start, "invalid syntax")
+				scn.compiler.addMessage(true, start, "invalid syntax")
 				scn.curPos.SkipErrors()
 				scn.prevToken = NewToken(TagErr, scn.curPos, scn.curPos, "")
 
@@ -98,7 +99,7 @@ func (scn *Scanner) nextToken() Token {
 				curWord += string(scn.curPos.GetSymbol())
 				pos = scn.curPos
 				scn.curPos.Next()
-				for scn.curPos.IsLetter() {
+				for scn.curPos.IsLetter() || scn.curPos.Cp() == '_' || scn.curPos.IsDigit() {
 					curWord += string(scn.curPos.GetSymbol())
 					pos = scn.curPos
 					scn.curPos.Next()
@@ -106,7 +107,7 @@ func (scn *Scanner) nextToken() Token {
 			}
 
 			if curWord == "" {
-				scn.compiler.AddMessage(true, start, "invalid syntax")
+				scn.compiler.addMessage(true, start, "invalid syntax")
 				scn.curPos.SkipErrors()
 
 				scn.prevToken = NewToken(TagErr, scn.curPos, scn.curPos, "")
@@ -149,6 +150,7 @@ func (scn *Scanner) nextTokenRegular() Token {
 		case '^':
 			token = NewToken(TagCaret, start, start, string(rune(scn.curPos.Cp())))
 		case '\\':
+			scn.wasEscape = !scn.wasEscape // если последний символ был обратный слэш, то считаем, не эскейп
 			token = NewToken(TagEscape, start, start, string(rune(scn.curPos.Cp())))
 		case '|':
 			token = NewToken(TagPipe, start, start, string(rune(scn.curPos.Cp())))
@@ -158,14 +160,18 @@ func (scn *Scanner) nextTokenRegular() Token {
 			token = NewToken(TagAnyCharacter, start, start, string(rune(scn.curPos.Cp())))
 		case '\n':
 			scn.regularMode = false
-			scn.compiler.AddMessage(true, start, "invalid syntax: expected /")
+			scn.compiler.addMessage(true, start, "invalid syntax: expected /")
 			token = NewToken(TagErr, start, start, string(rune(scn.curPos.Cp())))
 		default:
 			token = NewToken(TagCharacter, start, start, string(rune(scn.curPos.Cp())))
 		}
 		scn.curPos.Next()
 		if scn.prevToken.Tag() == TagName && token.Tag() != TagErr {
-			scn.compiler.AddToken(scn.prevToken.val, token)
+			scn.compiler.addToken(scn.prevToken.val, token)
+		}
+
+		if token.Tag() != TagEscape {
+			scn.wasEscape = false
 		}
 
 		return token

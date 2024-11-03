@@ -69,4 +69,5 @@ func main() {
 		fmt.Println(t.String())
 		t = scn.NextToken()
 	}
+
 }

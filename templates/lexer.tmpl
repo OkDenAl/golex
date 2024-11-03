@@ -3,8 +3,24 @@ package golexgen
 
 import (
 	"fmt"
-	"unicode"
 )
+
+type DefaultTag int
+
+const (
+	ErrDefaultTag DefaultTag = iota
+	{{ range .Regexps }}{{ .ActionName }}DefaultTag
+    {{ end }}
+)
+
+func (t DefaultTag) GetTag() string {
+	var tagToString = map[DefaultTag]string{
+	    {{ range .Regexps }}{{ .ActionName }}DefaultTag: "{{ .ActionName }}",
+	    {{ end }}
+	}
+
+	return tagToString[t]
+}
 
 type FiniteState struct {
 	NextState      int
@@ -91,12 +107,12 @@ func (e EOPTag) GetTag() string {
 
 type Token struct {
 	tag    Tag
-	coords Fragment
+	coords fragment
 	val    string
 }
 
-func NewToken(tag Tag, starting, following Position, val string) Token {
-	return Token{tag: tag, coords: NewFragment(starting, following), val: val}
+func NewToken(tag Tag, starting, following Position, val string) *Token {
+	return &Token{tag: tag, coords: newFragment(starting, following), val: val}
 }
 
 func (t Token) String() string {
@@ -107,16 +123,16 @@ func (t Token) Tag() string {
 	return t.tag.GetTag()
 }
 
-type Fragment struct {
+type fragment struct {
 	starting  Position
 	following Position
 }
 
-func NewFragment(starting, following Position) Fragment {
-	return Fragment{starting: starting, following: following}
+func newFragment(starting, following Position) fragment {
+	return fragment{starting: starting, following: following}
 }
 
-func (f Fragment) String() string {
+func (f fragment) String() string {
 	return fmt.Sprintf("%s-%s", f.starting.String(), f.following.String())
 }
 
@@ -140,14 +156,6 @@ func (p *Position) cp() int {
 		return -1
 	}
 	return int(p.text[p.index])
-}
-
-func (p *Position) isWhiteSpace() bool {
-	return p.cp() == ' '
-}
-
-func (p *Position) isLetter() bool {
-	return unicode.IsLetter(rune(p.cp()))
 }
 
 func (p *Position) isNewLine() bool {
@@ -223,7 +231,7 @@ func (s *Scanner) NextToken() Token {
 			} else {
 				break
 			}
-			s.handler.Error("unknown symbol", startPos, string(s.program[start]))
+			s.handler.Error("ERROR: unknown symbol", startPos, string(s.program[start]))
 		} else {
 			tok := s.findToken(maxRightReg, startPos, pos)
 			if tok != nil {
@@ -232,5 +240,6 @@ func (s *Scanner) NextToken() Token {
 		}
 	}
 
-	return NewToken(EOPTag{}, s.curPos, s.curPos, "")
+    eop:=NewToken(EOPTag{}, s.curPos, s.curPos, "")
+	return *eop
 }
