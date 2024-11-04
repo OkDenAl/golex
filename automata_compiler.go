@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type AutomataCompiler interface {
 	Compile() *FiniteState
 }
@@ -97,6 +99,15 @@ func (e *Escape) Compile() *FiniteState {
 		return Create([]rune{'\r'})
 	case "f":
 		return Create([]rune{'\f'})
+	case "d":
+		return Create(genRuneInRange('0', '9'))
+	case "s":
+		return Create([]rune{'\n', '\r', '\f', '\t', ' '})
+	case "w":
+		lowerLetters := genRuneInRange('a', 'z')
+		letters := append(lowerLetters, genRuneInRange('A', 'Z')...)
+		lettersAndNums := append(letters, genRuneInRange('0', '9')...)
+		return Create(append(lettersAndNums, '_'))
 	}
 
 	return Create([]rune(e.base.val))
@@ -146,16 +157,31 @@ func (s *SetItem) Compile() *FiniteState {
 }
 
 func (r *Range) Compile() *FiniteState {
-	var chars []rune
-	for i := []rune(r.start.val)[0]; i <= []rune(r.end.base.val)[0]; i++ {
-		chars = append(chars, i)
+	startChar := ' '
+	if r.startToken != nil {
+		startChar = []rune(r.startToken.val)[0]
 	}
+	if r.startEscape != nil {
+		startChar = []rune(r.startEscape.base.val)[0]
+	}
+
+	if startChar > []rune(r.end.val)[0] {
+		panic(fmt.Sprintf("character range is out of order: %s-%s: ASCII(%s)>ASCII(%s)",
+			string(startChar), r.end.val, string(startChar), r.end.val))
+	}
+
+	chars := genRuneInRange(startChar, []rune(r.end.val)[0])
 
 	return Create(chars)
 }
 
-func (c *Character) Compile() *FiniteState {
-	return c.base.Compile()
+func genRuneInRange(startChar, endChar rune) []rune {
+	chars := make([]rune, 0, endChar-startChar+1)
+	for i := startChar; i <= endChar; i++ {
+		chars = append(chars, i)
+	}
+
+	return chars
 }
 
 var anyRuneNotNL = genAnyRuneNotNL()

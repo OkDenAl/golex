@@ -37,13 +37,11 @@ func (s *SimpleExpr) Print(indent string) {
 	}
 }
 
-// Compile a Concatenation into a Finite State Machine
 func (c *Concatenation) Print(indent string) {
 	c.basic.Print(indent + mainIdent)
 	c.simple.Print(indent + mainIdent)
 }
 
-// Compile a BasicExpr into a Finite State Machine
 func (be *BasicExpr) Print(indent string) {
 	if be.op != nil {
 		be.op.Print(indent + mainIdent)
@@ -69,17 +67,14 @@ func (e *Element) Print(indent string) {
 	}
 }
 
-// Compile a Group into a Finite State Machine
 func (g *Group) Print(indent string) {
 	g.regExpr.Print(indent + mainIdent)
 }
 
-// Compile an Escape into a Finite State Machine
 func (e *Escape) Print(indent string) {
 	e.base.Print(indent + mainIdent)
 }
 
-// Compile a Set into a Finite State Machine
 func (s *Set) Print(indent string) {
 	if s.positive != nil {
 		s.positive.Print(indent + mainIdent)
@@ -90,7 +85,6 @@ func (s *Set) Print(indent string) {
 	}
 }
 
-// Compile a SetItems into a Finite State Machine
 func (s *SetItems) Print(indent string) {
 	s.item.Print(indent + mainIdent)
 
@@ -99,7 +93,6 @@ func (s *SetItems) Print(indent string) {
 	}
 }
 
-// Compile a SetItem into a Finite State Machine
 func (s *SetItem) Print(indent string) {
 	if s.rnge != nil {
 		s.rnge.Print(indent + mainIdent)
@@ -114,15 +107,15 @@ func (s *SetItem) Print(indent string) {
 	}
 }
 
-// Compile a Range into a Finite State Machine
 func (r *Range) Print(indent string) {
-	r.start.Print(indent + mainIdent)
-	r.end.Print(indent + mainIdent)
-}
+	if r.startToken != nil {
+		r.startToken.Print(indent)
+	}
+	if r.startEscape != nil {
+		r.startEscape.Print(indent + mainIdent)
+	}
 
-// Compile a Character into a Finite State Machine
-func (c *Character) Print(indent string) {
-	c.base.Print(indent + mainIdent)
+	r.end.Print(indent + mainIdent)
 }
 
 func (t *Token) Print(indent string) {

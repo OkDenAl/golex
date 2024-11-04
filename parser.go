@@ -19,7 +19,7 @@ func New(tokens []Token) *Parser {
 	}
 }
 
-// Parse a list of tokens into an executable
+// Parse a list of tokens into an AST Tree
 func (p *Parser) Parse() (Program, error) {
 	return p.program()
 }
@@ -36,7 +36,7 @@ func (p *Parser) program() (Program, error) {
 	}
 
 	for p.tokens[p.cursor].tag == TagNL {
-		p.mustExpectTags(TagNL)
+		p.mustExpectTag(TagNL)
 	}
 
 	var (
@@ -51,7 +51,7 @@ func (p *Parser) program() (Program, error) {
 	}
 
 	for p.tokens[p.cursor].tag == TagNL {
-		p.mustExpectTags(TagNL)
+		p.mustExpectTag(TagNL)
 	}
 
 	rules, err := p.rules()
@@ -64,45 +64,45 @@ func (p *Parser) program() (Program, error) {
 
 // NamedRegExpr    ::= RegularName "/" RegExpr "/" NewLine
 func (p *Parser) namedRegExpr() (NamedRegExpr, error) {
-	name := p.mustExpectTags(TagName)
-	p.mustExpectTags(TagRegularMarker)
+	name := p.mustExpectTag(TagName)
+	p.mustExpectTag(TagRegularMarker)
 	reset := p.reset()
 	expr, ok := p.regExpr()
 	if !ok {
 		reset()
 		return NamedRegExpr{}, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor].String())
 	}
-	p.mustExpectTags(TagRegularMarker)
-	p.mustExpectTags(TagNL)
+	p.mustExpectTag(TagRegularMarker)
+	p.mustExpectTag(TagNL)
 
 	return NamedRegExpr{name: name, expr: expr}, nil
 }
 
-// State           ::= "%x" (StateName)+ NewLine
+// State           ::= "%x" (Name)+ NewLine
 func (p *Parser) state() (*State, error) {
-	p.mustExpectTags(TagStateMarker)
+	p.mustExpectTag(TagStateMarker)
 
 	var names []Token
-	name := p.mustExpectTags(TagName)
+	name := p.mustExpectTag(TagName)
 	names = append(names, name)
 	p.startConditionNames[name.val] = struct{}{}
 	for p.tokens[p.cursor].tag == TagName {
-		name = p.mustExpectTags(TagName)
+		name = p.mustExpectTag(TagName)
 		names = append(names, name)
 		p.startConditionNames[name.val] = struct{}{}
 	}
 
-	p.mustExpectTags(TagNL)
+	p.mustExpectTag(TagNL)
 
 	return &State{names: names}, nil
 }
 
 // Rules           ::= "%%" (NewLine)+ (Rule)+ "%%"
 func (p *Parser) rules() (Rules, error) {
-	p.mustExpectTags(TagRulesMarker)
-	p.mustExpectTags(TagNL)
+	p.mustExpectTag(TagRulesMarker)
+	p.mustExpectTag(TagNL)
 	for p.tokens[p.cursor].tag == TagNL {
-		p.mustExpectTags(TagNL)
+		p.mustExpectTag(TagNL)
 	}
 
 	var rules []Rule
@@ -114,28 +114,28 @@ func (p *Parser) rules() (Rules, error) {
 		rules = append(rules, rule)
 	}
 
-	p.mustExpectTags(TagRulesMarker)
+	p.mustExpectTag(TagRulesMarker)
 
 	return Rules{ruleArr: rules}, nil
 }
 
-// Rule            ::= "<" Name ">" "/" RegExpr "/"  Name (SwitchCondition)? (NewLine)+
+// Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)? (NewLine)+
 func (p *Parser) rule() (Rule, error) {
 	var startCond *StartCondition
 	if p.tokens[p.cursor].Tag() == TagOpenStartCondition {
 		startCond = p.startCondition()
 	}
 
-	p.mustExpectTags(TagRegularMarker)
+	p.mustExpectTag(TagRegularMarker)
 	reset := p.reset()
 	expr, ok := p.regExpr()
 	if !ok {
 		reset()
 		return Rule{}, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor].String())
 	}
-	p.mustExpectTags(TagRegularMarker)
+	p.mustExpectTag(TagRegularMarker)
 
-	token := p.mustExpectTags(TagName)
+	token := p.mustExpectTag(TagName)
 	if v, ok := p.ruleNames[token.val]; ok {
 		panic("Error: duplicate: " + token.String() + "\n      first declaration was here: " + v.String())
 	}
@@ -146,9 +146,9 @@ func (p *Parser) rule() (Rule, error) {
 		switchCond = p.switchCondition()
 	}
 
-	p.mustExpectTags(TagNL)
+	p.mustExpectTag(TagNL)
 	for p.tokens[p.cursor].tag == TagNL {
-		p.mustExpectTags(TagNL)
+		p.mustExpectTag(TagNL)
 	}
 
 	return Rule{startCondition: startCond, expr: *expr, name: token, switchCondition: switchCond}, nil
@@ -156,19 +156,19 @@ func (p *Parser) rule() (Rule, error) {
 
 // StartCondition ::= "<" Name ">"
 func (p *Parser) startCondition() *StartCondition {
-	p.mustExpectTags(TagOpenStartCondition)
-	token := p.mustExpectTags(TagName)
-	p.mustExpectTags(TagCloseStartCondition)
+	p.mustExpectTag(TagOpenStartCondition)
+	token := p.mustExpectTag(TagName)
+	p.mustExpectTag(TagCloseStartCondition)
 
 	return &StartCondition{condition: token}
 }
 
-// SwitchCondition ::= ("BEGIN" "(" Name ")")
+// SwitchCondition ::= "BEGIN" "(" Name ")"
 func (p *Parser) switchCondition() *SwitchCondition {
-	p.mustExpectTags(TagBegin)
-	p.mustExpectTags(TagDefaultOpenBracket)
-	token := p.mustExpectTags(TagName)
-	p.mustExpectTags(TagDefaultCloseBracket)
+	p.mustExpectTag(TagBegin)
+	p.mustExpectTag(TagDefaultOpenBracket)
+	token := p.mustExpectTag(TagName)
+	p.mustExpectTag(TagDefaultCloseBracket)
 
 	return &SwitchCondition{nextCondition: token}
 }
@@ -261,7 +261,7 @@ func (p *Parser) basicExpr() (*BasicExpr, bool) {
 	return &BasicExpr{element: base}, true
 }
 
-// Element         ::= Character | Group | Set | Escape
+// Element         ::= Group | Set | Escape | AnyCharacter
 func (p *Parser) element() (*Element, bool) {
 	group, ok := p.group()
 	if ok {
@@ -278,7 +278,7 @@ func (p *Parser) element() (*Element, bool) {
 		return &Element{escape: escape}, true
 	}
 
-	character, ok := p.token()
+	character, ok := p.validIndependentCharacter()
 	if ok {
 		return &Element{character: character}, true
 	}
@@ -292,7 +292,7 @@ func (p *Parser) group() (*Group, bool) {
 		return nil, false
 	}
 	reset := p.reset()
-	defer p.mustExpectTags(TagCloseParen)
+	defer p.mustExpectTag(TagCloseParen)
 	regex, ok := p.regExpr()
 	if !ok {
 		reset()
@@ -301,13 +301,13 @@ func (p *Parser) group() (*Group, bool) {
 	return &Group{regex}, true
 }
 
-// Escape          ::= "\" Character
+// Escape          ::= "\" EscapeCharacter
 func (p *Parser) escape() (*Escape, bool) {
 	if _, ok := p.expectTags(TagEscape); !ok {
 		return nil, false
 	}
 
-	base, ok := p.setItemToken()
+	base, ok := p.escapeCharacter()
 	if !ok {
 		panic("Escape: no character")
 		return nil, false
@@ -338,7 +338,7 @@ func (p *Parser) set() (*Set, bool) {
 	}
 
 	if set != nil {
-		p.mustExpectTags(TagCloseBracket)
+		p.mustExpectTag(TagCloseBracket)
 		return set, true
 	}
 
@@ -361,7 +361,7 @@ func (p *Parser) setItems(isFirst bool) (*SetItems, bool) {
 
 }
 
-// SetItem         ::= Range | Escape | Character
+// SetItem         ::= Range | Escape | SetCharacter
 func (p *Parser) setItem(isFirst bool) (*SetItem, bool) {
 	reset := p.reset()
 	rnge, ok := p.rangeExpr()
@@ -376,78 +376,48 @@ func (p *Parser) setItem(isFirst bool) (*SetItem, bool) {
 	}
 
 	reset()
-	token, ok := p.setItemToken()
+	token, ok := p.setCharacter(isFirst)
 	if ok {
-		if token.Tag() != TagCloseBracket || isFirst {
-			return &SetItem{base: token}, true
-		}
+		return &SetItem{base: token}, true
 	}
 
 	reset()
 	return nil, false
 }
 
+// Range           ::=  (Escape | RangeStartCharacter) "-" RangeEndCharacter
 func (p *Parser) rangeExpr() (*Range, bool) {
-	start, ok := p.setItemToken()
-
-	if !ok {
-		return nil, false
+	var (
+		startToken  *Token
+		startEscape *Escape
+	)
+	reset := p.reset()
+	escape, ok := p.escape()
+	if ok {
+		startEscape = escape
+	} else {
+		reset()
+		startToken, ok = p.rangeStartCharacter()
+		if !ok {
+			return nil, false
+		}
 	}
 
 	if _, ok = p.expectTags(TagDash); !ok {
 		return nil, false
 	}
 
-	reset := p.reset()
-	end, ok := p.character()
+	end, ok := p.rangeEndCharacter()
 	if !ok {
 		reset()
 		panic("unexpected token " + p.tokens[p.cursor].String())
 	}
 
-	return &Range{start, end}, true
-
+	return &Range{startToken: startToken, startEscape: startEscape, end: end}, true
 }
 
-type characterOpts func(*Token) (*Character, bool)
-
-func withTag(tag DomainTag) characterOpts {
-	return func(token *Token) (*Character, bool) {
-		if token.Tag() == tag {
-			return &Character{token}, true
-		}
-
-		return nil, false
-	}
-}
-
-func (p *Parser) character(opts ...characterOpts) (*Character, bool) {
-	reset := p.reset()
-
-	base, ok := p.token()
-
-	if !ok {
-		return nil, false
-	}
-
-	for _, opt := range opts {
-		if res, ok := opt(base); ok {
-			return res, true
-		}
-	}
-
-	if res, ok := withTag(TagCharacter)(base); ok {
-		return res, true
-	}
-	if res, ok := withTag(TagAnyCharacter)(base); ok {
-		return res, true
-	}
-
-	reset()
-	return nil, false
-}
-
-func (p *Parser) token() (*Token, bool) {
+// ValidIndependentCharacter ::= [^()|/]
+func (p *Parser) validIndependentCharacter() (*Token, bool) {
 	token, ok := p.nextToken()
 	if !ok {
 		return nil, false
@@ -460,7 +430,8 @@ func (p *Parser) token() (*Token, bool) {
 	return &token, true
 }
 
-func (p *Parser) setItemToken() (*Token, bool) {
+// EscapeCharacter ::= .
+func (p *Parser) escapeCharacter() (*Token, bool) {
 	token, ok := p.nextToken()
 	if !ok {
 		return nil, false
@@ -477,6 +448,64 @@ func (p *Parser) setItemToken() (*Token, bool) {
 	return &token, true
 }
 
+// RangeStartCharacter ::= .
+func (p *Parser) rangeStartCharacter() (*Token, bool) {
+	token, ok := p.nextToken()
+	if !ok {
+		return nil, false
+	}
+
+	if token.Tag() == TagRegularMarker {
+		return nil, false
+	}
+
+	if token.Tag() == TagAnyCharacter {
+		token.tag = TagCharacter
+	}
+
+	return &token, true
+}
+
+// RangeStartCharacter ::= .
+func (p *Parser) rangeEndCharacter() (*Token, bool) {
+	token, ok := p.nextToken()
+	if !ok {
+		return nil, false
+	}
+
+	if token.Tag() == TagRegularMarker {
+		return nil, false
+	}
+
+	if token.Tag() == TagAnyCharacter {
+		token.tag = TagCharacter
+	}
+
+	return &token, true
+}
+
+// SetCharacter ::= .[^]]*
+func (p *Parser) setCharacter(isFirst bool) (*Token, bool) {
+	token, ok := p.nextToken()
+	if !ok {
+		return nil, false
+	}
+
+	if token.Tag() == TagRegularMarker {
+		return nil, false
+	}
+
+	if token.Tag() == TagAnyCharacter {
+		token.tag = TagCharacter
+	}
+
+	if token.Tag() != TagCloseBracket || isFirst {
+		return &token, true
+	}
+
+	return nil, false
+}
+
 func (p *Parser) nextToken() (Token, bool) {
 	if p.cursor == len(p.tokens) {
 		if len(p.tokens) == 0 {
@@ -491,20 +520,19 @@ func (p *Parser) nextToken() (Token, bool) {
 	return token, true
 }
 
-func (p *Parser) mustExpectTags(tags ...DomainTag) Token {
-	for _, tag := range tags {
-		if p.tokens[p.cursor].tag == tag {
-			token := p.tokens[p.cursor]
-			p.cursor = p.cursor + 1
-			if p.cursor != len(p.tokens) && p.tokens[p.cursor].tag == TagErr {
-				panic(fmt.Sprintf("parse error: unexpected token"))
-			}
-
-			return token
-		}
+func (p *Parser) mustExpectTag(tag DomainTag) Token {
+	reset := p.reset()
+	token, ok := p.nextToken()
+	if !ok {
+		panic(fmt.Sprintf("parse error: expected %s, but got EOF", tag))
 	}
 
-	panic(fmt.Sprintf("parse error: expected %s, but got %s", tags, p.tokens[p.cursor].String()))
+	if token.Tag() == tag {
+		return token
+	}
+
+	reset()
+	panic(fmt.Sprintf("parse error: expected %s, but got %s", tag, p.tokens[p.cursor].String()))
 }
 
 func (p *Parser) expectTags(tags ...DomainTag) (Token, bool) {

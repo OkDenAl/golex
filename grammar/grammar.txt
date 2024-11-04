@@ -1,21 +1,30 @@
 Program         ::= (NamedRegExpr)* (NewLine)* (State)? (NewLine)* Rules
-NamedRegExpr    ::= RegularName RegExpr NewLine
-State           ::= "%x" (StateName)+ NewLine
-Rules           ::= "%%" (NewLine)+ (Rule)+ (NewLine)+ "%%"
-Rule            ::= "/" RegExpr "/" TagRuleName
+NamedRegExpr    ::= Name "/" RegExpr "/" NewLine
+State           ::= "%x" (Name)+ NewLine
+Rules           ::= "%%" (NewLine)+ (Rule)+ "%%"
+Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)? (NewLine)+
+StartCondition  ::= "<" Name ">"
+SwitchCondition ::= "BEGIN" "(" Name ")"
 
 RegExpr         ::= Union | SimpleExpr
 Union           ::= SimpleExpr "|" RegExpr
 SimpleExpr      ::= Concatenation | BasicExpr
 Concatenation   ::= BasicExpr SimpleExpr
 BasicExpr       ::= Element ("*"|"+"|"?")?
-Element         ::= Group | Set | Escape | Base
+Element         ::= Group | Set | Escape | ValidIndependentCharacter
 Group           ::= "(" RegExpr ")"
-Escape          ::= "\" Base
+Escape          ::= "\" EscapeCharacter
 Set             ::= "[" ("^")? FirstSetItem SetItems "]"
 SetItems        ::= SetItem SetItems
-SetItem         ::= Range | Escape | Base
-SetItem         ::= Range | Escape | Base<without ]>
-Range           ::= Base "-" Character
+SetItem         ::= Range | Escape | SetCharacter
+Range           ::=  (Escape | RangeStartCharacter) "-" RangeEndCharacter
 
-Base ::= <any>
+
+Lexems
+Name ::= [A-Z][A-z0-9_]*
+NewLine ::= \\n
+ValidIndependentCharacter ::= [^()|/]
+EscapeCharacter ::= .
+SetCharacter ::= .[^]]*
+RangeStartCharacter ::= .
+RangeEndCharacter ::= .

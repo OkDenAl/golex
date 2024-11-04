@@ -220,7 +220,9 @@ func (scn *Scanner) scanNameTokens(curToken Token) []Token {
 	}
 	res, ok := scn.compiler.namesTokens[name]
 	if !ok {
-		tokens = append(tokens, t)
+		if t.Tag() == TagCloseBrace {
+			tokens = append(tokens, t)
+		}
 		return tokens
 	}
 

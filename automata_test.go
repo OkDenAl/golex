@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -20,7 +21,7 @@ func setup(t *testing.T, regexp string) *FiniteState {
 	require.True(t, ok)
 
 	res := expr.Compile()
-	//res.ToGraph(os.Stdout)
+	res.ToGraph(os.Stdout)
 	return res
 }
 

@@ -108,12 +108,7 @@ type SetItem struct {
 
 // Range ::= Character "-" Character
 type Range struct {
-	start *Token
-	end   *Character
-}
-
-// Character ::= literal character
-type Character struct {
-	// Value rune
-	base *Token
+	startToken  *Token
+	startEscape *Escape
+	end         *Token
 }
