@@ -13,9 +13,25 @@ type Handler struct {
 	golexgen.ErrHandlerBase
 }
 
-{{ range .Regexps }}func (h Handler){{ .ActionName }}(text []rune, start, end golexgen.Position) *golexgen.Token {
-    return golexgen.NewToken(golexgen.{{ .ActionName }}DefaultTag, start, end, string(text[start.Index():end.Index()]))
+{{ range .AllRegexps }}func (h *Handler){{ .ActionName }}(
+    text []rune,
+    start, end golexgen.Position,
+    errFunc golexgen.ErrFunc,
+    switchCond golexgen.SwitchConditionFunc,
+) (golexgen.Token,golexgen.Continued) {
+    {{ if .SwitchConditionName }}switchCond(golexgen.Condition{{ .SwitchConditionName }})
+
+    return golexgen.NewToken(
+    golexgen.Tag{{ .ActionName }},
+     start,end,
+     string(text[start.Index():end.Index()]),
+    ),false{{ else }} return golexgen.NewToken(
+                   golexgen.Tag{{ .ActionName }},
+                    start,end,
+                    string(text[start.Index():end.Index()]),
+                   ),false{{ end }}
 }
+
 {{ end }}
 
 func main() {

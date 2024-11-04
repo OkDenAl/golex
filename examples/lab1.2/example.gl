@@ -1,4 +1,9 @@
-SUKA /\\/
 %%
-/{SUKA}/ Skip
+/[\n\t ]+/ Skip
+
+/(mov|eax)/ Assembly
+
+/[A-Za-z][A-Za-z0-9]*/ Ident
+
+/[0-9]*|([0-9][A-Fa-f0-9]*h)/ Num
 %%

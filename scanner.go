@@ -56,6 +56,26 @@ func (scn *Scanner) nextToken() Token {
 			scn.prevToken = NewToken(TagNL, start, start, "NEW_LINE")
 
 			return NewToken(TagNL, start, start, "NEW_LINE")
+		case '<':
+			scn.curPos.Next()
+			scn.prevToken = NewToken(TagOpenStartCondition, start, start, "<")
+
+			return NewToken(TagOpenStartCondition, start, start, "<")
+		case '>':
+			scn.curPos.Next()
+			scn.prevToken = NewToken(TagCloseStartCondition, start, start, ">")
+
+			return NewToken(TagCloseStartCondition, start, start, ">")
+		case '(':
+			scn.curPos.Next()
+			scn.prevToken = NewToken(TagDefaultOpenBracket, start, start, "(")
+
+			return NewToken(TagDefaultOpenBracket, start, start, "(")
+		case ')':
+			scn.curPos.Next()
+			scn.prevToken = NewToken(TagDefaultCloseBracket, start, start, ")")
+
+			return NewToken(TagDefaultCloseBracket, start, start, ")")
 		case '%':
 			curWord += string(rune(scn.curPos.Cp()))
 			scn.curPos.Next()
@@ -113,6 +133,12 @@ func (scn *Scanner) nextToken() Token {
 				scn.prevToken = NewToken(TagErr, scn.curPos, scn.curPos, "")
 
 				return NewToken(TagErr, scn.curPos, scn.curPos, "")
+			}
+
+			if curWord == "BEGIN" {
+				scn.prevToken = NewToken(TagBegin, start, pos, "BEGIN")
+
+				return NewToken(TagBegin, start, pos, "BEGIN")
 			}
 
 			scn.prevToken = NewToken(TagName, start, pos, curWord)

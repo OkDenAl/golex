@@ -32,7 +32,11 @@ const (
 	TagErr
 	TagEOP
 	TagRegularMarker
-	TagStateName
+	TagOpenStartCondition
+	TagCloseStartCondition
+	TagDefaultOpenBracket
+	TagDefaultCloseBracket
+	TagBegin
 )
 
 type Token struct {

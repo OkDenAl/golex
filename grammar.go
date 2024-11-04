@@ -23,8 +23,18 @@ type Rules struct {
 }
 
 type Rule struct {
-	name Token
-	expr RegExpr
+	startCondition  *StartCondition
+	name            Token
+	expr            RegExpr
+	switchCondition *SwitchCondition
+}
+
+type StartCondition struct {
+	condition Token
+}
+
+type SwitchCondition struct {
+	nextCondition Token
 }
 
 // RegExpr ::= Union | SimpleExpr

@@ -5,108 +5,186 @@ import (
 	"fmt"
 )
 
+type ErrHandler interface {
+	Error(msg string, pos Position, symbol string)
+}
+
+type (
+	ErrFunc             func(msg string, pos Position, symbol string)
+	SwitchConditionFunc func(cond Condition)
+)
+
+type Continued bool
+
+type LexemHandler interface {
+	ErrHandler
+	Skip(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	NewLine(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	INT(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	CHAR(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	BOOL(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	AND(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	EQ(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	GE(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	GT(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	LT(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	LE(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	MOD(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	NE(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	OR(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	XOR(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	POW(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	NEW(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	NOT(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	STATEMENTS_END(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	STATEMENT_EXPR_END(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	IF(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	WARNING(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	ELSE(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	WHILE(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	ASSIGN(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	COLON(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	PLUS(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	MINUS(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	MUL(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	DIV(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	RETURN(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	LEFT_PAREN_1(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	RIGHT_PAREN_1(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	LEFT_PAREN_2(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	RIGHT_PAREN_2(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	LEFT_PAREN_3(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	RIGHT_PAREN_3(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	COMMA(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	TRUE(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	FALSE(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	REF_CONST(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	NUMBER(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	VARNAME(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	STRING_CONST(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	FUNCNAME(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	CHAR_CONST(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	COMMENT(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+}
+
+type Tag interface {
+	GetTag() string
+}
+
+const EOP = "EOP"
+
+type Condition int
+
+const (
+	dummy = Condition(iota)
+
+	ConditionINIT
+)
+
 type DefaultTag int
 
 const (
-	ErrDefaultTag DefaultTag = iota
-	SkipDefaultTag
-	NewLineDefaultTag
-	INTDefaultTag
-	CHARDefaultTag
-	BOOLDefaultTag
-	ANDDefaultTag
-	EQDefaultTag
-	GEDefaultTag
-	GTDefaultTag
-	LTDefaultTag
-	LEDefaultTag
-	MODDefaultTag
-	NEDefaultTag
-	ORDefaultTag
-	XORDefaultTag
-	POWDefaultTag
-	NEWDefaultTag
-	NOTDefaultTag
-	STATEMENTS_ENDDefaultTag
-	STATEMENT_EXPR_ENDDefaultTag
-	IFDefaultTag
-	WARNINGDefaultTag
-	ELSEDefaultTag
-	WHILEDefaultTag
-	ASSIGNDefaultTag
-	COLONDefaultTag
-	PLUSDefaultTag
-	MINUSDefaultTag
-	MULDefaultTag
-	DIVDefaultTag
-	RETURNDefaultTag
-	LEFT_PAREN_1DefaultTag
-	RIGHT_PAREN_1DefaultTag
-	LEFT_PAREN_2DefaultTag
-	RIGHT_PAREN_2DefaultTag
-	LEFT_PAREN_3DefaultTag
-	RIGHT_PAREN_3DefaultTag
-	COMMADefaultTag
-	TRUEDefaultTag
-	FALSEDefaultTag
-	REF_CONSTDefaultTag
-	NUMBERDefaultTag
-	VARNAMEDefaultTag
-	STRING_CONSTDefaultTag
-	FUNCNAMEDefaultTag
-	CHAR_CONSTDefaultTag
-	COMMENTDefaultTag
+	TagErr DefaultTag = iota
+	TagSkip
+	TagNewLine
+	TagINT
+	TagCHAR
+	TagBOOL
+	TagAND
+	TagEQ
+	TagGE
+	TagGT
+	TagLT
+	TagLE
+	TagMOD
+	TagNE
+	TagOR
+	TagXOR
+	TagPOW
+	TagNEW
+	TagNOT
+	TagSTATEMENTS_END
+	TagSTATEMENT_EXPR_END
+	TagIF
+	TagWARNING
+	TagELSE
+	TagWHILE
+	TagASSIGN
+	TagCOLON
+	TagPLUS
+	TagMINUS
+	TagMUL
+	TagDIV
+	TagRETURN
+	TagLEFT_PAREN_1
+	TagRIGHT_PAREN_1
+	TagLEFT_PAREN_2
+	TagRIGHT_PAREN_2
+	TagLEFT_PAREN_3
+	TagRIGHT_PAREN_3
+	TagCOMMA
+	TagTRUE
+	TagFALSE
+	TagREF_CONST
+	TagNUMBER
+	TagVARNAME
+	TagSTRING_CONST
+	TagFUNCNAME
+	TagCHAR_CONST
+	TagCOMMENT
+	TagINIT
 )
 
 func (t DefaultTag) GetTag() string {
 	var tagToString = map[DefaultTag]string{
-		SkipDefaultTag:               "Skip",
-		NewLineDefaultTag:            "NewLine",
-		INTDefaultTag:                "INT",
-		CHARDefaultTag:               "CHAR",
-		BOOLDefaultTag:               "BOOL",
-		ANDDefaultTag:                "AND",
-		EQDefaultTag:                 "EQ",
-		GEDefaultTag:                 "GE",
-		GTDefaultTag:                 "GT",
-		LTDefaultTag:                 "LT",
-		LEDefaultTag:                 "LE",
-		MODDefaultTag:                "MOD",
-		NEDefaultTag:                 "NE",
-		ORDefaultTag:                 "OR",
-		XORDefaultTag:                "XOR",
-		POWDefaultTag:                "POW",
-		NEWDefaultTag:                "NEW",
-		NOTDefaultTag:                "NOT",
-		STATEMENTS_ENDDefaultTag:     "STATEMENTS_END",
-		STATEMENT_EXPR_ENDDefaultTag: "STATEMENT_EXPR_END",
-		IFDefaultTag:                 "IF",
-		WARNINGDefaultTag:            "WARNING",
-		ELSEDefaultTag:               "ELSE",
-		WHILEDefaultTag:              "WHILE",
-		ASSIGNDefaultTag:             "ASSIGN",
-		COLONDefaultTag:              "COLON",
-		PLUSDefaultTag:               "PLUS",
-		MINUSDefaultTag:              "MINUS",
-		MULDefaultTag:                "MUL",
-		DIVDefaultTag:                "DIV",
-		RETURNDefaultTag:             "RETURN",
-		LEFT_PAREN_1DefaultTag:       "LEFT_PAREN_1",
-		RIGHT_PAREN_1DefaultTag:      "RIGHT_PAREN_1",
-		LEFT_PAREN_2DefaultTag:       "LEFT_PAREN_2",
-		RIGHT_PAREN_2DefaultTag:      "RIGHT_PAREN_2",
-		LEFT_PAREN_3DefaultTag:       "LEFT_PAREN_3",
-		RIGHT_PAREN_3DefaultTag:      "RIGHT_PAREN_3",
-		COMMADefaultTag:              "COMMA",
-		TRUEDefaultTag:               "TRUE",
-		FALSEDefaultTag:              "FALSE",
-		REF_CONSTDefaultTag:          "REF_CONST",
-		NUMBERDefaultTag:             "NUMBER",
-		VARNAMEDefaultTag:            "VARNAME",
-		STRING_CONSTDefaultTag:       "STRING_CONST",
-		FUNCNAMEDefaultTag:           "FUNCNAME",
-		CHAR_CONSTDefaultTag:         "CHAR_CONST",
-		COMMENTDefaultTag:            "COMMENT",
+		TagSkip:               "Skip",
+		TagNewLine:            "NewLine",
+		TagINT:                "INT",
+		TagCHAR:               "CHAR",
+		TagBOOL:               "BOOL",
+		TagAND:                "AND",
+		TagEQ:                 "EQ",
+		TagGE:                 "GE",
+		TagGT:                 "GT",
+		TagLT:                 "LT",
+		TagLE:                 "LE",
+		TagMOD:                "MOD",
+		TagNE:                 "NE",
+		TagOR:                 "OR",
+		TagXOR:                "XOR",
+		TagPOW:                "POW",
+		TagNEW:                "NEW",
+		TagNOT:                "NOT",
+		TagSTATEMENTS_END:     "STATEMENTS_END",
+		TagSTATEMENT_EXPR_END: "STATEMENT_EXPR_END",
+		TagIF:                 "IF",
+		TagWARNING:            "WARNING",
+		TagELSE:               "ELSE",
+		TagWHILE:              "WHILE",
+		TagASSIGN:             "ASSIGN",
+		TagCOLON:              "COLON",
+		TagPLUS:               "PLUS",
+		TagMINUS:              "MINUS",
+		TagMUL:                "MUL",
+		TagDIV:                "DIV",
+		TagRETURN:             "RETURN",
+		TagLEFT_PAREN_1:       "LEFT_PAREN_1",
+		TagRIGHT_PAREN_1:      "RIGHT_PAREN_1",
+		TagLEFT_PAREN_2:       "LEFT_PAREN_2",
+		TagRIGHT_PAREN_2:      "RIGHT_PAREN_2",
+		TagLEFT_PAREN_3:       "LEFT_PAREN_3",
+		TagRIGHT_PAREN_3:      "RIGHT_PAREN_3",
+		TagCOMMA:              "COMMA",
+		TagTRUE:               "TRUE",
+		TagFALSE:              "FALSE",
+		TagREF_CONST:          "REF_CONST",
+		TagNUMBER:             "NUMBER",
+		TagVARNAME:            "VARNAME",
+		TagSTRING_CONST:       "STRING_CONST",
+		TagFUNCNAME:           "FUNCNAME",
+		TagCHAR_CONST:         "CHAR_CONST",
+		TagCOMMENT:            "COMMENT",
+		TagINIT:               "INIT",
 	}
 
 	return tagToString[t]
@@ -169,7 +247,7 @@ var (
 	}
 	automataNewLine *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []int{2, 1},
+		TerminalStates: []int{1, 2},
 		Transitions: map[int]map[rune]int{
 			0: {10: 1},
 			1: {10: 2},
@@ -519,7 +597,7 @@ var (
 	}
 	automataNUMBER *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []int{12, 10, 11, 3, 6},
+		TerminalStates: []int{10, 12, 11, 3, 6},
 		Transitions: map[int]map[rune]int{
 			0: {48: 3, 49: 3, 50: 3, 51: 3, 52: 3, 53: 3, 54: 3, 55: 3, 56: 3, 57: 3, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 2, 98: 2, 99: 2, 100: 2, 101: 2, 102: 2, 103: 2, 104: 2, 105: 2, 106: 2, 107: 2, 108: 2, 109: 2, 110: 2, 111: 2, 112: 2, 113: 2, 114: 2, 115: 2, 116: 2, 117: 2, 118: 2, 119: 2, 120: 2, 121: 2, 122: 2},
 			1: {48: 6, 49: 6, 50: 6, 51: 6, 52: 6, 53: 6, 54: 6, 55: 6, 56: 6, 57: 6, 65: 4, 66: 4, 67: 4, 68: 4, 69: 4, 70: 4, 71: 4, 72: 4, 73: 4, 74: 4, 75: 4, 76: 4, 77: 4, 78: 4, 79: 4, 80: 4, 81: 4, 82: 4, 83: 4, 84: 4, 85: 4, 86: 4, 87: 4, 88: 4, 89: 4, 90: 4, 97: 5, 98: 5, 99: 5, 100: 5, 101: 5, 102: 5, 103: 5, 104: 5, 105: 5, 106: 5, 107: 5, 108: 5, 109: 5, 110: 5, 111: 5, 112: 5, 113: 5, 114: 5, 115: 5, 116: 5, 117: 5, 118: 5, 119: 5, 120: 5, 121: 5, 122: 5, 123: 7},
@@ -535,7 +613,7 @@ var (
 	}
 	automataVARNAME *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []int{11, 10, 12, 13},
+		TerminalStates: []int{12, 13, 10, 11},
 		Transitions: map[int]map[rune]int{
 			0:  {33: 3, 35: 9, 46: 7, 64: 5, 95: 1, 124: 2},
 			1:  {65: 10, 66: 10, 67: 10, 68: 10, 69: 10, 70: 10, 71: 10, 72: 10, 73: 10, 74: 10, 75: 10, 76: 10, 77: 10, 78: 10, 79: 10, 80: 10, 81: 10, 82: 10, 83: 10, 84: 10, 85: 10, 86: 10, 87: 10, 88: 10, 89: 10, 90: 10, 97: 11, 98: 11, 99: 11, 100: 11, 101: 11, 102: 11, 103: 11, 104: 11, 105: 11, 106: 11, 107: 11, 108: 11, 109: 11, 110: 11, 111: 11, 112: 11, 113: 11, 114: 11, 115: 11, 116: 11, 117: 11, 118: 11, 119: 11, 120: 11, 121: 11, 122: 11},
@@ -585,7 +663,7 @@ var (
 	}
 	automataCOMMENT *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []int{95, 99},
+		TerminalStates: []int{99, 95},
 		Transitions: map[int]map[rune]int{
 			0:  {123: 1},
 			1:  {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
@@ -689,72 +767,11 @@ var (
 	}
 )
 
-type ErrHandler interface {
-	Error(msg string, pos Position, symbol string)
-}
-
 type ErrHandlerBase struct{}
 
 func (e *ErrHandlerBase) Error(msg string, pos Position, symbol string) {
-	fmt.Printf("%s %s %s\n", msg, pos.String(), symbol)
+	fmt.Printf("ERROR%s: %s %s\n", pos.String(), msg, symbol)
 }
-
-type LexemHandler interface {
-	ErrHandler
-	Skip(text []rune, start, end Position) *Token
-	NewLine(text []rune, start, end Position) *Token
-	INT(text []rune, start, end Position) *Token
-	CHAR(text []rune, start, end Position) *Token
-	BOOL(text []rune, start, end Position) *Token
-	AND(text []rune, start, end Position) *Token
-	EQ(text []rune, start, end Position) *Token
-	GE(text []rune, start, end Position) *Token
-	GT(text []rune, start, end Position) *Token
-	LT(text []rune, start, end Position) *Token
-	LE(text []rune, start, end Position) *Token
-	MOD(text []rune, start, end Position) *Token
-	NE(text []rune, start, end Position) *Token
-	OR(text []rune, start, end Position) *Token
-	XOR(text []rune, start, end Position) *Token
-	POW(text []rune, start, end Position) *Token
-	NEW(text []rune, start, end Position) *Token
-	NOT(text []rune, start, end Position) *Token
-	STATEMENTS_END(text []rune, start, end Position) *Token
-	STATEMENT_EXPR_END(text []rune, start, end Position) *Token
-	IF(text []rune, start, end Position) *Token
-	WARNING(text []rune, start, end Position) *Token
-	ELSE(text []rune, start, end Position) *Token
-	WHILE(text []rune, start, end Position) *Token
-	ASSIGN(text []rune, start, end Position) *Token
-	COLON(text []rune, start, end Position) *Token
-	PLUS(text []rune, start, end Position) *Token
-	MINUS(text []rune, start, end Position) *Token
-	MUL(text []rune, start, end Position) *Token
-	DIV(text []rune, start, end Position) *Token
-	RETURN(text []rune, start, end Position) *Token
-	LEFT_PAREN_1(text []rune, start, end Position) *Token
-	RIGHT_PAREN_1(text []rune, start, end Position) *Token
-	LEFT_PAREN_2(text []rune, start, end Position) *Token
-	RIGHT_PAREN_2(text []rune, start, end Position) *Token
-	LEFT_PAREN_3(text []rune, start, end Position) *Token
-	RIGHT_PAREN_3(text []rune, start, end Position) *Token
-	COMMA(text []rune, start, end Position) *Token
-	TRUE(text []rune, start, end Position) *Token
-	FALSE(text []rune, start, end Position) *Token
-	REF_CONST(text []rune, start, end Position) *Token
-	NUMBER(text []rune, start, end Position) *Token
-	VARNAME(text []rune, start, end Position) *Token
-	STRING_CONST(text []rune, start, end Position) *Token
-	FUNCNAME(text []rune, start, end Position) *Token
-	CHAR_CONST(text []rune, start, end Position) *Token
-	COMMENT(text []rune, start, end Position) *Token
-}
-
-type Tag interface {
-	GetTag() string
-}
-
-const EOP = "EOP"
 
 type EOPTag struct{}
 
@@ -768,8 +785,8 @@ type Token struct {
 	val    string
 }
 
-func NewToken(tag Tag, starting, following Position, val string) *Token {
-	return &Token{tag: tag, coords: newFragment(starting, following), val: val}
+func NewToken(tag Tag, starting, following Position, val string) Token {
+	return Token{tag: tag, coords: newFragment(starting, following), val: val}
 }
 
 func (t Token) String() string {
@@ -840,162 +857,189 @@ func (p *Position) next() Position {
 type Scanner struct {
 	program []rune
 	handler LexemHandler
-	regexps []*FiniteState
+	regexps map[Condition][]*FiniteState
 	curPos  Position
+
+	curCondition Condition
 }
 
 func NewScanner(program []rune, handler LexemHandler) Scanner {
-	regexps := make([]*FiniteState, 0, 47)
-	regexps = append(regexps, automataSkip)
-	regexps = append(regexps, automataNewLine)
-	regexps = append(regexps, automataINT)
-	regexps = append(regexps, automataCHAR)
-	regexps = append(regexps, automataBOOL)
-	regexps = append(regexps, automataAND)
-	regexps = append(regexps, automataEQ)
-	regexps = append(regexps, automataGE)
-	regexps = append(regexps, automataGT)
-	regexps = append(regexps, automataLT)
-	regexps = append(regexps, automataLE)
-	regexps = append(regexps, automataMOD)
-	regexps = append(regexps, automataNE)
-	regexps = append(regexps, automataOR)
-	regexps = append(regexps, automataXOR)
-	regexps = append(regexps, automataPOW)
-	regexps = append(regexps, automataNEW)
-	regexps = append(regexps, automataNOT)
-	regexps = append(regexps, automataSTATEMENTS_END)
-	regexps = append(regexps, automataSTATEMENT_EXPR_END)
-	regexps = append(regexps, automataIF)
-	regexps = append(regexps, automataWARNING)
-	regexps = append(regexps, automataELSE)
-	regexps = append(regexps, automataWHILE)
-	regexps = append(regexps, automataASSIGN)
-	regexps = append(regexps, automataCOLON)
-	regexps = append(regexps, automataPLUS)
-	regexps = append(regexps, automataMINUS)
-	regexps = append(regexps, automataMUL)
-	regexps = append(regexps, automataDIV)
-	regexps = append(regexps, automataRETURN)
-	regexps = append(regexps, automataLEFT_PAREN_1)
-	regexps = append(regexps, automataRIGHT_PAREN_1)
-	regexps = append(regexps, automataLEFT_PAREN_2)
-	regexps = append(regexps, automataRIGHT_PAREN_2)
-	regexps = append(regexps, automataLEFT_PAREN_3)
-	regexps = append(regexps, automataRIGHT_PAREN_3)
-	regexps = append(regexps, automataCOMMA)
-	regexps = append(regexps, automataTRUE)
-	regexps = append(regexps, automataFALSE)
-	regexps = append(regexps, automataREF_CONST)
-	regexps = append(regexps, automataNUMBER)
-	regexps = append(regexps, automataVARNAME)
-	regexps = append(regexps, automataSTRING_CONST)
-	regexps = append(regexps, automataFUNCNAME)
-	regexps = append(regexps, automataCHAR_CONST)
-	regexps = append(regexps, automataCOMMENT)
+	regexps := make(map[Condition][]*FiniteState)
 
-	return Scanner{program: program, handler: handler, regexps: regexps, curPos: NewPosition(program)}
+	regexps[ConditionINIT] = make([]*FiniteState, 0, 47)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSkip)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNewLine)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataINT)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataCHAR)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataBOOL)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataAND)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataEQ)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataGE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataGT)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataLT)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataLE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataMOD)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataOR)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataXOR)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataPOW)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNEW)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNOT)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSTATEMENTS_END)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSTATEMENT_EXPR_END)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataIF)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataWARNING)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataELSE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataWHILE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataASSIGN)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataCOLON)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataPLUS)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataMINUS)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataMUL)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataDIV)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataRETURN)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataLEFT_PAREN_1)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataRIGHT_PAREN_1)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataLEFT_PAREN_2)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataRIGHT_PAREN_2)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataLEFT_PAREN_3)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataRIGHT_PAREN_3)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataCOMMA)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataTRUE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataFALSE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataREF_CONST)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNUMBER)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataVARNAME)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSTRING_CONST)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataFUNCNAME)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataCHAR_CONST)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataCOMMENT)
+
+	return Scanner{program: program, handler: handler, regexps: regexps, curPos: NewPosition(program), curCondition: ConditionINIT}
 }
 
-func (s *Scanner) findToken(automata *FiniteState, start, end Position) *Token {
+func (s *Scanner) switchCondition(cond Condition) {
+	s.curCondition = cond
+}
+
+func (s *Scanner) findToken(
+	automata *FiniteState,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	switch s.curCondition {
+	case ConditionINIT:
+		return s.findTokenINIT(automata, start, end, errFunc, switchCond)
+	}
+
+	return Token{}, true
+}
+
+func (s *Scanner) findTokenINIT(
+	automata *FiniteState,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
 	switch automata {
 	case automataSkip:
-		return s.handler.Skip(s.program, start, end)
+		return s.handler.Skip(s.program, start, end, errFunc, switchCond)
 	case automataNewLine:
-		return s.handler.NewLine(s.program, start, end)
+		return s.handler.NewLine(s.program, start, end, errFunc, switchCond)
 	case automataINT:
-		return s.handler.INT(s.program, start, end)
+		return s.handler.INT(s.program, start, end, errFunc, switchCond)
 	case automataCHAR:
-		return s.handler.CHAR(s.program, start, end)
+		return s.handler.CHAR(s.program, start, end, errFunc, switchCond)
 	case automataBOOL:
-		return s.handler.BOOL(s.program, start, end)
+		return s.handler.BOOL(s.program, start, end, errFunc, switchCond)
 	case automataAND:
-		return s.handler.AND(s.program, start, end)
+		return s.handler.AND(s.program, start, end, errFunc, switchCond)
 	case automataEQ:
-		return s.handler.EQ(s.program, start, end)
+		return s.handler.EQ(s.program, start, end, errFunc, switchCond)
 	case automataGE:
-		return s.handler.GE(s.program, start, end)
+		return s.handler.GE(s.program, start, end, errFunc, switchCond)
 	case automataGT:
-		return s.handler.GT(s.program, start, end)
+		return s.handler.GT(s.program, start, end, errFunc, switchCond)
 	case automataLT:
-		return s.handler.LT(s.program, start, end)
+		return s.handler.LT(s.program, start, end, errFunc, switchCond)
 	case automataLE:
-		return s.handler.LE(s.program, start, end)
+		return s.handler.LE(s.program, start, end, errFunc, switchCond)
 	case automataMOD:
-		return s.handler.MOD(s.program, start, end)
+		return s.handler.MOD(s.program, start, end, errFunc, switchCond)
 	case automataNE:
-		return s.handler.NE(s.program, start, end)
+		return s.handler.NE(s.program, start, end, errFunc, switchCond)
 	case automataOR:
-		return s.handler.OR(s.program, start, end)
+		return s.handler.OR(s.program, start, end, errFunc, switchCond)
 	case automataXOR:
-		return s.handler.XOR(s.program, start, end)
+		return s.handler.XOR(s.program, start, end, errFunc, switchCond)
 	case automataPOW:
-		return s.handler.POW(s.program, start, end)
+		return s.handler.POW(s.program, start, end, errFunc, switchCond)
 	case automataNEW:
-		return s.handler.NEW(s.program, start, end)
+		return s.handler.NEW(s.program, start, end, errFunc, switchCond)
 	case automataNOT:
-		return s.handler.NOT(s.program, start, end)
+		return s.handler.NOT(s.program, start, end, errFunc, switchCond)
 	case automataSTATEMENTS_END:
-		return s.handler.STATEMENTS_END(s.program, start, end)
+		return s.handler.STATEMENTS_END(s.program, start, end, errFunc, switchCond)
 	case automataSTATEMENT_EXPR_END:
-		return s.handler.STATEMENT_EXPR_END(s.program, start, end)
+		return s.handler.STATEMENT_EXPR_END(s.program, start, end, errFunc, switchCond)
 	case automataIF:
-		return s.handler.IF(s.program, start, end)
+		return s.handler.IF(s.program, start, end, errFunc, switchCond)
 	case automataWARNING:
-		return s.handler.WARNING(s.program, start, end)
+		return s.handler.WARNING(s.program, start, end, errFunc, switchCond)
 	case automataELSE:
-		return s.handler.ELSE(s.program, start, end)
+		return s.handler.ELSE(s.program, start, end, errFunc, switchCond)
 	case automataWHILE:
-		return s.handler.WHILE(s.program, start, end)
+		return s.handler.WHILE(s.program, start, end, errFunc, switchCond)
 	case automataASSIGN:
-		return s.handler.ASSIGN(s.program, start, end)
+		return s.handler.ASSIGN(s.program, start, end, errFunc, switchCond)
 	case automataCOLON:
-		return s.handler.COLON(s.program, start, end)
+		return s.handler.COLON(s.program, start, end, errFunc, switchCond)
 	case automataPLUS:
-		return s.handler.PLUS(s.program, start, end)
+		return s.handler.PLUS(s.program, start, end, errFunc, switchCond)
 	case automataMINUS:
-		return s.handler.MINUS(s.program, start, end)
+		return s.handler.MINUS(s.program, start, end, errFunc, switchCond)
 	case automataMUL:
-		return s.handler.MUL(s.program, start, end)
+		return s.handler.MUL(s.program, start, end, errFunc, switchCond)
 	case automataDIV:
-		return s.handler.DIV(s.program, start, end)
+		return s.handler.DIV(s.program, start, end, errFunc, switchCond)
 	case automataRETURN:
-		return s.handler.RETURN(s.program, start, end)
+		return s.handler.RETURN(s.program, start, end, errFunc, switchCond)
 	case automataLEFT_PAREN_1:
-		return s.handler.LEFT_PAREN_1(s.program, start, end)
+		return s.handler.LEFT_PAREN_1(s.program, start, end, errFunc, switchCond)
 	case automataRIGHT_PAREN_1:
-		return s.handler.RIGHT_PAREN_1(s.program, start, end)
+		return s.handler.RIGHT_PAREN_1(s.program, start, end, errFunc, switchCond)
 	case automataLEFT_PAREN_2:
-		return s.handler.LEFT_PAREN_2(s.program, start, end)
+		return s.handler.LEFT_PAREN_2(s.program, start, end, errFunc, switchCond)
 	case automataRIGHT_PAREN_2:
-		return s.handler.RIGHT_PAREN_2(s.program, start, end)
+		return s.handler.RIGHT_PAREN_2(s.program, start, end, errFunc, switchCond)
 	case automataLEFT_PAREN_3:
-		return s.handler.LEFT_PAREN_3(s.program, start, end)
+		return s.handler.LEFT_PAREN_3(s.program, start, end, errFunc, switchCond)
 	case automataRIGHT_PAREN_3:
-		return s.handler.RIGHT_PAREN_3(s.program, start, end)
+		return s.handler.RIGHT_PAREN_3(s.program, start, end, errFunc, switchCond)
 	case automataCOMMA:
-		return s.handler.COMMA(s.program, start, end)
+		return s.handler.COMMA(s.program, start, end, errFunc, switchCond)
 	case automataTRUE:
-		return s.handler.TRUE(s.program, start, end)
+		return s.handler.TRUE(s.program, start, end, errFunc, switchCond)
 	case automataFALSE:
-		return s.handler.FALSE(s.program, start, end)
+		return s.handler.FALSE(s.program, start, end, errFunc, switchCond)
 	case automataREF_CONST:
-		return s.handler.REF_CONST(s.program, start, end)
+		return s.handler.REF_CONST(s.program, start, end, errFunc, switchCond)
 	case automataNUMBER:
-		return s.handler.NUMBER(s.program, start, end)
+		return s.handler.NUMBER(s.program, start, end, errFunc, switchCond)
 	case automataVARNAME:
-		return s.handler.VARNAME(s.program, start, end)
+		return s.handler.VARNAME(s.program, start, end, errFunc, switchCond)
 	case automataSTRING_CONST:
-		return s.handler.STRING_CONST(s.program, start, end)
+		return s.handler.STRING_CONST(s.program, start, end, errFunc, switchCond)
 	case automataFUNCNAME:
-		return s.handler.FUNCNAME(s.program, start, end)
+		return s.handler.FUNCNAME(s.program, start, end, errFunc, switchCond)
 	case automataCHAR_CONST:
-		return s.handler.CHAR_CONST(s.program, start, end)
+		return s.handler.CHAR_CONST(s.program, start, end, errFunc, switchCond)
 	case automataCOMMENT:
-		return s.handler.COMMENT(s.program, start, end)
-
+		return s.handler.COMMENT(s.program, start, end, errFunc, switchCond)
 	}
-	return nil
+
+	return Token{}, true
 }
 
 func (s *Scanner) NextToken() Token {
@@ -1005,7 +1049,7 @@ func (s *Scanner) NextToken() Token {
 		var maxRightReg *FiniteState
 		maxRight := 0
 
-		for _, r := range s.regexps {
+		for _, r := range s.regexps[s.curCondition] {
 			res := r.FindMatchEndIndex(string(s.program[s.curPos.index:]))
 			if res > maxRight {
 				maxRightReg = r
@@ -1028,13 +1072,12 @@ func (s *Scanner) NextToken() Token {
 			}
 			s.handler.Error("ERROR: unknown symbol", startPos, string(s.program[start]))
 		} else {
-			tok := s.findToken(maxRightReg, startPos, pos)
-			if tok != nil {
-				return *tok
+			tok, continued := s.findToken(maxRightReg, startPos, pos, s.handler.Error, s.switchCondition)
+			if !continued {
+				return tok
 			}
 		}
 	}
 
-	eop := NewToken(EOPTag{}, s.curPos, s.curPos, "")
-	return *eop
+	return NewToken(EOPTag{}, s.curPos, s.curPos, "")
 }

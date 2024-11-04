@@ -3,8 +3,63 @@ package golexgen
 
 import (
 	"fmt"
-	"unicode"
 )
+
+type ErrHandler interface {
+	Error(msg string, pos Position, symbol string)
+}
+
+type (
+	ErrFunc             func(msg string, pos Position, symbol string)
+	SwitchConditionFunc func(cond Condition)
+)
+
+type Continued bool
+
+type LexemHandler interface {
+	ErrHandler
+	Skip(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	Assembly(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	Ident(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	Num(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+}
+
+type Tag interface {
+	GetTag() string
+}
+
+const EOP = "EOP"
+
+type Condition int
+
+const (
+	dummy = Condition(iota)
+
+	ConditionINIT
+)
+
+type DefaultTag int
+
+const (
+	TagErr DefaultTag = iota
+	TagSkip
+	TagAssembly
+	TagIdent
+	TagNum
+	TagINIT
+)
+
+func (t DefaultTag) GetTag() string {
+	var tagToString = map[DefaultTag]string{
+		TagSkip:     "Skip",
+		TagAssembly: "Assembly",
+		TagIdent:    "Ident",
+		TagNum:      "Num",
+		TagINIT:     "INIT",
+	}
+
+	return tagToString[t]
+}
 
 type FiniteState struct {
 	NextState      int
@@ -52,33 +107,57 @@ func (f *FiniteState) isTerminal(state int) bool {
 var (
 	automataSkip *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []int{1},
+		TerminalStates: []int{1, 2, 4, 5, 6, 3},
 		Transitions: map[int]map[rune]int{
-			0: {92: 1},
+			0: {9: 2, 10: 1, 32: 3},
+			1: {9: 5, 10: 4, 32: 6},
+			2: {9: 5, 10: 4, 32: 6},
+			3: {9: 5, 10: 4, 32: 6},
+			4: {9: 5, 10: 4, 32: 6},
+			5: {9: 5, 10: 4, 32: 6},
+			6: {9: 5, 10: 4, 32: 6},
+		},
+	}
+	automataAssembly *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []int{3, 6},
+		Transitions: map[int]map[rune]int{
+			0: {101: 4, 109: 1},
+			1: {111: 2},
+			2: {118: 3},
+			4: {97: 5},
+			5: {120: 6},
+		},
+	}
+	automataIdent *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []int{2, 3, 4, 5, 1},
+		Transitions: map[int]map[rune]int{
+			0: {65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 2, 98: 2, 99: 2, 100: 2, 101: 2, 102: 2, 103: 2, 104: 2, 105: 2, 106: 2, 107: 2, 108: 2, 109: 2, 110: 2, 111: 2, 112: 2, 113: 2, 114: 2, 115: 2, 116: 2, 117: 2, 118: 2, 119: 2, 120: 2, 121: 2, 122: 2},
+			1: {48: 5, 49: 5, 50: 5, 51: 5, 52: 5, 53: 5, 54: 5, 55: 5, 56: 5, 57: 5, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 3, 73: 3, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 3, 81: 3, 82: 3, 83: 3, 84: 3, 85: 3, 86: 3, 87: 3, 88: 3, 89: 3, 90: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 103: 4, 104: 4, 105: 4, 106: 4, 107: 4, 108: 4, 109: 4, 110: 4, 111: 4, 112: 4, 113: 4, 114: 4, 115: 4, 116: 4, 117: 4, 118: 4, 119: 4, 120: 4, 121: 4, 122: 4},
+			2: {48: 5, 49: 5, 50: 5, 51: 5, 52: 5, 53: 5, 54: 5, 55: 5, 56: 5, 57: 5, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 3, 73: 3, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 3, 81: 3, 82: 3, 83: 3, 84: 3, 85: 3, 86: 3, 87: 3, 88: 3, 89: 3, 90: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 103: 4, 104: 4, 105: 4, 106: 4, 107: 4, 108: 4, 109: 4, 110: 4, 111: 4, 112: 4, 113: 4, 114: 4, 115: 4, 116: 4, 117: 4, 118: 4, 119: 4, 120: 4, 121: 4, 122: 4},
+			3: {48: 5, 49: 5, 50: 5, 51: 5, 52: 5, 53: 5, 54: 5, 55: 5, 56: 5, 57: 5, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 3, 73: 3, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 3, 81: 3, 82: 3, 83: 3, 84: 3, 85: 3, 86: 3, 87: 3, 88: 3, 89: 3, 90: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 103: 4, 104: 4, 105: 4, 106: 4, 107: 4, 108: 4, 109: 4, 110: 4, 111: 4, 112: 4, 113: 4, 114: 4, 115: 4, 116: 4, 117: 4, 118: 4, 119: 4, 120: 4, 121: 4, 122: 4},
+			4: {48: 5, 49: 5, 50: 5, 51: 5, 52: 5, 53: 5, 54: 5, 55: 5, 56: 5, 57: 5, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 3, 73: 3, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 3, 81: 3, 82: 3, 83: 3, 84: 3, 85: 3, 86: 3, 87: 3, 88: 3, 89: 3, 90: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 103: 4, 104: 4, 105: 4, 106: 4, 107: 4, 108: 4, 109: 4, 110: 4, 111: 4, 112: 4, 113: 4, 114: 4, 115: 4, 116: 4, 117: 4, 118: 4, 119: 4, 120: 4, 121: 4, 122: 4},
+			5: {48: 5, 49: 5, 50: 5, 51: 5, 52: 5, 53: 5, 54: 5, 55: 5, 56: 5, 57: 5, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 3, 73: 3, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 3, 81: 3, 82: 3, 83: 3, 84: 3, 85: 3, 86: 3, 87: 3, 88: 3, 89: 3, 90: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 103: 4, 104: 4, 105: 4, 106: 4, 107: 4, 108: 4, 109: 4, 110: 4, 111: 4, 112: 4, 113: 4, 114: 4, 115: 4, 116: 4, 117: 4, 118: 4, 119: 4, 120: 4, 121: 4, 122: 4},
+		},
+	}
+	automataNum *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []int{1, 0, 6},
+		Transitions: map[int]map[rune]int{
+			0: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1},
+			1: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 104: 6},
+			3: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 104: 6},
+			4: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 104: 6},
 		},
 	}
 )
 
-type ErrHandler interface {
-	Error(msg string, pos Position, symbol string)
-}
-
 type ErrHandlerBase struct{}
 
 func (e *ErrHandlerBase) Error(msg string, pos Position, symbol string) {
-	fmt.Printf("%s %s %s\n", msg, pos.String(), symbol)
+	fmt.Printf("ERROR%s: %s %s\n", pos.String(), msg, symbol)
 }
-
-type LexemHandler interface {
-	ErrHandler
-	Skip(text []rune, start, end Position) *Token
-}
-
-type Tag interface {
-	GetTag() string
-}
-
-const EOP = "EOP"
 
 type EOPTag struct{}
 
@@ -88,12 +167,12 @@ func (e EOPTag) GetTag() string {
 
 type Token struct {
 	tag    Tag
-	coords Fragment
+	coords fragment
 	val    string
 }
 
 func NewToken(tag Tag, starting, following Position, val string) Token {
-	return Token{tag: tag, coords: NewFragment(starting, following), val: val}
+	return Token{tag: tag, coords: newFragment(starting, following), val: val}
 }
 
 func (t Token) String() string {
@@ -104,16 +183,16 @@ func (t Token) Tag() string {
 	return t.tag.GetTag()
 }
 
-type Fragment struct {
+type fragment struct {
 	starting  Position
 	following Position
 }
 
-func NewFragment(starting, following Position) Fragment {
-	return Fragment{starting: starting, following: following}
+func newFragment(starting, following Position) fragment {
+	return fragment{starting: starting, following: following}
 }
 
-func (f Fragment) String() string {
+func (f fragment) String() string {
 	return fmt.Sprintf("%s-%s", f.starting.String(), f.following.String())
 }
 
@@ -137,14 +216,6 @@ func (p *Position) cp() int {
 		return -1
 	}
 	return int(p.text[p.index])
-}
-
-func (p *Position) isWhiteSpace() bool {
-	return p.cp() == ' '
-}
-
-func (p *Position) isLetter() bool {
-	return unicode.IsLetter(rune(p.cp()))
 }
 
 func (p *Position) isNewLine() bool {
@@ -172,24 +243,60 @@ func (p *Position) next() Position {
 type Scanner struct {
 	program []rune
 	handler LexemHandler
-	regexps []*FiniteState
+	regexps map[Condition][]*FiniteState
 	curPos  Position
+
+	curCondition Condition
 }
 
 func NewScanner(program []rune, handler LexemHandler) Scanner {
-	regexps := make([]*FiniteState, 0, 1)
-	regexps = append(regexps, automataSkip)
+	regexps := make(map[Condition][]*FiniteState)
 
-	return Scanner{program: program, handler: handler, regexps: regexps, curPos: NewPosition(program)}
+	regexps[ConditionINIT] = make([]*FiniteState, 0, 4)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSkip)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataAssembly)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataIdent)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNum)
+
+	return Scanner{program: program, handler: handler, regexps: regexps, curPos: NewPosition(program), curCondition: ConditionINIT}
 }
 
-func (s *Scanner) findToken(automata *FiniteState, start, end Position) *Token {
+func (s *Scanner) switchCondition(cond Condition) {
+	s.curCondition = cond
+}
+
+func (s *Scanner) findToken(
+	automata *FiniteState,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	switch s.curCondition {
+	case ConditionINIT:
+		return s.findTokenINIT(automata, start, end, errFunc, switchCond)
+	}
+
+	return Token{}, true
+}
+
+func (s *Scanner) findTokenINIT(
+	automata *FiniteState,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
 	switch automata {
 	case automataSkip:
-		return s.handler.Skip(s.program, start, end)
-
+		return s.handler.Skip(s.program, start, end, errFunc, switchCond)
+	case automataAssembly:
+		return s.handler.Assembly(s.program, start, end, errFunc, switchCond)
+	case automataIdent:
+		return s.handler.Ident(s.program, start, end, errFunc, switchCond)
+	case automataNum:
+		return s.handler.Num(s.program, start, end, errFunc, switchCond)
 	}
-	return nil
+
+	return Token{}, true
 }
 
 func (s *Scanner) NextToken() Token {
@@ -199,7 +306,7 @@ func (s *Scanner) NextToken() Token {
 		var maxRightReg *FiniteState
 		maxRight := 0
 
-		for _, r := range s.regexps {
+		for _, r := range s.regexps[s.curCondition] {
 			res := r.FindMatchEndIndex(string(s.program[s.curPos.index:]))
 			if res > maxRight {
 				maxRightReg = r
@@ -220,11 +327,11 @@ func (s *Scanner) NextToken() Token {
 			} else {
 				break
 			}
-			s.handler.Error("unknown symbol", startPos, string(s.program[start]))
+			s.handler.Error("ERROR: unknown symbol", startPos, string(s.program[start]))
 		} else {
-			tok := s.findToken(maxRightReg, startPos, pos)
-			if tok != nil {
-				return *tok
+			tok, continued := s.findToken(maxRightReg, startPos, pos, s.handler.Error, s.switchCondition)
+			if !continued {
+				return tok
 			}
 		}
 	}

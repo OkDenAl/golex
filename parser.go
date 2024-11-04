@@ -5,12 +5,17 @@ import "fmt"
 type Parser struct {
 	cursor int
 	tokens []Token
+
+	startConditionNames map[string]struct{}
+	ruleNames           map[string]Token
 }
 
 func New(tokens []Token) *Parser {
 	return &Parser{
-		cursor: 0,
-		tokens: tokens,
+		cursor:              0,
+		tokens:              tokens,
+		startConditionNames: map[string]struct{}{},
+		ruleNames:           map[string]Token{},
 	}
 }
 
@@ -78,8 +83,13 @@ func (p *Parser) state() (*State, error) {
 	p.mustExpectTags(TagStateMarker)
 
 	var names []Token
+	name := p.mustExpectTags(TagName)
+	names = append(names, name)
+	p.startConditionNames[name.val] = struct{}{}
 	for p.tokens[p.cursor].tag == TagName {
-		names = append(names, p.tokens[p.cursor])
+		name = p.mustExpectTags(TagName)
+		names = append(names, name)
+		p.startConditionNames[name.val] = struct{}{}
 	}
 
 	p.mustExpectTags(TagNL)
@@ -96,7 +106,7 @@ func (p *Parser) rules() (Rules, error) {
 	}
 
 	var rules []Rule
-	for p.tokens[p.cursor].tag == TagRegularMarker {
+	for p.tokens[p.cursor].tag == TagRegularMarker || p.tokens[p.cursor].tag == TagOpenStartCondition {
 		rule, err := p.rule()
 		if err != nil {
 			return Rules{}, err
@@ -109,8 +119,13 @@ func (p *Parser) rules() (Rules, error) {
 	return Rules{ruleArr: rules}, nil
 }
 
-// Rule            ::= ("/" RegExpr "/" | "{" TagName "}" TagName (NewLine)+
+// Rule            ::= "<" Name ">" "/" RegExpr "/"  Name (SwitchCondition)? (NewLine)+
 func (p *Parser) rule() (Rule, error) {
+	var startCond *StartCondition
+	if p.tokens[p.cursor].Tag() == TagOpenStartCondition {
+		startCond = p.startCondition()
+	}
+
 	p.mustExpectTags(TagRegularMarker)
 	reset := p.reset()
 	expr, ok := p.regExpr()
@@ -119,13 +134,43 @@ func (p *Parser) rule() (Rule, error) {
 		return Rule{}, fmt.Errorf("parse error: failed to parse regular expr starts with %s", p.tokens[p.cursor].String())
 	}
 	p.mustExpectTags(TagRegularMarker)
+
 	token := p.mustExpectTags(TagName)
+	if v, ok := p.ruleNames[token.val]; ok {
+		panic("Error: duplicate: " + token.String() + "\n      first declaration was here: " + v.String())
+	}
+	p.ruleNames[token.val] = token
+
+	var switchCond *SwitchCondition
+	if p.tokens[p.cursor].Tag() == TagBegin {
+		switchCond = p.switchCondition()
+	}
+
 	p.mustExpectTags(TagNL)
 	for p.tokens[p.cursor].tag == TagNL {
 		p.mustExpectTags(TagNL)
 	}
 
-	return Rule{expr: *expr, name: token}, nil
+	return Rule{startCondition: startCond, expr: *expr, name: token, switchCondition: switchCond}, nil
+}
+
+// StartCondition ::= "<" Name ">"
+func (p *Parser) startCondition() *StartCondition {
+	p.mustExpectTags(TagOpenStartCondition)
+	token := p.mustExpectTags(TagName)
+	p.mustExpectTags(TagCloseStartCondition)
+
+	return &StartCondition{condition: token}
+}
+
+// SwitchCondition ::= ("BEGIN" "(" Name ")")
+func (p *Parser) switchCondition() *SwitchCondition {
+	p.mustExpectTags(TagBegin)
+	p.mustExpectTags(TagDefaultOpenBracket)
+	token := p.mustExpectTags(TagName)
+	p.mustExpectTags(TagDefaultCloseBracket)
+
+	return &SwitchCondition{nextCondition: token}
 }
 
 // RegExpr         ::= Union | SimpleExpr

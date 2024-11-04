@@ -5,17 +5,48 @@ import (
 	"fmt"
 )
 
-type DefaultTag int
+type ErrHandler interface {
+	Error(msg string, pos Position, symbol string)
+}
 
+type (
+    ErrFunc func (msg string, pos Position, symbol string)
+    SwitchConditionFunc func (cond Condition)
+)
+
+type Continued bool
+
+type LexemHandler interface {
+	ErrHandler
+    {{ range .AllRegexps }}{{ .ActionName }}(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+    {{ end }}
+}
+
+type Tag interface {
+	GetTag() string
+}
+
+const EOP = "EOP"
+
+type Condition int
 const (
-	ErrDefaultTag DefaultTag = iota
-	{{ range .Regexps }}{{ .ActionName }}DefaultTag
+   dummy = Condition(iota)
+{{ range $key, $value := .Conditions }}
+   Condition{{ $key }}{{ end }}
+)
+
+type DefaultTag int
+const (
+	TagErr DefaultTag = iota
+	{{ range .AllRegexps }}Tag{{ .ActionName }}
+    {{ end }}{{ range $key, $value := .Conditions }}Tag{{ $key }}
     {{ end }}
 )
 
 func (t DefaultTag) GetTag() string {
 	var tagToString = map[DefaultTag]string{
-	    {{ range .Regexps }}{{ .ActionName }}DefaultTag: "{{ .ActionName }}",
+	    {{ range .AllRegexps }}Tag{{ .ActionName }}: "{{ .ActionName }}",
+	    {{ end }}{{ range $key, $value := .Conditions }}Tag{{ $key }}: "{{ $key }}",
 	    {{ end }}
 	}
 
@@ -65,39 +96,22 @@ func (f *FiniteState) isTerminal(state int) bool {
 	return false
 }
 var(
-    {{ range .Regexps }}automata{{ .ActionName }} *FiniteState = &FiniteState{
+    {{ range .AllRegexps }}automata{{ .ActionName }} *FiniteState = &FiniteState{
     CurrentState:  {{ .RegexpVal.CurrentState }},
     TerminalStates: []int{ {{ range .RegexpVal.TerminalStates }}{{ . }}, {{ end }}},
     Transitions: map[int]map[rune]int{
-            {{ range $key, $value := .RegexpVal.Transitions }}{{ $key }}: { {{ range $char, $nextState := $value }}{{ $char }}: {{ $nextState }},{{ end }}
-                },
+            {{ range $key, $value := .RegexpVal.Transitions }}{{ $key }}: { {{ range $char, $nextState := $value }}{{ $char }}: {{ $nextState }},{{ end }}},
             {{ end }}
         },
         }
     {{ end }}
 )
 
-type ErrHandler interface {
-	Error(msg string, pos Position, symbol string)
-}
-
 type ErrHandlerBase struct{}
 
 func (e *ErrHandlerBase) Error(msg string, pos Position, symbol string) {
-	fmt.Printf("%s %s %s\n", msg, pos.String(), symbol)
+	fmt.Printf("ERROR%s: %s %s\n",pos.String(),msg, symbol)
 }
-
-type LexemHandler interface {
-	ErrHandler
-    {{ range .Regexps }}{{ .ActionName }}(text []rune, start, end Position) *Token
-    {{ end }}
-}
-
-type Tag interface {
-	GetTag() string
-}
-
-const EOP = "EOP"
 
 type EOPTag struct{}
 
@@ -111,8 +125,8 @@ type Token struct {
 	val    string
 }
 
-func NewToken(tag Tag, starting, following Position, val string) *Token {
-	return &Token{tag: tag, coords: newFragment(starting, following), val: val}
+func NewToken(tag Tag, starting, following Position, val string) Token {
+	return Token{tag: tag, coords: newFragment(starting, following), val: val}
 }
 
 func (t Token) String() string {
@@ -183,25 +197,56 @@ func (p *Position) next() Position {
 type Scanner struct {
 	program []rune
 	handler LexemHandler
-	regexps []*FiniteState
+	regexps map[Condition][]*FiniteState
 	curPos  Position
+
+	curCondition Condition
 }
 
 func NewScanner(program []rune, handler LexemHandler) Scanner {
-    regexps := make([]*FiniteState, 0, {{ .RegexpsLen }})
-    {{ range .Regexps }}regexps = append(regexps, automata{{ .ActionName }})
+    regexps := make(map[Condition][]*FiniteState)
+    {{ range $key, $value := .Conditions }}
+       regexps[Condition{{ $key }}]=make([]*FiniteState,0, {{ $value.RegexpsLen }})
+       {{ range $value.Regexps }}regexps[Condition{{ $key }}] = append(regexps[Condition{{ $key }}], automata{{ .ActionName }})
+        {{ end }}
     {{ end }}
-	return Scanner{program: program, handler: handler,regexps:regexps, curPos: NewPosition(program)}
+
+
+	return Scanner{program: program, handler: handler,regexps:regexps, curPos: NewPosition(program),curCondition:ConditionINIT}
+}
+
+func (s *Scanner) switchCondition(cond Condition) {
+    s.curCondition = cond
 }
 
 
-func (s *Scanner) findToken(automata *FiniteState, start, end Position) *Token {
+func (s *Scanner) findToken(
+    automata *FiniteState,
+    start, end Position,
+    errFunc ErrFunc,
+    switchCond SwitchConditionFunc,
+) (Token, Continued) {
+    switch s.curCondition{
+    {{ range $key, $value := .Conditions }} case Condition{{ $key }}: return s.findToken{{ $key }}(automata,start,end,errFunc, switchCond)
+    {{ end }}}
+
+	return Token{}, true
+}
+
+{{ range $key, $value := .Conditions }}
+func (s *Scanner) findToken{{ $key }}(
+    automata *FiniteState,
+    start, end Position,
+    errFunc ErrFunc,
+    switchCond SwitchConditionFunc,
+) (Token, Continued) {
 	switch automata {
-    {{ range .Regexps }}case automata{{ .ActionName }}: return s.handler.{{ .ActionName }}(s.program, start, end)
-    {{ end }}
-	}
-	return nil
+    {{ range $value.Regexps }}case automata{{ .ActionName }}: return s.handler.{{ .ActionName }}(s.program, start, end, errFunc, switchCond)
+    {{ end }}}
+
+	return Token{}, true
 }
+{{ end }}
 
 func (s *Scanner) NextToken() Token {
 	for s.curPos.cp() != -1 {
@@ -210,7 +255,7 @@ func (s *Scanner) NextToken() Token {
 		var maxRightReg *FiniteState
 		maxRight := 0
 
-		for _, r := range s.regexps {
+		for _, r := range s.regexps[s.curCondition] {
 			res := r.FindMatchEndIndex(string(s.program[s.curPos.index:]))
 			if res > maxRight {
 				maxRightReg = r
@@ -233,13 +278,12 @@ func (s *Scanner) NextToken() Token {
 			}
 			s.handler.Error("ERROR: unknown symbol", startPos, string(s.program[start]))
 		} else {
-			tok := s.findToken(maxRightReg, startPos, pos)
-			if tok != nil {
-				return *tok
+			tok, continued := s.findToken(maxRightReg, startPos, pos, s.handler.Error, s.switchCondition)
+			if !continued {
+				return tok
 			}
 		}
 	}
 
-    eop:=NewToken(EOPTag{}, s.curPos, s.curPos, "")
-	return *eop
+	return NewToken(EOPTag{}, s.curPos, s.curPos, "")
 }
