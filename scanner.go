@@ -144,6 +144,7 @@ func (scn *Scanner) nextToken() Token {
 			const (
 				begin        = "begin"
 				continueName = "continue"
+				edit         = "edit"
 			)
 
 			switch curWord {
@@ -153,6 +154,9 @@ func (scn *Scanner) nextToken() Token {
 			case continueName:
 				scn.prevToken = NewToken(TagContinue, start, pos, continueName)
 				return NewToken(TagContinue, start, pos, continueName)
+			case edit:
+				scn.prevToken = NewToken(TagEdit, start, pos, edit)
+				return NewToken(TagEdit, start, pos, edit)
 			}
 
 			scn.prevToken = NewToken(TagName, scn.curPos, scn.curPos, curWord)

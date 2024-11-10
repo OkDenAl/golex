@@ -8,63 +8,30 @@ import (
 	"golex/examples/testing/golexgen"
 	"log"
 	"os"
-	"time"
 )
 
 type Handler struct {
-	golexgen.ErrHandlerBase
+	golexgen.HandlerBase
 }
 
 func (h *Handler) Skip(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
-	return golexgen.NewToken(
-		golexgen.TagSkip,
-		start, end,
-		string(text[start.Index():end.Index()]),
-	), false
+	panic("edit me") // TODO: edit this
+	return golexgen.Token{}, true
 }
 
-func (h *Handler) Assembly(
-	text []rune,
+func (h *Handler) NewLine(
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
-	return golexgen.NewToken(
-		golexgen.TagAssembly,
-		start, end,
-		string(text[start.Index():end.Index()]),
-	), false
-}
-
-func (h *Handler) Ident(
-	text []rune,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	return golexgen.NewToken(
-		golexgen.TagIdent,
-		start, end,
-		string(text[start.Index():end.Index()]),
-	), false
-}
-
-func (h *Handler) Num(
-	text []rune,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	return golexgen.NewToken(
-		golexgen.TagNum,
-		start, end,
-		string(text[start.Index():end.Index()]),
-	), false
+	panic("edit me") // TODO: edit this
+	return golexgen.NewToken(golexgen.TagNewLine, start, end, text), false
 }
 
 func main() {
@@ -79,12 +46,9 @@ func main() {
 	}
 	scn := golexgen.NewScanner([]rune(string(content)), &Handler{})
 
-	tm := time.Now()
 	t := scn.NextToken()
 	for t.Tag() != golexgen.EOP {
 		fmt.Println(t.String())
 		t = scn.NextToken()
 	}
-
-	fmt.Println(time.Since(tm))
 }

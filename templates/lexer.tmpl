@@ -18,7 +18,7 @@ type Continued bool
 
 type LexemHandler interface {
 	ErrHandler
-    {{ range .AllRegexps }}{{ .ActionName }}(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+    {{ range .AllRegexps }}{{ .ActionName }}(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
     {{ end }}
 }
 
@@ -153,11 +153,30 @@ var(
         {{ end }}
 )
 
-type ErrHandlerBase struct{}
+type HandlerBase struct{}
 
-func (e *ErrHandlerBase) Error(msg string, pos Position, symbol string) {
+func (e *HandlerBase) Error(msg string, pos Position, symbol string) {
 	fmt.Printf("ERROR%s: %s %s\n",pos.String(),msg, symbol)
 }
+
+{{ range .AllRegexps }}func (h *HandlerBase){{ .ActionName }}(
+    text string,
+    start, end Position,
+    errFunc ErrFunc,
+    switchCond SwitchConditionFunc,
+) (Token,Continued) {
+    {{ if .SwitchConditionName }}switchCond(golexgen.Condition{{ .SwitchConditionName }})
+
+        {{ if .Continued }}return Token{},{{ .Continued }}
+        }
+        {{ else }} return NewToken(Tag{{ .ActionName }},start,end,text), {{ .Continued }}
+        }{{ end }}
+    {{ else}}{{ if .Continued }}return Token{},{{ .Continued }}
+        }
+        {{ else }} return NewToken(Tag{{ .ActionName }},start,end,text), {{ .Continued }}
+        }{{ end }}
+    {{end}}
+{{ end }}
 
 type EOPTag struct{}
 
@@ -286,7 +305,7 @@ func (s *Scanner) findTokenOneAutomata{{ $key }}(
     switchCond SwitchConditionFunc,
 ) (Token, Continued) {
 	switch name {
-    {{ range $value.Regexps }}case "{{ .ActionName }}": return s.handler.{{ .ActionName }}(s.program, start, end, errFunc, switchCond)
+    {{ range $value.Regexps }}case "{{ .ActionName }}": return s.handler.{{ .ActionName }}(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
     {{ end }}}
 
 	return Token{}, true
@@ -315,7 +334,7 @@ func (s *Scanner) findToken{{ $key }}(
     switchCond SwitchConditionFunc,
 ) (Token, Continued) {
 	switch automata {
-    {{ range $value.Regexps }}case automata{{ .ActionName }}: return s.handler.{{ .ActionName }}(s.program, start, end, errFunc, switchCond)
+    {{ range $value.Regexps }}case automata{{ .ActionName }}: return s.handler.{{ .ActionName }}(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
     {{ end }}}
 
 	return Token{}, true

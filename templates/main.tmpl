@@ -10,29 +10,33 @@ import (
 )
 
 type Handler struct {
-	golexgen.ErrHandlerBase
+	golexgen.HandlerBase
 }
 
-{{ range .AllRegexps }}func (h *Handler){{ .ActionName }}(
-    text []rune,
-    start, end golexgen.Position,
-    errFunc golexgen.ErrFunc,
-    switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token,golexgen.Continued) {
-    {{ if .SwitchConditionName }}switchCond(golexgen.Condition{{ .SwitchConditionName }})
+{{ range .AllRegexps }}
+    {{ if .Edit }}
+        func (h *Handler){{ .ActionName }}(
+            text string,
+            start, end golexgen.Position,
+            errFunc golexgen.ErrFunc,
+            switchCond golexgen.SwitchConditionFunc,
+        ) (golexgen.Token,golexgen.Continued) {
+            panic("edit me") // TODO: edit this
+            {{ if .SwitchConditionName }}switchCond(golexgen.Condition{{ .SwitchConditionName }})
 
-    return golexgen.NewToken(
-    golexgen.Tag{{ .ActionName }},
-     start,end,
-     string(text[start.Index():end.Index()]),
-    ),false{{ else }} return golexgen.NewToken(
-                   golexgen.Tag{{ .ActionName }},
-                    start,end,
-                    string(text[start.Index():end.Index()]),
-                   ), {{ .Continued }}{{ end }}
-}
-
+                {{ if .Continued }}return golexgen.Token{},{{ .Continued }}
+                    }
+                {{ else }} return golexgen.NewToken(golexgen.Tag{{ .ActionName }},start,end,text), {{ .Continued }}
+                    }{{ end }}
+            {{ else}}{{ if .Continued }}return golexgen.Token{},{{ .Continued }}
+                    }
+                {{ else }} return golexgen.NewToken(golexgen.Tag{{ .ActionName }},start,end,text), {{ .Continued }}
+                    }{{ end }}
+            {{end}}
+    {{ else }}
+    {{end}}
 {{ end }}
+
 
 func main() {
 	if len(os.Args) < 2 {

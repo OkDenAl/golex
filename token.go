@@ -38,6 +38,7 @@ const (
 	TagDefaultCloseBracket
 	TagBegin
 	TagContinue
+	TagEdit
 )
 
 type Token struct {

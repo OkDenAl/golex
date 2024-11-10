@@ -27,6 +27,7 @@ type Rule struct {
 	name            Token
 	expr            RegExpr
 	contin          *Token
+	edit            *Token
 	switchCondition *SwitchCondition
 }
 

@@ -18,10 +18,53 @@ type Continued bool
 
 type LexemHandler interface {
 	ErrHandler
-	Skip(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	Assembly(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	Ident(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	Num(text []rune, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	Skip(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	NewLine(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	INT(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	CHAR(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	BOOL(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	AND(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	EQ(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	GE(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	GT(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	LT(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	LE(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	MOD(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	NE(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	OR(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	XOR(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	POW(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	NEW(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	NOT(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	STATEMENTS_END(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	STATEMENT_EXPR_END(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	IF(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	WARNING(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	ELSE(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	WHILE(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	ASSIGN(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	COLON(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	PLUS(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	MINUS(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	MUL(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	DIV(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	RETURN(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	LEFT_PAREN_1(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	RIGHT_PAREN_1(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	LEFT_PAREN_2(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	RIGHT_PAREN_2(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	LEFT_PAREN_3(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	RIGHT_PAREN_3(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	COMMA(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	TRUE(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	FALSE(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	REF_CONST(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	NUMBER(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	VARNAME(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	STRING_CONST(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	FUNCNAME(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	CHAR_CONST(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	COMMENT(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
 }
 
 type Tag interface {
@@ -43,19 +86,105 @@ type DefaultTag int
 const (
 	TagErr DefaultTag = iota
 	TagSkip
-	TagAssembly
-	TagIdent
-	TagNum
+	TagNewLine
+	TagINT
+	TagCHAR
+	TagBOOL
+	TagAND
+	TagEQ
+	TagGE
+	TagGT
+	TagLT
+	TagLE
+	TagMOD
+	TagNE
+	TagOR
+	TagXOR
+	TagPOW
+	TagNEW
+	TagNOT
+	TagSTATEMENTS_END
+	TagSTATEMENT_EXPR_END
+	TagIF
+	TagWARNING
+	TagELSE
+	TagWHILE
+	TagASSIGN
+	TagCOLON
+	TagPLUS
+	TagMINUS
+	TagMUL
+	TagDIV
+	TagRETURN
+	TagLEFT_PAREN_1
+	TagRIGHT_PAREN_1
+	TagLEFT_PAREN_2
+	TagRIGHT_PAREN_2
+	TagLEFT_PAREN_3
+	TagRIGHT_PAREN_3
+	TagCOMMA
+	TagTRUE
+	TagFALSE
+	TagREF_CONST
+	TagNUMBER
+	TagVARNAME
+	TagSTRING_CONST
+	TagFUNCNAME
+	TagCHAR_CONST
+	TagCOMMENT
 	TagINIT
 )
 
 func (t DefaultTag) GetTag() string {
 	var tagToString = map[DefaultTag]string{
-		TagSkip:     "Skip",
-		TagAssembly: "Assembly",
-		TagIdent:    "Ident",
-		TagNum:      "Num",
-		TagINIT:     "INIT",
+		TagSkip:               "Skip",
+		TagNewLine:            "NewLine",
+		TagINT:                "INT",
+		TagCHAR:               "CHAR",
+		TagBOOL:               "BOOL",
+		TagAND:                "AND",
+		TagEQ:                 "EQ",
+		TagGE:                 "GE",
+		TagGT:                 "GT",
+		TagLT:                 "LT",
+		TagLE:                 "LE",
+		TagMOD:                "MOD",
+		TagNE:                 "NE",
+		TagOR:                 "OR",
+		TagXOR:                "XOR",
+		TagPOW:                "POW",
+		TagNEW:                "NEW",
+		TagNOT:                "NOT",
+		TagSTATEMENTS_END:     "STATEMENTS_END",
+		TagSTATEMENT_EXPR_END: "STATEMENT_EXPR_END",
+		TagIF:                 "IF",
+		TagWARNING:            "WARNING",
+		TagELSE:               "ELSE",
+		TagWHILE:              "WHILE",
+		TagASSIGN:             "ASSIGN",
+		TagCOLON:              "COLON",
+		TagPLUS:               "PLUS",
+		TagMINUS:              "MINUS",
+		TagMUL:                "MUL",
+		TagDIV:                "DIV",
+		TagRETURN:             "RETURN",
+		TagLEFT_PAREN_1:       "LEFT_PAREN_1",
+		TagRIGHT_PAREN_1:      "RIGHT_PAREN_1",
+		TagLEFT_PAREN_2:       "LEFT_PAREN_2",
+		TagRIGHT_PAREN_2:      "RIGHT_PAREN_2",
+		TagLEFT_PAREN_3:       "LEFT_PAREN_3",
+		TagRIGHT_PAREN_3:      "RIGHT_PAREN_3",
+		TagCOMMA:              "COMMA",
+		TagTRUE:               "TRUE",
+		TagFALSE:              "FALSE",
+		TagREF_CONST:          "REF_CONST",
+		TagNUMBER:             "NUMBER",
+		TagVARNAME:            "VARNAME",
+		TagSTRING_CONST:       "STRING_CONST",
+		TagFUNCNAME:           "FUNCNAME",
+		TagCHAR_CONST:         "CHAR_CONST",
+		TagCOMMENT:            "COMMENT",
+		TagINIT:               "INIT",
 	}
 
 	return tagToString[t]
@@ -141,80 +270,1151 @@ func (f *FiniteState) isTerminal(state int) bool {
 var (
 	automataSkip *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 3, lexemName: "Skip"}, {state: 1, lexemName: "Skip"}, {state: 2, lexemName: "Skip"}, {state: 6, lexemName: "Skip"}, {state: 4, lexemName: "Skip"}, {state: 5, lexemName: "Skip"}},
+		TerminalStates: []TerminalState{{state: 3, lexemName: "Skip"}, {state: 4, lexemName: "Skip"}, {state: 1, lexemName: "Skip"}, {state: 2, lexemName: "Skip"}},
 		Transitions: map[int]map[rune]int{
-			0: {9: 2, 10: 1, 32: 3},
-			1: {9: 5, 10: 4, 32: 6},
-			2: {9: 5, 10: 4, 32: 6},
-			3: {9: 5, 10: 4, 32: 6},
-			4: {9: 5, 10: 4, 32: 6},
-			5: {9: 5, 10: 4, 32: 6},
-			6: {9: 5, 10: 4, 32: 6},
+			0: {9: 1, 32: 2},
+			1: {9: 3, 32: 4},
+			2: {9: 3, 32: 4},
+			3: {9: 3, 32: 4},
+			4: {9: 3, 32: 4},
 		},
 	}
-	automataAssembly *FiniteState = &FiniteState{
+	automataNewLine *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 3, lexemName: "Assembly"}, {state: 6, lexemName: "Assembly"}},
+		TerminalStates: []TerminalState{{state: 2, lexemName: "NewLine"}, {state: 1, lexemName: "NewLine"}},
 		Transitions: map[int]map[rune]int{
-			0: {101: 4, 109: 1},
+			0: {10: 1},
+			1: {10: 2},
+			2: {10: 2},
+		},
+	}
+	automataINT *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 3, lexemName: "INT"}},
+		Transitions: map[int]map[rune]int{
+			0: {105: 1},
+			1: {110: 2},
+			2: {116: 3},
+		},
+	}
+	automataCHAR *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "CHAR"}},
+		Transitions: map[int]map[rune]int{
+			0: {99: 1},
+			1: {104: 2},
+			2: {97: 3},
+			3: {114: 4},
+		},
+	}
+	automataBOOL *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "BOOL"}},
+		Transitions: map[int]map[rune]int{
+			0: {98: 1},
 			1: {111: 2},
-			2: {118: 3},
-			4: {97: 5},
-			5: {120: 6},
+			2: {111: 3},
+			3: {108: 4},
 		},
 	}
-	automataIdent *FiniteState = &FiniteState{
+	automataAND *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "Ident"}, {state: 2, lexemName: "Ident"}, {state: 3, lexemName: "Ident"}, {state: 4, lexemName: "Ident"}, {state: 5, lexemName: "Ident"}},
+		TerminalStates: []TerminalState{{state: 5, lexemName: "AND"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {97: 2},
+			2: {110: 3},
+			3: {100: 4},
+			4: {95: 5},
+		},
+	}
+	automataEQ *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "EQ"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {101: 2},
+			2: {113: 3},
+			3: {95: 4},
+		},
+	}
+	automataGE *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "GE"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {103: 2},
+			2: {101: 3},
+			3: {95: 4},
+		},
+	}
+	automataGT *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "GT"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {103: 2},
+			2: {116: 3},
+			3: {95: 4},
+		},
+	}
+	automataLT *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "LT"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {108: 2},
+			2: {116: 3},
+			3: {95: 4},
+		},
+	}
+	automataLE *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "LE"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {108: 2},
+			2: {101: 3},
+			3: {95: 4},
+		},
+	}
+	automataMOD *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 5, lexemName: "MOD"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {109: 2},
+			2: {111: 3},
+			3: {100: 4},
+			4: {95: 5},
+		},
+	}
+	automataNE *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "NE"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {110: 2},
+			2: {101: 3},
+			3: {95: 4},
+		},
+	}
+	automataOR *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "OR"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {111: 2},
+			2: {114: 3},
+			3: {95: 4},
+		},
+	}
+	automataXOR *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 5, lexemName: "XOR"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {120: 2},
+			2: {111: 3},
+			3: {114: 4},
+			4: {95: 5},
+		},
+	}
+	automataPOW *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 5, lexemName: "POW"}},
+		Transitions: map[int]map[rune]int{
+			0: {95: 1},
+			1: {112: 2},
+			2: {111: 3},
+			3: {119: 4},
+			4: {95: 5},
+		},
+	}
+	automataNEW *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "NEW"}},
+		Transitions: map[int]map[rune]int{
+			0: {110: 1},
+			1: {101: 2},
+			2: {119: 3},
+			3: {95: 4},
+		},
+	}
+	automataNOT *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "NOT"}},
+		Transitions: map[int]map[rune]int{
+			0: {110: 1},
+			1: {111: 2},
+			2: {116: 3},
+			3: {95: 4},
+		},
+	}
+	automataSTATEMENTS_END *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 2, lexemName: "STATEMENTS_END"}},
+		Transitions: map[int]map[rune]int{
+			0: {37: 1},
+			1: {37: 2},
+		},
+	}
+	automataSTATEMENT_EXPR_END *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "STATEMENT_EXPR_END"}},
+		Transitions: map[int]map[rune]int{
+			0: {37: 1},
+		},
+	}
+	automataIF *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "IF"}},
+		Transitions: map[int]map[rune]int{
+			0: {63: 1},
+		},
+	}
+	automataWARNING *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "WARNING"}},
+		Transitions: map[int]map[rune]int{
+			0: {92: 1},
+		},
+	}
+	automataELSE *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 3, lexemName: "ELSE"}},
+		Transitions: map[int]map[rune]int{
+			0: {43: 1},
+			1: {43: 2},
+			2: {43: 3},
+		},
+	}
+	automataWHILE *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "WHILE"}},
+		Transitions: map[int]map[rune]int{
+			0: {38: 1},
+		},
+	}
+	automataASSIGN *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 2, lexemName: "ASSIGN"}},
+		Transitions: map[int]map[rune]int{
+			0: {58: 1},
+			1: {61: 2},
+		},
+	}
+	automataCOLON *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "COLON"}},
+		Transitions: map[int]map[rune]int{
+			0: {58: 1},
+		},
+	}
+	automataPLUS *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "PLUS"}},
+		Transitions: map[int]map[rune]int{
+			0: {43: 1},
+		},
+	}
+	automataMINUS *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "MINUS"}},
+		Transitions: map[int]map[rune]int{
+			0: {45: 1},
+		},
+	}
+	automataMUL *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "MUL"}},
+		Transitions: map[int]map[rune]int{
+			0: {42: 1},
+		},
+	}
+	automataDIV *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "DIV"}},
+		Transitions: map[int]map[rune]int{
+			0: {47: 1},
+		},
+	}
+	automataRETURN *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "RETURN"}},
+		Transitions: map[int]map[rune]int{
+			0: {94: 1},
+		},
+	}
+	automataLEFT_PAREN_1 *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "LEFT_PAREN_1"}},
+		Transitions: map[int]map[rune]int{
+			0: {40: 1},
+		},
+	}
+	automataRIGHT_PAREN_1 *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "RIGHT_PAREN_1"}},
+		Transitions: map[int]map[rune]int{
+			0: {41: 1},
+		},
+	}
+	automataLEFT_PAREN_2 *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "LEFT_PAREN_2"}},
+		Transitions: map[int]map[rune]int{
+			0: {91: 1},
+		},
+	}
+	automataRIGHT_PAREN_2 *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "RIGHT_PAREN_2"}},
+		Transitions: map[int]map[rune]int{
+			0: {93: 1},
+		},
+	}
+	automataLEFT_PAREN_3 *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "LEFT_PAREN_3"}},
+		Transitions: map[int]map[rune]int{
+			0: {60: 1},
+		},
+	}
+	automataRIGHT_PAREN_3 *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "RIGHT_PAREN_3"}},
+		Transitions: map[int]map[rune]int{
+			0: {62: 1},
+		},
+	}
+	automataCOMMA *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "COMMA"}},
+		Transitions: map[int]map[rune]int{
+			0: {44: 1},
+		},
+	}
+	automataTRUE *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 4, lexemName: "TRUE"}},
+		Transitions: map[int]map[rune]int{
+			0: {116: 1},
+			1: {114: 2},
+			2: {117: 3},
+			3: {101: 4},
+		},
+	}
+	automataFALSE *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 5, lexemName: "FALSE"}},
+		Transitions: map[int]map[rune]int{
+			0: {102: 1},
+			1: {97: 2},
+			2: {108: 3},
+			3: {115: 4},
+			4: {101: 5},
+		},
+	}
+	automataREF_CONST *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 7, lexemName: "REF_CONST"}},
+		Transitions: map[int]map[rune]int{
+			0: {110: 1},
+			1: {111: 2},
+			2: {116: 3},
+			3: {104: 4},
+			4: {105: 5},
+			5: {110: 6},
+			6: {103: 7},
+		},
+	}
+	automataNUMBER *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 10, lexemName: "NUMBER"}, {state: 12, lexemName: "NUMBER"}, {state: 11, lexemName: "NUMBER"}, {state: 3, lexemName: "NUMBER"}, {state: 6, lexemName: "NUMBER"}},
+		Transitions: map[int]map[rune]int{
+			0: {48: 3, 49: 3, 50: 3, 51: 3, 52: 3, 53: 3, 54: 3, 55: 3, 56: 3, 57: 3, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 2, 98: 2, 99: 2, 100: 2, 101: 2, 102: 2, 103: 2, 104: 2, 105: 2, 106: 2, 107: 2, 108: 2, 109: 2, 110: 2, 111: 2, 112: 2, 113: 2, 114: 2, 115: 2, 116: 2, 117: 2, 118: 2, 119: 2, 120: 2, 121: 2, 122: 2},
+			1: {48: 6, 49: 6, 50: 6, 51: 6, 52: 6, 53: 6, 54: 6, 55: 6, 56: 6, 57: 6, 65: 4, 66: 4, 67: 4, 68: 4, 69: 4, 70: 4, 71: 4, 72: 4, 73: 4, 74: 4, 75: 4, 76: 4, 77: 4, 78: 4, 79: 4, 80: 4, 81: 4, 82: 4, 83: 4, 84: 4, 85: 4, 86: 4, 87: 4, 88: 4, 89: 4, 90: 4, 97: 5, 98: 5, 99: 5, 100: 5, 101: 5, 102: 5, 103: 5, 104: 5, 105: 5, 106: 5, 107: 5, 108: 5, 109: 5, 110: 5, 111: 5, 112: 5, 113: 5, 114: 5, 115: 5, 116: 5, 117: 5, 118: 5, 119: 5, 120: 5, 121: 5, 122: 5, 123: 7},
+			2: {48: 6, 49: 6, 50: 6, 51: 6, 52: 6, 53: 6, 54: 6, 55: 6, 56: 6, 57: 6, 65: 4, 66: 4, 67: 4, 68: 4, 69: 4, 70: 4, 71: 4, 72: 4, 73: 4, 74: 4, 75: 4, 76: 4, 77: 4, 78: 4, 79: 4, 80: 4, 81: 4, 82: 4, 83: 4, 84: 4, 85: 4, 86: 4, 87: 4, 88: 4, 89: 4, 90: 4, 97: 5, 98: 5, 99: 5, 100: 5, 101: 5, 102: 5, 103: 5, 104: 5, 105: 5, 106: 5, 107: 5, 108: 5, 109: 5, 110: 5, 111: 5, 112: 5, 113: 5, 114: 5, 115: 5, 116: 5, 117: 5, 118: 5, 119: 5, 120: 5, 121: 5, 122: 5, 123: 7},
+			3: {48: 6, 49: 6, 50: 6, 51: 6, 52: 6, 53: 6, 54: 6, 55: 6, 56: 6, 57: 6, 65: 4, 66: 4, 67: 4, 68: 4, 69: 4, 70: 4, 71: 4, 72: 4, 73: 4, 74: 4, 75: 4, 76: 4, 77: 4, 78: 4, 79: 4, 80: 4, 81: 4, 82: 4, 83: 4, 84: 4, 85: 4, 86: 4, 87: 4, 88: 4, 89: 4, 90: 4, 97: 5, 98: 5, 99: 5, 100: 5, 101: 5, 102: 5, 103: 5, 104: 5, 105: 5, 106: 5, 107: 5, 108: 5, 109: 5, 110: 5, 111: 5, 112: 5, 113: 5, 114: 5, 115: 5, 116: 5, 117: 5, 118: 5, 119: 5, 120: 5, 121: 5, 122: 5, 123: 7},
+			4: {48: 6, 49: 6, 50: 6, 51: 6, 52: 6, 53: 6, 54: 6, 55: 6, 56: 6, 57: 6, 65: 4, 66: 4, 67: 4, 68: 4, 69: 4, 70: 4, 71: 4, 72: 4, 73: 4, 74: 4, 75: 4, 76: 4, 77: 4, 78: 4, 79: 4, 80: 4, 81: 4, 82: 4, 83: 4, 84: 4, 85: 4, 86: 4, 87: 4, 88: 4, 89: 4, 90: 4, 97: 5, 98: 5, 99: 5, 100: 5, 101: 5, 102: 5, 103: 5, 104: 5, 105: 5, 106: 5, 107: 5, 108: 5, 109: 5, 110: 5, 111: 5, 112: 5, 113: 5, 114: 5, 115: 5, 116: 5, 117: 5, 118: 5, 119: 5, 120: 5, 121: 5, 122: 5, 123: 7},
+			5: {48: 6, 49: 6, 50: 6, 51: 6, 52: 6, 53: 6, 54: 6, 55: 6, 56: 6, 57: 6, 65: 4, 66: 4, 67: 4, 68: 4, 69: 4, 70: 4, 71: 4, 72: 4, 73: 4, 74: 4, 75: 4, 76: 4, 77: 4, 78: 4, 79: 4, 80: 4, 81: 4, 82: 4, 83: 4, 84: 4, 85: 4, 86: 4, 87: 4, 88: 4, 89: 4, 90: 4, 97: 5, 98: 5, 99: 5, 100: 5, 101: 5, 102: 5, 103: 5, 104: 5, 105: 5, 106: 5, 107: 5, 108: 5, 109: 5, 110: 5, 111: 5, 112: 5, 113: 5, 114: 5, 115: 5, 116: 5, 117: 5, 118: 5, 119: 5, 120: 5, 121: 5, 122: 5, 123: 7},
+			6: {48: 6, 49: 6, 50: 6, 51: 6, 52: 6, 53: 6, 54: 6, 55: 6, 56: 6, 57: 6, 65: 4, 66: 4, 67: 4, 68: 4, 69: 4, 70: 4, 71: 4, 72: 4, 73: 4, 74: 4, 75: 4, 76: 4, 77: 4, 78: 4, 79: 4, 80: 4, 81: 4, 82: 4, 83: 4, 84: 4, 85: 4, 86: 4, 87: 4, 88: 4, 89: 4, 90: 4, 97: 5, 98: 5, 99: 5, 100: 5, 101: 5, 102: 5, 103: 5, 104: 5, 105: 5, 106: 5, 107: 5, 108: 5, 109: 5, 110: 5, 111: 5, 112: 5, 113: 5, 114: 5, 115: 5, 116: 5, 117: 5, 118: 5, 119: 5, 120: 5, 121: 5, 122: 5, 123: 7},
+			7: {48: 8, 49: 8, 50: 8, 51: 8, 52: 8, 53: 8, 54: 8, 55: 8, 56: 8, 57: 8},
+			8: {48: 9, 49: 9, 50: 9, 51: 9, 52: 9, 53: 9, 54: 9, 55: 9, 56: 9, 57: 9, 125: 10},
+			9: {48: 9, 49: 9, 50: 9, 51: 9, 52: 9, 53: 9, 54: 9, 55: 9, 56: 9, 57: 9, 125: 10},
+		},
+	}
+	automataVARNAME *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 10, lexemName: "VARNAME"}, {state: 11, lexemName: "VARNAME"}, {state: 12, lexemName: "VARNAME"}, {state: 13, lexemName: "VARNAME"}},
+		Transitions: map[int]map[rune]int{
+			0:  {33: 3, 35: 9, 46: 7, 64: 5, 95: 1, 124: 2},
+			1:  {65: 10, 66: 10, 67: 10, 68: 10, 69: 10, 70: 10, 71: 10, 72: 10, 73: 10, 74: 10, 75: 10, 76: 10, 77: 10, 78: 10, 79: 10, 80: 10, 81: 10, 82: 10, 83: 10, 84: 10, 85: 10, 86: 10, 87: 10, 88: 10, 89: 10, 90: 10, 97: 11, 98: 11, 99: 11, 100: 11, 101: 11, 102: 11, 103: 11, 104: 11, 105: 11, 106: 11, 107: 11, 108: 11, 109: 11, 110: 11, 111: 11, 112: 11, 113: 11, 114: 11, 115: 11, 116: 11, 117: 11, 118: 11, 119: 11, 120: 11, 121: 11, 122: 11},
+			2:  {65: 10, 66: 10, 67: 10, 68: 10, 69: 10, 70: 10, 71: 10, 72: 10, 73: 10, 74: 10, 75: 10, 76: 10, 77: 10, 78: 10, 79: 10, 80: 10, 81: 10, 82: 10, 83: 10, 84: 10, 85: 10, 86: 10, 87: 10, 88: 10, 89: 10, 90: 10, 97: 11, 98: 11, 99: 11, 100: 11, 101: 11, 102: 11, 103: 11, 104: 11, 105: 11, 106: 11, 107: 11, 108: 11, 109: 11, 110: 11, 111: 11, 112: 11, 113: 11, 114: 11, 115: 11, 116: 11, 117: 11, 118: 11, 119: 11, 120: 11, 121: 11, 122: 11},
+			3:  {65: 10, 66: 10, 67: 10, 68: 10, 69: 10, 70: 10, 71: 10, 72: 10, 73: 10, 74: 10, 75: 10, 76: 10, 77: 10, 78: 10, 79: 10, 80: 10, 81: 10, 82: 10, 83: 10, 84: 10, 85: 10, 86: 10, 87: 10, 88: 10, 89: 10, 90: 10, 97: 11, 98: 11, 99: 11, 100: 11, 101: 11, 102: 11, 103: 11, 104: 11, 105: 11, 106: 11, 107: 11, 108: 11, 109: 11, 110: 11, 111: 11, 112: 11, 113: 11, 114: 11, 115: 11, 116: 11, 117: 11, 118: 11, 119: 11, 120: 11, 121: 11, 122: 11},
+			4:  {65: 10, 66: 10, 67: 10, 68: 10, 69: 10, 70: 10, 71: 10, 72: 10, 73: 10, 74: 10, 75: 10, 76: 10, 77: 10, 78: 10, 79: 10, 80: 10, 81: 10, 82: 10, 83: 10, 84: 10, 85: 10, 86: 10, 87: 10, 88: 10, 89: 10, 90: 10, 97: 11, 98: 11, 99: 11, 100: 11, 101: 11, 102: 11, 103: 11, 104: 11, 105: 11, 106: 11, 107: 11, 108: 11, 109: 11, 110: 11, 111: 11, 112: 11, 113: 11, 114: 11, 115: 11, 116: 11, 117: 11, 118: 11, 119: 11, 120: 11, 121: 11, 122: 11},
+			5:  {65: 10, 66: 10, 67: 10, 68: 10, 69: 10, 70: 10, 71: 10, 72: 10, 73: 10, 74: 10, 75: 10, 76: 10, 77: 10, 78: 10, 79: 10, 80: 10, 81: 10, 82: 10, 83: 10, 84: 10, 85: 10, 86: 10, 87: 10, 88: 10, 89: 10, 90: 10, 97: 11, 98: 11, 99: 11, 100: 11, 101: 11, 102: 11, 103: 11, 104: 11, 105: 11, 106: 11, 107: 11, 108: 11, 109: 11, 110: 11, 111: 11, 112: 11, 113: 11, 114: 11, 115: 11, 116: 11, 117: 11, 118: 11, 119: 11, 120: 11, 121: 11, 122: 11},
+			6:  {65: 10, 66: 10, 67: 10, 68: 10, 69: 10, 70: 10, 71: 10, 72: 10, 73: 10, 74: 10, 75: 10, 76: 10, 77: 10, 78: 10, 79: 10, 80: 10, 81: 10, 82: 10, 83: 10, 84: 10, 85: 10, 86: 10, 87: 10, 88: 10, 89: 10, 90: 10, 97: 11, 98: 11, 99: 11, 100: 11, 101: 11, 102: 11, 103: 11, 104: 11, 105: 11, 106: 11, 107: 11, 108: 11, 109: 11, 110: 11, 111: 11, 112: 11, 113: 11, 114: 11, 115: 11, 116: 11, 117: 11, 118: 11, 119: 11, 120: 11, 121: 11, 122: 11},
+			7:  {65: 10, 66: 10, 67: 10, 68: 10, 69: 10, 70: 10, 71: 10, 72: 10, 73: 10, 74: 10, 75: 10, 76: 10, 77: 10, 78: 10, 79: 10, 80: 10, 81: 10, 82: 10, 83: 10, 84: 10, 85: 10, 86: 10, 87: 10, 88: 10, 89: 10, 90: 10, 97: 11, 98: 11, 99: 11, 100: 11, 101: 11, 102: 11, 103: 11, 104: 11, 105: 11, 106: 11, 107: 11, 108: 11, 109: 11, 110: 11, 111: 11, 112: 11, 113: 11, 114: 11, 115: 11, 116: 11, 117: 11, 118: 11, 119: 11, 120: 11, 121: 11, 122: 11},
+			8:  {65: 10, 66: 10, 67: 10, 68: 10, 69: 10, 70: 10, 71: 10, 72: 10, 73: 10, 74: 10, 75: 10, 76: 10, 77: 10, 78: 10, 79: 10, 80: 10, 81: 10, 82: 10, 83: 10, 84: 10, 85: 10, 86: 10, 87: 10, 88: 10, 89: 10, 90: 10, 97: 11, 98: 11, 99: 11, 100: 11, 101: 11, 102: 11, 103: 11, 104: 11, 105: 11, 106: 11, 107: 11, 108: 11, 109: 11, 110: 11, 111: 11, 112: 11, 113: 11, 114: 11, 115: 11, 116: 11, 117: 11, 118: 11, 119: 11, 120: 11, 121: 11, 122: 11},
+			9:  {65: 10, 66: 10, 67: 10, 68: 10, 69: 10, 70: 10, 71: 10, 72: 10, 73: 10, 74: 10, 75: 10, 76: 10, 77: 10, 78: 10, 79: 10, 80: 10, 81: 10, 82: 10, 83: 10, 84: 10, 85: 10, 86: 10, 87: 10, 88: 10, 89: 10, 90: 10, 97: 11, 98: 11, 99: 11, 100: 11, 101: 11, 102: 11, 103: 11, 104: 11, 105: 11, 106: 11, 107: 11, 108: 11, 109: 11, 110: 11, 111: 11, 112: 11, 113: 11, 114: 11, 115: 11, 116: 11, 117: 11, 118: 11, 119: 11, 120: 11, 121: 11, 122: 11},
+			10: {65: 12, 66: 12, 67: 12, 68: 12, 69: 12, 70: 12, 71: 12, 72: 12, 73: 12, 74: 12, 75: 12, 76: 12, 77: 12, 78: 12, 79: 12, 80: 12, 81: 12, 82: 12, 83: 12, 84: 12, 85: 12, 86: 12, 87: 12, 88: 12, 89: 12, 90: 12, 97: 13, 98: 13, 99: 13, 100: 13, 101: 13, 102: 13, 103: 13, 104: 13, 105: 13, 106: 13, 107: 13, 108: 13, 109: 13, 110: 13, 111: 13, 112: 13, 113: 13, 114: 13, 115: 13, 116: 13, 117: 13, 118: 13, 119: 13, 120: 13, 121: 13, 122: 13},
+			11: {65: 12, 66: 12, 67: 12, 68: 12, 69: 12, 70: 12, 71: 12, 72: 12, 73: 12, 74: 12, 75: 12, 76: 12, 77: 12, 78: 12, 79: 12, 80: 12, 81: 12, 82: 12, 83: 12, 84: 12, 85: 12, 86: 12, 87: 12, 88: 12, 89: 12, 90: 12, 97: 13, 98: 13, 99: 13, 100: 13, 101: 13, 102: 13, 103: 13, 104: 13, 105: 13, 106: 13, 107: 13, 108: 13, 109: 13, 110: 13, 111: 13, 112: 13, 113: 13, 114: 13, 115: 13, 116: 13, 117: 13, 118: 13, 119: 13, 120: 13, 121: 13, 122: 13},
+			12: {65: 12, 66: 12, 67: 12, 68: 12, 69: 12, 70: 12, 71: 12, 72: 12, 73: 12, 74: 12, 75: 12, 76: 12, 77: 12, 78: 12, 79: 12, 80: 12, 81: 12, 82: 12, 83: 12, 84: 12, 85: 12, 86: 12, 87: 12, 88: 12, 89: 12, 90: 12, 97: 13, 98: 13, 99: 13, 100: 13, 101: 13, 102: 13, 103: 13, 104: 13, 105: 13, 106: 13, 107: 13, 108: 13, 109: 13, 110: 13, 111: 13, 112: 13, 113: 13, 114: 13, 115: 13, 116: 13, 117: 13, 118: 13, 119: 13, 120: 13, 121: 13, 122: 13},
+			13: {65: 12, 66: 12, 67: 12, 68: 12, 69: 12, 70: 12, 71: 12, 72: 12, 73: 12, 74: 12, 75: 12, 76: 12, 77: 12, 78: 12, 79: 12, 80: 12, 81: 12, 82: 12, 83: 12, 84: 12, 85: 12, 86: 12, 87: 12, 88: 12, 89: 12, 90: 12, 97: 13, 98: 13, 99: 13, 100: 13, 101: 13, 102: 13, 103: 13, 104: 13, 105: 13, 106: 13, 107: 13, 108: 13, 109: 13, 110: 13, 111: 13, 112: 13, 113: 13, 114: 13, 115: 13, 116: 13, 117: 13, 118: 13, 119: 13, 120: 13, 121: 13, 122: 13},
+		},
+	}
+	automataSTRING_CONST *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 5, lexemName: "STRING_CONST"}},
+		Transitions: map[int]map[rune]int{
+			0: {39: 1},
+			1: {32: 4, 39: 5, 65: 2, 66: 2, 67: 2, 68: 2, 69: 2, 70: 2, 71: 2, 72: 2, 73: 2, 74: 2, 75: 2, 76: 2, 77: 2, 78: 2, 79: 2, 80: 2, 81: 2, 82: 2, 83: 2, 84: 2, 85: 2, 86: 2, 87: 2, 88: 2, 89: 2, 90: 2, 97: 3, 98: 3, 99: 3, 100: 3, 101: 3, 102: 3, 103: 3, 104: 3, 105: 3, 106: 3, 107: 3, 108: 3, 109: 3, 110: 3, 111: 3, 112: 3, 113: 3, 114: 3, 115: 3, 116: 3, 117: 3, 118: 3, 119: 3, 120: 3, 121: 3, 122: 3},
+			2: {32: 4, 39: 5, 65: 2, 66: 2, 67: 2, 68: 2, 69: 2, 70: 2, 71: 2, 72: 2, 73: 2, 74: 2, 75: 2, 76: 2, 77: 2, 78: 2, 79: 2, 80: 2, 81: 2, 82: 2, 83: 2, 84: 2, 85: 2, 86: 2, 87: 2, 88: 2, 89: 2, 90: 2, 97: 3, 98: 3, 99: 3, 100: 3, 101: 3, 102: 3, 103: 3, 104: 3, 105: 3, 106: 3, 107: 3, 108: 3, 109: 3, 110: 3, 111: 3, 112: 3, 113: 3, 114: 3, 115: 3, 116: 3, 117: 3, 118: 3, 119: 3, 120: 3, 121: 3, 122: 3},
+			3: {32: 4, 39: 5, 65: 2, 66: 2, 67: 2, 68: 2, 69: 2, 70: 2, 71: 2, 72: 2, 73: 2, 74: 2, 75: 2, 76: 2, 77: 2, 78: 2, 79: 2, 80: 2, 81: 2, 82: 2, 83: 2, 84: 2, 85: 2, 86: 2, 87: 2, 88: 2, 89: 2, 90: 2, 97: 3, 98: 3, 99: 3, 100: 3, 101: 3, 102: 3, 103: 3, 104: 3, 105: 3, 106: 3, 107: 3, 108: 3, 109: 3, 110: 3, 111: 3, 112: 3, 113: 3, 114: 3, 115: 3, 116: 3, 117: 3, 118: 3, 119: 3, 120: 3, 121: 3, 122: 3},
+			4: {32: 4, 39: 5, 65: 2, 66: 2, 67: 2, 68: 2, 69: 2, 70: 2, 71: 2, 72: 2, 73: 2, 74: 2, 75: 2, 76: 2, 77: 2, 78: 2, 79: 2, 80: 2, 81: 2, 82: 2, 83: 2, 84: 2, 85: 2, 86: 2, 87: 2, 88: 2, 89: 2, 90: 2, 97: 3, 98: 3, 99: 3, 100: 3, 101: 3, 102: 3, 103: 3, 104: 3, 105: 3, 106: 3, 107: 3, 108: 3, 109: 3, 110: 3, 111: 3, 112: 3, 113: 3, 114: 3, 115: 3, 116: 3, 117: 3, 118: 3, 119: 3, 120: 3, 121: 3, 122: 3},
+		},
+	}
+	automataFUNCNAME *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 1, lexemName: "FUNCNAME"}, {state: 2, lexemName: "FUNCNAME"}, {state: 0, lexemName: "FUNCNAME"}},
 		Transitions: map[int]map[rune]int{
 			0: {65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 2, 98: 2, 99: 2, 100: 2, 101: 2, 102: 2, 103: 2, 104: 2, 105: 2, 106: 2, 107: 2, 108: 2, 109: 2, 110: 2, 111: 2, 112: 2, 113: 2, 114: 2, 115: 2, 116: 2, 117: 2, 118: 2, 119: 2, 120: 2, 121: 2, 122: 2},
-			1: {48: 5, 49: 5, 50: 5, 51: 5, 52: 5, 53: 5, 54: 5, 55: 5, 56: 5, 57: 5, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 3, 73: 3, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 3, 81: 3, 82: 3, 83: 3, 84: 3, 85: 3, 86: 3, 87: 3, 88: 3, 89: 3, 90: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 103: 4, 104: 4, 105: 4, 106: 4, 107: 4, 108: 4, 109: 4, 110: 4, 111: 4, 112: 4, 113: 4, 114: 4, 115: 4, 116: 4, 117: 4, 118: 4, 119: 4, 120: 4, 121: 4, 122: 4},
-			2: {48: 5, 49: 5, 50: 5, 51: 5, 52: 5, 53: 5, 54: 5, 55: 5, 56: 5, 57: 5, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 3, 73: 3, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 3, 81: 3, 82: 3, 83: 3, 84: 3, 85: 3, 86: 3, 87: 3, 88: 3, 89: 3, 90: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 103: 4, 104: 4, 105: 4, 106: 4, 107: 4, 108: 4, 109: 4, 110: 4, 111: 4, 112: 4, 113: 4, 114: 4, 115: 4, 116: 4, 117: 4, 118: 4, 119: 4, 120: 4, 121: 4, 122: 4},
-			3: {48: 5, 49: 5, 50: 5, 51: 5, 52: 5, 53: 5, 54: 5, 55: 5, 56: 5, 57: 5, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 3, 73: 3, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 3, 81: 3, 82: 3, 83: 3, 84: 3, 85: 3, 86: 3, 87: 3, 88: 3, 89: 3, 90: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 103: 4, 104: 4, 105: 4, 106: 4, 107: 4, 108: 4, 109: 4, 110: 4, 111: 4, 112: 4, 113: 4, 114: 4, 115: 4, 116: 4, 117: 4, 118: 4, 119: 4, 120: 4, 121: 4, 122: 4},
-			4: {48: 5, 49: 5, 50: 5, 51: 5, 52: 5, 53: 5, 54: 5, 55: 5, 56: 5, 57: 5, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 3, 73: 3, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 3, 81: 3, 82: 3, 83: 3, 84: 3, 85: 3, 86: 3, 87: 3, 88: 3, 89: 3, 90: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 103: 4, 104: 4, 105: 4, 106: 4, 107: 4, 108: 4, 109: 4, 110: 4, 111: 4, 112: 4, 113: 4, 114: 4, 115: 4, 116: 4, 117: 4, 118: 4, 119: 4, 120: 4, 121: 4, 122: 4},
-			5: {48: 5, 49: 5, 50: 5, 51: 5, 52: 5, 53: 5, 54: 5, 55: 5, 56: 5, 57: 5, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 3, 73: 3, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 3, 81: 3, 82: 3, 83: 3, 84: 3, 85: 3, 86: 3, 87: 3, 88: 3, 89: 3, 90: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 103: 4, 104: 4, 105: 4, 106: 4, 107: 4, 108: 4, 109: 4, 110: 4, 111: 4, 112: 4, 113: 4, 114: 4, 115: 4, 116: 4, 117: 4, 118: 4, 119: 4, 120: 4, 121: 4, 122: 4},
+			1: {65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 2, 98: 2, 99: 2, 100: 2, 101: 2, 102: 2, 103: 2, 104: 2, 105: 2, 106: 2, 107: 2, 108: 2, 109: 2, 110: 2, 111: 2, 112: 2, 113: 2, 114: 2, 115: 2, 116: 2, 117: 2, 118: 2, 119: 2, 120: 2, 121: 2, 122: 2},
+			2: {65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 2, 98: 2, 99: 2, 100: 2, 101: 2, 102: 2, 103: 2, 104: 2, 105: 2, 106: 2, 107: 2, 108: 2, 109: 2, 110: 2, 111: 2, 112: 2, 113: 2, 114: 2, 115: 2, 116: 2, 117: 2, 118: 2, 119: 2, 120: 2, 121: 2, 122: 2},
 		},
 	}
-	automataNum *FiniteState = &FiniteState{
+	automataCHAR_CONST *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "Num"}, {state: 0, lexemName: "Num"}, {state: 6, lexemName: "Num"}},
+		TerminalStates: []TerminalState{{state: 4, lexemName: "CHAR_CONST"}},
 		Transitions: map[int]map[rune]int{
-			0: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1},
-			1: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 104: 6},
-			3: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 104: 6},
-			4: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 104: 6},
+			0: {34: 1},
+			1: {34: 4, 65: 2, 66: 2, 67: 2, 68: 2, 69: 2, 70: 2, 71: 2, 72: 2, 73: 2, 74: 2, 75: 2, 76: 2, 77: 2, 78: 2, 79: 2, 80: 2, 81: 2, 82: 2, 83: 2, 84: 2, 85: 2, 86: 2, 87: 2, 88: 2, 89: 2, 90: 2, 97: 3, 98: 3, 99: 3, 100: 3, 101: 3, 102: 3, 103: 3, 104: 3, 105: 3, 106: 3, 107: 3, 108: 3, 109: 3, 110: 3, 111: 3, 112: 3, 113: 3, 114: 3, 115: 3, 116: 3, 117: 3, 118: 3, 119: 3, 120: 3, 121: 3, 122: 3},
+			2: {34: 4},
+			3: {34: 4},
+		},
+	}
+	automataCOMMENT *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 99, lexemName: "COMMENT"}, {state: 95, lexemName: "COMMENT"}},
+		Transitions: map[int]map[rune]int{
+			0:  {123: 1},
+			1:  {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			3:  {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			4:  {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			5:  {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			6:  {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			7:  {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			8:  {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			9:  {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			10: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			11: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			12: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			13: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			14: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			15: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			16: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			17: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			18: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			19: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			20: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			21: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			22: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			23: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			24: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			25: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			26: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			27: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			28: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			29: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			30: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			31: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			32: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			33: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			34: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			35: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			36: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			37: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			38: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			39: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			40: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			41: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			42: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			43: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			44: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			45: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			46: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			47: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			48: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			49: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			50: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			51: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			52: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			53: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			54: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			55: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			56: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			57: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			58: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			59: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			60: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			61: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			62: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			63: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			64: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			65: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			66: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			67: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			68: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			69: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			70: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			71: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			72: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			73: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			74: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			75: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			76: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			77: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			78: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			79: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			80: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			81: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			82: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			83: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			84: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			85: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			86: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			87: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			88: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			89: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			90: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			91: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			92: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			93: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			94: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			95: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			96: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			97: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
+			98: {9: 98, 32: 97, 33: 65, 34: 66, 35: 67, 36: 68, 37: 69, 38: 70, 39: 71, 40: 72, 41: 73, 42: 74, 43: 75, 44: 76, 45: 77, 46: 78, 47: 79, 48: 3, 49: 4, 50: 5, 51: 6, 52: 7, 53: 8, 54: 9, 55: 10, 56: 11, 57: 12, 58: 80, 59: 81, 60: 82, 61: 83, 62: 84, 63: 85, 64: 86, 65: 39, 66: 40, 67: 41, 68: 42, 69: 43, 70: 44, 71: 45, 72: 46, 73: 47, 74: 48, 75: 49, 76: 50, 77: 51, 78: 52, 79: 53, 80: 54, 81: 55, 82: 56, 83: 57, 84: 58, 85: 59, 86: 60, 87: 61, 88: 62, 89: 63, 90: 64, 91: 87, 92: 88, 93: 89, 94: 90, 95: 91, 96: 92, 97: 13, 98: 14, 99: 15, 100: 16, 101: 17, 102: 18, 103: 19, 104: 20, 105: 21, 106: 22, 107: 23, 108: 24, 109: 25, 110: 26, 111: 27, 112: 28, 113: 29, 114: 30, 115: 31, 116: 32, 117: 33, 118: 34, 119: 35, 120: 36, 121: 37, 122: 38, 123: 93, 124: 94, 125: 95, 126: 96},
 		},
 	}
 
 	automataUnionRegexps *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: ""}, {state: 6, lexemName: "Skip"}, {state: 13, lexemName: "Assembly"}, {state: 3, lexemName: "Skip"}, {state: 9, lexemName: ""}, {state: 19, lexemName: "Num"}, {state: 18, lexemName: "Ident"}, {state: 5, lexemName: "Skip"}, {state: 10, lexemName: "Assembly"}, {state: 16, lexemName: "Ident"}, {state: 17, lexemName: "Ident"}, {state: 11, lexemName: ""}, {state: 24, lexemName: "Num"}, {state: 7, lexemName: "Skip"}, {state: 14, lexemName: "Ident"}, {state: 4, lexemName: "Skip"}, {state: 2, lexemName: "Skip"}, {state: 15, lexemName: "Ident"}, {state: 8, lexemName: ""}, {state: 0, lexemName: "Num"}},
+		TerminalStates: []TerminalState{{state: 68, lexemName: ""}, {state: 63, lexemName: ""}, {state: 4, lexemName: "Skip"}, {state: 92, lexemName: "LEFT_PAREN_1"}, {state: 124, lexemName: "NUMBER"}, {state: 146, lexemName: "FUNCNAME"}, {state: 54, lexemName: ""}, {state: 118, lexemName: ""}, {state: 77, lexemName: "STATEMENT_EXPR_END"}, {state: 144, lexemName: "STRING_CONST"}, {state: 80, lexemName: ""}, {state: 94, lexemName: "LEFT_PAREN_2"}, {state: 20, lexemName: ""}, {state: 125, lexemName: "NUMBER"}, {state: 31, lexemName: "GE"}, {state: 66, lexemName: "POW"}, {state: 115, lexemName: ""}, {state: 37, lexemName: ""}, {state: 48, lexemName: "MOD"}, {state: 114, lexemName: "REF_CONST"}, {state: 10, lexemName: "INT"}, {state: 15, lexemName: ""}, {state: 86, lexemName: "COLON"}, {state: 8, lexemName: ""}, {state: 119, lexemName: ""}, {state: 35, lexemName: "GT"}, {state: 45, lexemName: ""}, {state: 136, lexemName: "VARNAME"}, {state: 5, lexemName: "Skip"}, {state: 29, lexemName: ""}, {state: 84, lexemName: ""}, {state: 76, lexemName: "STATEMENTS_END"}, {state: 6, lexemName: "NewLine"}, {state: 0, lexemName: "FUNCNAME"}, {state: 51, lexemName: ""}, {state: 11, lexemName: ""}, {state: 25, lexemName: ""}, {state: 138, lexemName: "VARNAME"}, {state: 87, lexemName: "PLUS"}, {state: 137, lexemName: "VARNAME"}, {state: 52, lexemName: "NE"}, {state: 249, lexemName: "COMMENT"}, {state: 18, lexemName: "BOOL"}, {state: 56, lexemName: "OR"}, {state: 61, lexemName: "XOR"}, {state: 126, lexemName: "NUMBER"}, {state: 85, lexemName: "ASSIGN"}, {state: 139, lexemName: "VARNAME"}, {state: 145, lexemName: "FUNCNAME"}, {state: 79, lexemName: "WARNING"}, {state: 95, lexemName: "RIGHT_PAREN_2"}, {state: 117, lexemName: "NUMBER"}, {state: 39, lexemName: "LT"}, {state: 103, lexemName: ""}, {state: 7, lexemName: "NewLine"}, {state: 2, lexemName: "Skip"}, {state: 72, lexemName: ""}, {state: 78, lexemName: "IF"}, {state: 23, lexemName: "AND"}, {state: 150, lexemName: "CHAR_CONST"}, {state: 96, lexemName: "LEFT_PAREN_3"}, {state: 91, lexemName: "RETURN"}, {state: 50, lexemName: ""}, {state: 98, lexemName: "COMMA"}, {state: 97, lexemName: "RIGHT_PAREN_3"}, {state: 88, lexemName: "MINUS"}, {state: 99, lexemName: ""}, {state: 74, lexemName: "NOT"}, {state: 90, lexemName: "DIV"}, {state: 14, lexemName: "CHAR"}, {state: 83, lexemName: "WHILE"}, {state: 75, lexemName: ""}, {state: 58, lexemName: ""}, {state: 120, lexemName: "NUMBER"}, {state: 107, lexemName: "FALSE"}, {state: 102, lexemName: "TRUE"}, {state: 3, lexemName: "Skip"}, {state: 67, lexemName: ""}, {state: 27, lexemName: "EQ"}, {state: 82, lexemName: "ELSE"}, {state: 70, lexemName: "NEW"}, {state: 116, lexemName: ""}, {state: 245, lexemName: "COMMENT"}, {state: 0, lexemName: ""}, {state: 43, lexemName: "LE"}, {state: 93, lexemName: "RIGHT_PAREN_1"}, {state: 89, lexemName: "MUL"}},
 		Transitions: map[int]map[rune]int{
-			0:  {9: 3, 10: 2, 32: 4, 48: 19, 49: 19, 50: 19, 51: 19, 52: 19, 53: 19, 54: 19, 55: 19, 56: 19, 57: 19, 65: 14, 66: 14, 67: 14, 68: 14, 69: 14, 70: 14, 71: 14, 72: 14, 73: 14, 74: 14, 75: 14, 76: 14, 77: 14, 78: 14, 79: 14, 80: 14, 81: 14, 82: 14, 83: 14, 84: 14, 85: 14, 86: 14, 87: 14, 88: 14, 89: 14, 90: 14, 97: 8, 98: 8, 99: 8, 100: 8, 101: 11, 102: 8, 103: 15, 104: 15, 105: 8, 106: 8, 107: 8, 108: 8, 109: 8, 110: 8, 111: 8, 112: 15, 113: 8, 114: 8, 115: 15, 116: 15, 117: 15, 118: 15, 119: 15, 120: 8, 121: 15, 122: 8},
-			2:  {9: 6, 10: 5, 32: 7},
-			3:  {9: 6, 10: 5, 32: 7},
-			4:  {9: 6, 10: 5, 32: 7},
-			5:  {9: 6, 10: 5, 32: 7},
-			6:  {9: 6, 10: 5, 32: 7},
-			7:  {9: 6, 10: 5, 32: 7},
-			8:  {48: 18, 49: 18, 50: 18, 51: 18, 52: 18, 53: 18, 54: 18, 55: 18, 56: 18, 57: 18, 65: 16, 66: 16, 67: 16, 68: 16, 69: 16, 70: 16, 71: 16, 72: 16, 73: 16, 74: 16, 75: 16, 76: 16, 77: 16, 78: 16, 79: 16, 80: 16, 81: 16, 82: 16, 83: 16, 84: 16, 85: 16, 86: 16, 87: 16, 88: 16, 89: 16, 90: 16, 97: 9, 98: 9, 99: 17, 100: 9, 101: 17, 102: 9, 103: 9, 104: 9, 105: 9, 106: 9, 107: 17, 108: 9, 109: 17, 110: 17, 111: 9, 112: 9, 113: 17, 114: 9, 115: 9, 116: 17, 117: 17, 118: 9, 119: 9, 120: 9, 121: 17, 122: 9},
-			9:  {48: 18, 49: 18, 50: 18, 51: 18, 52: 18, 53: 18, 54: 18, 55: 18, 56: 18, 57: 18, 65: 16, 66: 16, 67: 16, 68: 16, 69: 16, 70: 16, 71: 16, 72: 16, 73: 16, 74: 16, 75: 16, 76: 16, 77: 16, 78: 16, 79: 16, 80: 16, 81: 16, 82: 16, 83: 16, 84: 16, 85: 16, 86: 16, 87: 16, 88: 16, 89: 16, 90: 16, 97: 9, 98: 9, 99: 9, 100: 9, 101: 9, 102: 9, 103: 9, 104: 9, 105: 9, 106: 9, 107: 9, 108: 9, 109: 9, 110: 9, 111: 9, 112: 9, 113: 9, 114: 9, 115: 9, 116: 9, 117: 9, 118: 10, 119: 9, 120: 9, 121: 9, 122: 9},
-			11: {97: 12},
-			12: {120: 13},
-			14: {48: 18, 49: 18, 50: 18, 51: 18, 52: 18, 53: 18, 54: 18, 55: 18, 56: 18, 57: 18, 65: 16, 66: 16, 67: 16, 68: 16, 69: 16, 70: 16, 71: 16, 72: 16, 73: 16, 74: 16, 75: 16, 76: 16, 77: 16, 78: 16, 79: 16, 80: 16, 81: 16, 82: 16, 83: 16, 84: 16, 85: 16, 86: 16, 87: 16, 88: 16, 89: 16, 90: 16, 97: 17, 98: 17, 99: 17, 100: 17, 101: 17, 102: 17, 103: 17, 104: 17, 105: 17, 106: 17, 107: 17, 108: 17, 109: 17, 110: 17, 111: 17, 112: 17, 113: 17, 114: 17, 115: 17, 116: 17, 117: 17, 118: 17, 119: 17, 120: 17, 121: 17, 122: 17},
-			16: {48: 18, 49: 18, 50: 18, 51: 18, 52: 18, 53: 18, 54: 18, 55: 18, 56: 18, 57: 18, 65: 16, 66: 16, 67: 16, 68: 16, 69: 16, 70: 16, 71: 16, 72: 16, 73: 16, 74: 16, 75: 16, 76: 16, 77: 16, 78: 16, 79: 16, 80: 16, 81: 16, 82: 16, 83: 16, 84: 16, 85: 16, 86: 16, 87: 16, 88: 16, 89: 16, 90: 16, 97: 9, 98: 9, 99: 9, 100: 9, 101: 9, 102: 9, 103: 9, 104: 9, 105: 9, 106: 9, 107: 9, 108: 9, 109: 9, 110: 9, 111: 9, 112: 9, 113: 9, 114: 9, 115: 9, 116: 9, 117: 9, 118: 9, 119: 9, 120: 9, 121: 9, 122: 9},
-			18: {48: 18, 49: 18, 50: 18, 51: 18, 52: 18, 53: 18, 54: 18, 55: 18, 56: 18, 57: 18, 65: 16, 66: 16, 67: 16, 68: 16, 69: 16, 70: 16, 71: 16, 72: 16, 73: 16, 74: 16, 75: 16, 76: 16, 77: 16, 78: 16, 79: 16, 80: 16, 81: 16, 82: 16, 83: 16, 84: 16, 85: 16, 86: 16, 87: 16, 88: 16, 89: 16, 90: 16, 97: 9, 98: 9, 99: 9, 100: 9, 101: 9, 102: 9, 103: 9, 104: 9, 105: 9, 106: 9, 107: 9, 108: 9, 109: 9, 110: 9, 111: 9, 112: 9, 113: 9, 114: 9, 115: 9, 116: 9, 117: 9, 118: 9, 119: 9, 120: 9, 121: 9, 122: 9},
-			19: {48: 19, 49: 19, 50: 19, 51: 19, 52: 19, 53: 19, 54: 19, 55: 19, 56: 19, 57: 19, 65: 21, 66: 21, 67: 21, 68: 21, 69: 21, 70: 21, 97: 22, 98: 22, 99: 22, 100: 22, 101: 22, 102: 22, 104: 24},
-			21: {48: 19, 49: 19, 50: 19, 51: 19, 52: 19, 53: 19, 54: 19, 55: 19, 56: 19, 57: 19, 65: 21, 66: 21, 67: 21, 68: 21, 69: 21, 70: 21, 97: 22, 98: 22, 99: 22, 100: 22, 101: 22, 102: 22, 104: 24},
-			22: {48: 19, 49: 19, 50: 19, 51: 19, 52: 19, 53: 19, 54: 19, 55: 19, 56: 19, 57: 19, 65: 21, 66: 21, 67: 21, 68: 21, 69: 21, 70: 21, 97: 22, 98: 22, 99: 22, 100: 22, 101: 22, 102: 22, 104: 24},
+			0:   {9: 2, 10: 6, 32: 3, 33: 129, 34: 147, 35: 135, 37: 75, 38: 83, 39: 140, 40: 92, 41: 93, 42: 89, 43: 80, 44: 98, 45: 88, 46: 133, 47: 90, 48: 117, 49: 117, 50: 117, 51: 117, 52: 117, 53: 117, 54: 117, 55: 117, 56: 117, 57: 117, 58: 84, 60: 96, 62: 97, 63: 78, 64: 131, 65: 115, 66: 115, 67: 115, 68: 115, 69: 115, 70: 115, 71: 115, 72: 115, 73: 115, 74: 115, 75: 115, 76: 115, 77: 115, 78: 115, 79: 115, 80: 115, 81: 115, 82: 115, 83: 115, 84: 115, 85: 115, 86: 115, 87: 115, 88: 115, 89: 115, 90: 115, 91: 94, 92: 79, 93: 95, 94: 91, 95: 19, 97: 67, 98: 15, 99: 11, 100: 67, 101: 67, 102: 103, 103: 67, 104: 67, 105: 8, 106: 67, 107: 67, 108: 67, 109: 67, 110: 67, 111: 67, 112: 67, 113: 67, 114: 67, 115: 67, 116: 99, 117: 67, 118: 67, 119: 67, 120: 116, 121: 116, 122: 67, 123: 151, 124: 128},
+			2:   {9: 4, 32: 5},
+			3:   {9: 4, 32: 5},
+			4:   {9: 4, 32: 5},
+			5:   {9: 4, 32: 5},
+			6:   {10: 7},
+			7:   {10: 7},
+			8:   {110: 9},
+			9:   {116: 10},
+			11:  {104: 12},
+			12:  {97: 13},
+			13:  {114: 14},
+			15:  {111: 16},
+			16:  {111: 17},
+			17:  {108: 18},
+			19:  {65: 136, 66: 136, 67: 136, 68: 136, 69: 136, 70: 136, 71: 136, 72: 136, 73: 136, 74: 136, 75: 136, 76: 136, 77: 136, 78: 136, 79: 136, 80: 136, 81: 136, 82: 136, 83: 136, 84: 136, 85: 136, 86: 136, 87: 136, 88: 136, 89: 136, 90: 136, 97: 20, 98: 137, 99: 137, 100: 50, 101: 25, 102: 50, 103: 29, 104: 50, 105: 137, 106: 50, 107: 50, 108: 37, 109: 45, 110: 50, 111: 54, 112: 63, 113: 50, 114: 50, 115: 50, 116: 137, 117: 137, 118: 50, 119: 137, 120: 58, 121: 50, 122: 137},
+			20:  {110: 21},
+			21:  {100: 22},
+			22:  {95: 23},
+			25:  {113: 26},
+			26:  {95: 27},
+			29:  {101: 30, 116: 34},
+			30:  {95: 31},
+			34:  {95: 35},
+			37:  {101: 42, 116: 38},
+			38:  {95: 39},
+			42:  {95: 43},
+			45:  {111: 46},
+			46:  {100: 47},
+			47:  {95: 48},
+			50:  {65: 138, 66: 138, 67: 138, 68: 138, 69: 138, 70: 138, 71: 138, 72: 138, 73: 138, 74: 138, 75: 138, 76: 138, 77: 138, 78: 138, 79: 138, 80: 138, 81: 138, 82: 138, 83: 138, 84: 138, 85: 138, 86: 138, 87: 138, 88: 138, 89: 138, 90: 138, 97: 51, 98: 51, 99: 51, 100: 51, 101: 51, 102: 51, 103: 51, 104: 51, 105: 51, 106: 139, 107: 51, 108: 51, 109: 51, 110: 51, 111: 51, 112: 51, 113: 51, 114: 51, 115: 51, 116: 51, 117: 51, 118: 51, 119: 51, 120: 51, 121: 51, 122: 51},
+			51:  {65: 138, 66: 138, 67: 138, 68: 138, 69: 138, 70: 138, 71: 138, 72: 138, 73: 138, 74: 138, 75: 138, 76: 138, 77: 138, 78: 138, 79: 138, 80: 138, 81: 138, 82: 138, 83: 138, 84: 138, 85: 138, 86: 138, 87: 138, 88: 138, 89: 138, 90: 138, 95: 52, 97: 51, 98: 51, 99: 51, 100: 51, 101: 51, 102: 51, 103: 51, 104: 51, 105: 51, 106: 51, 107: 51, 108: 51, 109: 51, 110: 51, 111: 51, 112: 51, 113: 51, 114: 51, 115: 51, 116: 51, 117: 51, 118: 51, 119: 51, 120: 51, 121: 51, 122: 51},
+			54:  {114: 55},
+			55:  {95: 56},
+			58:  {111: 59},
+			59:  {114: 60},
+			60:  {95: 61},
+			63:  {111: 64},
+			64:  {119: 65},
+			65:  {95: 66},
+			67:  {48: 120, 49: 120, 50: 120, 51: 120, 52: 120, 53: 120, 54: 120, 55: 120, 56: 120, 57: 120, 65: 118, 66: 118, 67: 118, 68: 118, 69: 118, 70: 118, 71: 118, 72: 118, 73: 118, 74: 118, 75: 118, 76: 118, 77: 118, 78: 118, 79: 118, 80: 118, 81: 118, 82: 118, 83: 118, 84: 118, 85: 118, 86: 118, 87: 118, 88: 118, 89: 118, 90: 118, 97: 68, 98: 68, 99: 68, 100: 68, 101: 68, 102: 68, 103: 68, 104: 119, 105: 68, 106: 68, 107: 119, 108: 119, 109: 68, 110: 68, 111: 72, 112: 119, 113: 68, 114: 119, 115: 119, 116: 68, 117: 68, 118: 68, 119: 68, 120: 68, 121: 68, 122: 119, 123: 121},
+			68:  {48: 120, 49: 120, 50: 120, 51: 120, 52: 120, 53: 120, 54: 120, 55: 120, 56: 120, 57: 120, 65: 118, 66: 118, 67: 118, 68: 118, 69: 118, 70: 118, 71: 118, 72: 118, 73: 118, 74: 118, 75: 118, 76: 118, 77: 118, 78: 118, 79: 118, 80: 118, 81: 118, 82: 118, 83: 118, 84: 118, 85: 118, 86: 118, 87: 118, 88: 118, 89: 118, 90: 118, 97: 68, 98: 68, 99: 68, 100: 68, 101: 68, 102: 68, 103: 68, 104: 68, 105: 68, 106: 68, 107: 68, 108: 68, 109: 68, 110: 68, 111: 68, 112: 68, 113: 68, 114: 68, 115: 68, 116: 68, 117: 68, 118: 68, 119: 69, 120: 68, 121: 68, 122: 68, 123: 121},
+			69:  {95: 70},
+			72:  {116: 73},
+			73:  {95: 74, 104: 111},
+			75:  {37: 76},
+			80:  {43: 81},
+			81:  {43: 82},
+			84:  {61: 85},
+			99:  {114: 100},
+			100: {117: 101},
+			101: {101: 102},
+			103: {97: 104},
+			104: {108: 105},
+			105: {115: 106},
+			106: {101: 107},
+			111: {105: 112},
+			112: {110: 113},
+			113: {103: 114},
+			115: {48: 120, 49: 120, 50: 120, 51: 120, 52: 120, 53: 120, 54: 120, 55: 120, 56: 120, 57: 120, 65: 118, 66: 118, 67: 118, 68: 118, 69: 118, 70: 118, 71: 118, 72: 118, 73: 118, 74: 118, 75: 118, 76: 118, 77: 118, 78: 118, 79: 118, 80: 118, 81: 118, 82: 118, 83: 118, 84: 118, 85: 118, 86: 118, 87: 118, 88: 118, 89: 118, 90: 118, 97: 119, 98: 119, 99: 119, 100: 119, 101: 119, 102: 119, 103: 119, 104: 119, 105: 119, 106: 119, 107: 119, 108: 119, 109: 119, 110: 119, 111: 119, 112: 119, 113: 119, 114: 119, 115: 119, 116: 119, 117: 119, 118: 119, 119: 119, 120: 119, 121: 119, 122: 119, 123: 121},
+			117: {48: 120, 49: 120, 50: 120, 51: 120, 52: 120, 53: 120, 54: 120, 55: 120, 56: 120, 57: 120, 65: 118, 66: 118, 67: 118, 68: 118, 69: 118, 70: 118, 71: 118, 72: 118, 73: 118, 74: 118, 75: 118, 76: 118, 77: 118, 78: 118, 79: 118, 80: 118, 81: 118, 82: 118, 83: 118, 84: 118, 85: 118, 86: 118, 87: 118, 88: 118, 89: 118, 90: 118, 97: 68, 98: 68, 99: 68, 100: 68, 101: 68, 102: 68, 103: 68, 104: 68, 105: 68, 106: 68, 107: 68, 108: 68, 109: 68, 110: 68, 111: 68, 112: 68, 113: 68, 114: 68, 115: 68, 116: 68, 117: 68, 118: 68, 119: 68, 120: 68, 121: 68, 122: 68, 123: 121},
+			118: {48: 120, 49: 120, 50: 120, 51: 120, 52: 120, 53: 120, 54: 120, 55: 120, 56: 120, 57: 120, 65: 118, 66: 118, 67: 118, 68: 118, 69: 118, 70: 118, 71: 118, 72: 118, 73: 118, 74: 118, 75: 118, 76: 118, 77: 118, 78: 118, 79: 118, 80: 118, 81: 118, 82: 118, 83: 118, 84: 118, 85: 118, 86: 118, 87: 118, 88: 118, 89: 118, 90: 118, 97: 68, 98: 68, 99: 68, 100: 68, 101: 68, 102: 68, 103: 68, 104: 68, 105: 68, 106: 68, 107: 68, 108: 68, 109: 68, 110: 68, 111: 68, 112: 68, 113: 68, 114: 68, 115: 68, 116: 68, 117: 68, 118: 68, 119: 68, 120: 68, 121: 68, 122: 68, 123: 121},
+			120: {48: 120, 49: 120, 50: 120, 51: 120, 52: 120, 53: 120, 54: 120, 55: 120, 56: 120, 57: 120, 65: 118, 66: 118, 67: 118, 68: 118, 69: 118, 70: 118, 71: 118, 72: 118, 73: 118, 74: 118, 75: 118, 76: 118, 77: 118, 78: 118, 79: 118, 80: 118, 81: 118, 82: 118, 83: 118, 84: 118, 85: 118, 86: 118, 87: 118, 88: 118, 89: 118, 90: 118, 97: 68, 98: 68, 99: 68, 100: 68, 101: 68, 102: 68, 103: 68, 104: 68, 105: 68, 106: 68, 107: 68, 108: 68, 109: 68, 110: 68, 111: 68, 112: 68, 113: 68, 114: 68, 115: 68, 116: 68, 117: 68, 118: 68, 119: 68, 120: 68, 121: 68, 122: 68, 123: 121},
+			121: {48: 122, 49: 122, 50: 122, 51: 122, 52: 122, 53: 122, 54: 122, 55: 122, 56: 122, 57: 122},
+			122: {48: 123, 49: 123, 50: 123, 51: 123, 52: 123, 53: 123, 54: 123, 55: 123, 56: 123, 57: 123, 125: 124},
+			123: {48: 123, 49: 123, 50: 123, 51: 123, 52: 123, 53: 123, 54: 123, 55: 123, 56: 123, 57: 123, 125: 124},
+			128: {65: 136, 66: 136, 67: 136, 68: 136, 69: 136, 70: 136, 71: 136, 72: 136, 73: 136, 74: 136, 75: 136, 76: 136, 77: 136, 78: 136, 79: 136, 80: 136, 81: 136, 82: 136, 83: 136, 84: 136, 85: 136, 86: 136, 87: 136, 88: 136, 89: 136, 90: 136, 97: 50, 98: 50, 99: 50, 100: 50, 101: 50, 102: 50, 103: 50, 104: 50, 105: 50, 106: 50, 107: 50, 108: 50, 109: 50, 110: 50, 111: 50, 112: 50, 113: 50, 114: 50, 115: 50, 116: 50, 117: 50, 118: 50, 119: 50, 120: 50, 121: 50, 122: 50},
+			129: {65: 136, 66: 136, 67: 136, 68: 136, 69: 136, 70: 136, 71: 136, 72: 136, 73: 136, 74: 136, 75: 136, 76: 136, 77: 136, 78: 136, 79: 136, 80: 136, 81: 136, 82: 136, 83: 136, 84: 136, 85: 136, 86: 136, 87: 136, 88: 136, 89: 136, 90: 136, 97: 50, 98: 50, 99: 50, 100: 50, 101: 50, 102: 50, 103: 50, 104: 50, 105: 50, 106: 50, 107: 50, 108: 50, 109: 50, 110: 50, 111: 50, 112: 50, 113: 50, 114: 50, 115: 50, 116: 50, 117: 50, 118: 50, 119: 50, 120: 50, 121: 50, 122: 50},
+			130: {65: 136, 66: 136, 67: 136, 68: 136, 69: 136, 70: 136, 71: 136, 72: 136, 73: 136, 74: 136, 75: 136, 76: 136, 77: 136, 78: 136, 79: 136, 80: 136, 81: 136, 82: 136, 83: 136, 84: 136, 85: 136, 86: 136, 87: 136, 88: 136, 89: 136, 90: 136, 97: 50, 98: 50, 99: 50, 100: 50, 101: 50, 102: 50, 103: 50, 104: 50, 105: 50, 106: 50, 107: 50, 108: 50, 109: 50, 110: 50, 111: 50, 112: 50, 113: 50, 114: 50, 115: 50, 116: 50, 117: 50, 118: 50, 119: 50, 120: 50, 121: 50, 122: 50},
+			131: {65: 136, 66: 136, 67: 136, 68: 136, 69: 136, 70: 136, 71: 136, 72: 136, 73: 136, 74: 136, 75: 136, 76: 136, 77: 136, 78: 136, 79: 136, 80: 136, 81: 136, 82: 136, 83: 136, 84: 136, 85: 136, 86: 136, 87: 136, 88: 136, 89: 136, 90: 136, 97: 50, 98: 50, 99: 50, 100: 50, 101: 50, 102: 50, 103: 50, 104: 50, 105: 50, 106: 50, 107: 50, 108: 50, 109: 50, 110: 50, 111: 50, 112: 50, 113: 50, 114: 50, 115: 50, 116: 50, 117: 50, 118: 50, 119: 50, 120: 50, 121: 50, 122: 50},
+			132: {65: 136, 66: 136, 67: 136, 68: 136, 69: 136, 70: 136, 71: 136, 72: 136, 73: 136, 74: 136, 75: 136, 76: 136, 77: 136, 78: 136, 79: 136, 80: 136, 81: 136, 82: 136, 83: 136, 84: 136, 85: 136, 86: 136, 87: 136, 88: 136, 89: 136, 90: 136, 97: 50, 98: 50, 99: 50, 100: 50, 101: 50, 102: 50, 103: 50, 104: 50, 105: 50, 106: 50, 107: 50, 108: 50, 109: 50, 110: 50, 111: 50, 112: 50, 113: 50, 114: 50, 115: 50, 116: 50, 117: 50, 118: 50, 119: 50, 120: 50, 121: 50, 122: 50},
+			133: {65: 136, 66: 136, 67: 136, 68: 136, 69: 136, 70: 136, 71: 136, 72: 136, 73: 136, 74: 136, 75: 136, 76: 136, 77: 136, 78: 136, 79: 136, 80: 136, 81: 136, 82: 136, 83: 136, 84: 136, 85: 136, 86: 136, 87: 136, 88: 136, 89: 136, 90: 136, 97: 50, 98: 50, 99: 50, 100: 50, 101: 50, 102: 50, 103: 50, 104: 50, 105: 50, 106: 50, 107: 50, 108: 50, 109: 50, 110: 50, 111: 50, 112: 50, 113: 50, 114: 50, 115: 50, 116: 50, 117: 50, 118: 50, 119: 50, 120: 50, 121: 50, 122: 50},
+			134: {65: 136, 66: 136, 67: 136, 68: 136, 69: 136, 70: 136, 71: 136, 72: 136, 73: 136, 74: 136, 75: 136, 76: 136, 77: 136, 78: 136, 79: 136, 80: 136, 81: 136, 82: 136, 83: 136, 84: 136, 85: 136, 86: 136, 87: 136, 88: 136, 89: 136, 90: 136, 97: 50, 98: 50, 99: 50, 100: 50, 101: 50, 102: 50, 103: 50, 104: 50, 105: 50, 106: 50, 107: 50, 108: 50, 109: 50, 110: 50, 111: 50, 112: 50, 113: 50, 114: 50, 115: 50, 116: 50, 117: 50, 118: 50, 119: 50, 120: 50, 121: 50, 122: 50},
+			135: {65: 136, 66: 136, 67: 136, 68: 136, 69: 136, 70: 136, 71: 136, 72: 136, 73: 136, 74: 136, 75: 136, 76: 136, 77: 136, 78: 136, 79: 136, 80: 136, 81: 136, 82: 136, 83: 136, 84: 136, 85: 136, 86: 136, 87: 136, 88: 136, 89: 136, 90: 136, 97: 50, 98: 50, 99: 50, 100: 50, 101: 50, 102: 50, 103: 50, 104: 50, 105: 50, 106: 50, 107: 50, 108: 50, 109: 50, 110: 50, 111: 50, 112: 50, 113: 50, 114: 50, 115: 50, 116: 50, 117: 50, 118: 50, 119: 50, 120: 50, 121: 50, 122: 50},
+			136: {65: 138, 66: 138, 67: 138, 68: 138, 69: 138, 70: 138, 71: 138, 72: 138, 73: 138, 74: 138, 75: 138, 76: 138, 77: 138, 78: 138, 79: 138, 80: 138, 81: 138, 82: 138, 83: 138, 84: 138, 85: 138, 86: 138, 87: 138, 88: 138, 89: 138, 90: 138, 97: 139, 98: 139, 99: 139, 100: 139, 101: 139, 102: 139, 103: 139, 104: 139, 105: 139, 106: 139, 107: 139, 108: 139, 109: 139, 110: 139, 111: 139, 112: 139, 113: 139, 114: 139, 115: 139, 116: 139, 117: 139, 118: 139, 119: 139, 120: 139, 121: 139, 122: 139},
+			138: {65: 138, 66: 138, 67: 138, 68: 138, 69: 138, 70: 138, 71: 138, 72: 138, 73: 138, 74: 138, 75: 138, 76: 138, 77: 138, 78: 138, 79: 138, 80: 138, 81: 138, 82: 138, 83: 138, 84: 138, 85: 138, 86: 138, 87: 138, 88: 138, 89: 138, 90: 138, 97: 51, 98: 51, 99: 51, 100: 51, 101: 51, 102: 51, 103: 51, 104: 51, 105: 51, 106: 51, 107: 51, 108: 51, 109: 51, 110: 51, 111: 51, 112: 51, 113: 51, 114: 51, 115: 51, 116: 51, 117: 51, 118: 51, 119: 51, 120: 51, 121: 51, 122: 51},
+			140: {32: 143, 39: 144, 65: 141, 66: 141, 67: 141, 68: 141, 69: 141, 70: 141, 71: 141, 72: 141, 73: 141, 74: 141, 75: 141, 76: 141, 77: 141, 78: 141, 79: 141, 80: 141, 81: 141, 82: 141, 83: 141, 84: 141, 85: 141, 86: 141, 87: 141, 88: 141, 89: 141, 90: 141, 97: 142, 98: 142, 99: 142, 100: 142, 101: 142, 102: 142, 103: 142, 104: 142, 105: 142, 106: 142, 107: 142, 108: 142, 109: 142, 110: 142, 111: 142, 112: 142, 113: 142, 114: 142, 115: 142, 116: 142, 117: 142, 118: 142, 119: 142, 120: 142, 121: 142, 122: 142},
+			141: {32: 143, 39: 144, 65: 141, 66: 141, 67: 141, 68: 141, 69: 141, 70: 141, 71: 141, 72: 141, 73: 141, 74: 141, 75: 141, 76: 141, 77: 141, 78: 141, 79: 141, 80: 141, 81: 141, 82: 141, 83: 141, 84: 141, 85: 141, 86: 141, 87: 141, 88: 141, 89: 141, 90: 141, 97: 142, 98: 142, 99: 142, 100: 142, 101: 142, 102: 142, 103: 142, 104: 142, 105: 142, 106: 142, 107: 142, 108: 142, 109: 142, 110: 142, 111: 142, 112: 142, 113: 142, 114: 142, 115: 142, 116: 142, 117: 142, 118: 142, 119: 142, 120: 142, 121: 142, 122: 142},
+			142: {32: 143, 39: 144, 65: 141, 66: 141, 67: 141, 68: 141, 69: 141, 70: 141, 71: 141, 72: 141, 73: 141, 74: 141, 75: 141, 76: 141, 77: 141, 78: 141, 79: 141, 80: 141, 81: 141, 82: 141, 83: 141, 84: 141, 85: 141, 86: 141, 87: 141, 88: 141, 89: 141, 90: 141, 97: 142, 98: 142, 99: 142, 100: 142, 101: 142, 102: 142, 103: 142, 104: 142, 105: 142, 106: 142, 107: 142, 108: 142, 109: 142, 110: 142, 111: 142, 112: 142, 113: 142, 114: 142, 115: 142, 116: 142, 117: 142, 118: 142, 119: 142, 120: 142, 121: 142, 122: 142},
+			143: {32: 143, 39: 144, 65: 141, 66: 141, 67: 141, 68: 141, 69: 141, 70: 141, 71: 141, 72: 141, 73: 141, 74: 141, 75: 141, 76: 141, 77: 141, 78: 141, 79: 141, 80: 141, 81: 141, 82: 141, 83: 141, 84: 141, 85: 141, 86: 141, 87: 141, 88: 141, 89: 141, 90: 141, 97: 142, 98: 142, 99: 142, 100: 142, 101: 142, 102: 142, 103: 142, 104: 142, 105: 142, 106: 142, 107: 142, 108: 142, 109: 142, 110: 142, 111: 142, 112: 142, 113: 142, 114: 142, 115: 142, 116: 142, 117: 142, 118: 142, 119: 142, 120: 142, 121: 142, 122: 142},
+			147: {34: 150, 65: 148, 66: 148, 67: 148, 68: 148, 69: 148, 70: 148, 71: 148, 72: 148, 73: 148, 74: 148, 75: 148, 76: 148, 77: 148, 78: 148, 79: 148, 80: 148, 81: 148, 82: 148, 83: 148, 84: 148, 85: 148, 86: 148, 87: 148, 88: 148, 89: 148, 90: 148, 97: 149, 98: 149, 99: 149, 100: 149, 101: 149, 102: 149, 103: 149, 104: 149, 105: 149, 106: 149, 107: 149, 108: 149, 109: 149, 110: 149, 111: 149, 112: 149, 113: 149, 114: 149, 115: 149, 116: 149, 117: 149, 118: 149, 119: 149, 120: 149, 121: 149, 122: 149},
+			148: {34: 150},
+			149: {34: 150},
+			151: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			153: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			154: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			155: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			156: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			157: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			158: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			159: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			160: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			161: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			162: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			163: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			164: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			165: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			166: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			167: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			168: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			169: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			170: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			171: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			172: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			173: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			174: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			175: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			176: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			177: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			178: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			179: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			180: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			181: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			182: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			183: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			184: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			185: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			186: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			187: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			188: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			189: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			190: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			191: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			192: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			193: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			194: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			195: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			196: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			197: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			198: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			199: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			200: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			201: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			202: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			203: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			204: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			205: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			206: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			207: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			208: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			209: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			210: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			211: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			212: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			213: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			214: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			215: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			216: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			217: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			218: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			219: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			220: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			221: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			222: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			223: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			224: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			225: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			226: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			227: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			228: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			229: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			230: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			231: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			232: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			233: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			234: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			235: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			236: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			237: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			238: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			239: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			240: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			241: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			242: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			243: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			244: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			245: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			246: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			247: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
+			248: {9: 248, 32: 247, 33: 215, 34: 216, 35: 217, 36: 218, 37: 219, 38: 220, 39: 221, 40: 222, 41: 223, 42: 224, 43: 225, 44: 226, 45: 227, 46: 228, 47: 229, 48: 153, 49: 154, 50: 155, 51: 156, 52: 157, 53: 158, 54: 159, 55: 160, 56: 161, 57: 162, 58: 230, 59: 231, 60: 232, 61: 233, 62: 234, 63: 235, 64: 236, 65: 189, 66: 190, 67: 191, 68: 192, 69: 193, 70: 194, 71: 195, 72: 196, 73: 197, 74: 198, 75: 199, 76: 200, 77: 201, 78: 202, 79: 203, 80: 204, 81: 205, 82: 206, 83: 207, 84: 208, 85: 209, 86: 210, 87: 211, 88: 212, 89: 213, 90: 214, 91: 237, 92: 238, 93: 239, 94: 240, 95: 241, 96: 242, 97: 163, 98: 164, 99: 165, 100: 166, 101: 167, 102: 168, 103: 169, 104: 170, 105: 171, 106: 172, 107: 173, 108: 174, 109: 175, 110: 176, 111: 177, 112: 178, 113: 179, 114: 180, 115: 181, 116: 182, 117: 183, 118: 184, 119: 185, 120: 186, 121: 187, 122: 188, 123: 243, 124: 244, 125: 245, 126: 246},
 		},
 	}
 )
 
-type ErrHandlerBase struct{}
+type HandlerBase struct{}
 
-func (e *ErrHandlerBase) Error(msg string, pos Position, symbol string) {
+func (e *HandlerBase) Error(msg string, pos Position, symbol string) {
 	fmt.Printf("ERROR%s: %s %s\n", pos.String(), msg, symbol)
+}
+
+func (h *HandlerBase) Skip(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return Token{}, true
+}
+
+func (h *HandlerBase) NewLine(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagNewLine, start, end, text), false
+}
+
+func (h *HandlerBase) INT(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagINT, start, end, text), false
+}
+
+func (h *HandlerBase) CHAR(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagCHAR, start, end, text), false
+}
+
+func (h *HandlerBase) BOOL(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagBOOL, start, end, text), false
+}
+
+func (h *HandlerBase) AND(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagAND, start, end, text), false
+}
+
+func (h *HandlerBase) EQ(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagEQ, start, end, text), false
+}
+
+func (h *HandlerBase) GE(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagGE, start, end, text), false
+}
+
+func (h *HandlerBase) GT(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagGT, start, end, text), false
+}
+
+func (h *HandlerBase) LT(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagLT, start, end, text), false
+}
+
+func (h *HandlerBase) LE(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagLE, start, end, text), false
+}
+
+func (h *HandlerBase) MOD(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagMOD, start, end, text), false
+}
+
+func (h *HandlerBase) NE(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagNE, start, end, text), false
+}
+
+func (h *HandlerBase) OR(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagOR, start, end, text), false
+}
+
+func (h *HandlerBase) XOR(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagXOR, start, end, text), false
+}
+
+func (h *HandlerBase) POW(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagPOW, start, end, text), false
+}
+
+func (h *HandlerBase) NEW(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagNEW, start, end, text), false
+}
+
+func (h *HandlerBase) NOT(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagNOT, start, end, text), false
+}
+
+func (h *HandlerBase) STATEMENTS_END(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagSTATEMENTS_END, start, end, text), false
+}
+
+func (h *HandlerBase) STATEMENT_EXPR_END(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagSTATEMENT_EXPR_END, start, end, text), false
+}
+
+func (h *HandlerBase) IF(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagIF, start, end, text), false
+}
+
+func (h *HandlerBase) WARNING(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagWARNING, start, end, text), false
+}
+
+func (h *HandlerBase) ELSE(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagELSE, start, end, text), false
+}
+
+func (h *HandlerBase) WHILE(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagWHILE, start, end, text), false
+}
+
+func (h *HandlerBase) ASSIGN(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagASSIGN, start, end, text), false
+}
+
+func (h *HandlerBase) COLON(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagCOLON, start, end, text), false
+}
+
+func (h *HandlerBase) PLUS(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagPLUS, start, end, text), false
+}
+
+func (h *HandlerBase) MINUS(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagMINUS, start, end, text), false
+}
+
+func (h *HandlerBase) MUL(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagMUL, start, end, text), false
+}
+
+func (h *HandlerBase) DIV(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagDIV, start, end, text), false
+}
+
+func (h *HandlerBase) RETURN(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagRETURN, start, end, text), false
+}
+
+func (h *HandlerBase) LEFT_PAREN_1(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagLEFT_PAREN_1, start, end, text), false
+}
+
+func (h *HandlerBase) RIGHT_PAREN_1(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagRIGHT_PAREN_1, start, end, text), false
+}
+
+func (h *HandlerBase) LEFT_PAREN_2(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagLEFT_PAREN_2, start, end, text), false
+}
+
+func (h *HandlerBase) RIGHT_PAREN_2(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagRIGHT_PAREN_2, start, end, text), false
+}
+
+func (h *HandlerBase) LEFT_PAREN_3(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagLEFT_PAREN_3, start, end, text), false
+}
+
+func (h *HandlerBase) RIGHT_PAREN_3(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagRIGHT_PAREN_3, start, end, text), false
+}
+
+func (h *HandlerBase) COMMA(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagCOMMA, start, end, text), false
+}
+
+func (h *HandlerBase) TRUE(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagTRUE, start, end, text), false
+}
+
+func (h *HandlerBase) FALSE(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagFALSE, start, end, text), false
+}
+
+func (h *HandlerBase) REF_CONST(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagREF_CONST, start, end, text), false
+}
+
+func (h *HandlerBase) NUMBER(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagNUMBER, start, end, text), false
+}
+
+func (h *HandlerBase) VARNAME(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagVARNAME, start, end, text), false
+}
+
+func (h *HandlerBase) STRING_CONST(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagSTRING_CONST, start, end, text), false
+}
+
+func (h *HandlerBase) FUNCNAME(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagFUNCNAME, start, end, text), false
+}
+
+func (h *HandlerBase) CHAR_CONST(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagCHAR_CONST, start, end, text), false
+}
+
+func (h *HandlerBase) COMMENT(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagCOMMENT, start, end, text), false
 }
 
 type EOPTag struct{}
@@ -310,11 +1510,54 @@ type Scanner struct {
 func NewScanner(program []rune, handler LexemHandler) Scanner {
 	regexps := make(map[Condition][]*FiniteState)
 
-	regexps[ConditionINIT] = make([]*FiniteState, 0, 4)
+	regexps[ConditionINIT] = make([]*FiniteState, 0, 47)
 	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSkip)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataAssembly)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataIdent)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNum)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNewLine)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataINT)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataCHAR)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataBOOL)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataAND)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataEQ)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataGE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataGT)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataLT)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataLE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataMOD)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataOR)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataXOR)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataPOW)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNEW)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNOT)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSTATEMENTS_END)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSTATEMENT_EXPR_END)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataIF)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataWARNING)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataELSE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataWHILE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataASSIGN)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataCOLON)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataPLUS)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataMINUS)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataMUL)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataDIV)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataRETURN)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataLEFT_PAREN_1)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataRIGHT_PAREN_1)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataLEFT_PAREN_2)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataRIGHT_PAREN_2)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataLEFT_PAREN_3)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataRIGHT_PAREN_3)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataCOMMA)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataTRUE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataFALSE)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataREF_CONST)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNUMBER)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataVARNAME)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSTRING_CONST)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataFUNCNAME)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataCHAR_CONST)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataCOMMENT)
 
 	return Scanner{program: program, handler: handler, regexps: regexps, curPos: NewPosition(program), curCondition: ConditionINIT}
 }
@@ -345,13 +1588,99 @@ func (s *Scanner) findTokenOneAutomataINIT(
 ) (Token, Continued) {
 	switch name {
 	case "Skip":
-		return s.handler.Skip(s.program, start, end, errFunc, switchCond)
-	case "Assembly":
-		return s.handler.Assembly(s.program, start, end, errFunc, switchCond)
-	case "Ident":
-		return s.handler.Ident(s.program, start, end, errFunc, switchCond)
-	case "Num":
-		return s.handler.Num(s.program, start, end, errFunc, switchCond)
+		return s.handler.Skip(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "NewLine":
+		return s.handler.NewLine(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "INT":
+		return s.handler.INT(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "CHAR":
+		return s.handler.CHAR(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "BOOL":
+		return s.handler.BOOL(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "AND":
+		return s.handler.AND(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "EQ":
+		return s.handler.EQ(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "GE":
+		return s.handler.GE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "GT":
+		return s.handler.GT(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "LT":
+		return s.handler.LT(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "LE":
+		return s.handler.LE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "MOD":
+		return s.handler.MOD(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "NE":
+		return s.handler.NE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "OR":
+		return s.handler.OR(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "XOR":
+		return s.handler.XOR(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "POW":
+		return s.handler.POW(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "NEW":
+		return s.handler.NEW(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "NOT":
+		return s.handler.NOT(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "STATEMENTS_END":
+		return s.handler.STATEMENTS_END(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "STATEMENT_EXPR_END":
+		return s.handler.STATEMENT_EXPR_END(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "IF":
+		return s.handler.IF(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "WARNING":
+		return s.handler.WARNING(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "ELSE":
+		return s.handler.ELSE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "WHILE":
+		return s.handler.WHILE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "ASSIGN":
+		return s.handler.ASSIGN(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "COLON":
+		return s.handler.COLON(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "PLUS":
+		return s.handler.PLUS(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "MINUS":
+		return s.handler.MINUS(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "MUL":
+		return s.handler.MUL(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "DIV":
+		return s.handler.DIV(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "RETURN":
+		return s.handler.RETURN(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "LEFT_PAREN_1":
+		return s.handler.LEFT_PAREN_1(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "RIGHT_PAREN_1":
+		return s.handler.RIGHT_PAREN_1(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "LEFT_PAREN_2":
+		return s.handler.LEFT_PAREN_2(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "RIGHT_PAREN_2":
+		return s.handler.RIGHT_PAREN_2(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "LEFT_PAREN_3":
+		return s.handler.LEFT_PAREN_3(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "RIGHT_PAREN_3":
+		return s.handler.RIGHT_PAREN_3(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "COMMA":
+		return s.handler.COMMA(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "TRUE":
+		return s.handler.TRUE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "FALSE":
+		return s.handler.FALSE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "REF_CONST":
+		return s.handler.REF_CONST(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "NUMBER":
+		return s.handler.NUMBER(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "VARNAME":
+		return s.handler.VARNAME(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "STRING_CONST":
+		return s.handler.STRING_CONST(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "FUNCNAME":
+		return s.handler.FUNCNAME(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "CHAR_CONST":
+		return s.handler.CHAR_CONST(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "COMMENT":
+		return s.handler.COMMENT(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
@@ -379,13 +1708,99 @@ func (s *Scanner) findTokenINIT(
 ) (Token, Continued) {
 	switch automata {
 	case automataSkip:
-		return s.handler.Skip(s.program, start, end, errFunc, switchCond)
-	case automataAssembly:
-		return s.handler.Assembly(s.program, start, end, errFunc, switchCond)
-	case automataIdent:
-		return s.handler.Ident(s.program, start, end, errFunc, switchCond)
-	case automataNum:
-		return s.handler.Num(s.program, start, end, errFunc, switchCond)
+		return s.handler.Skip(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataNewLine:
+		return s.handler.NewLine(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataINT:
+		return s.handler.INT(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataCHAR:
+		return s.handler.CHAR(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataBOOL:
+		return s.handler.BOOL(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataAND:
+		return s.handler.AND(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataEQ:
+		return s.handler.EQ(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataGE:
+		return s.handler.GE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataGT:
+		return s.handler.GT(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataLT:
+		return s.handler.LT(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataLE:
+		return s.handler.LE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataMOD:
+		return s.handler.MOD(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataNE:
+		return s.handler.NE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataOR:
+		return s.handler.OR(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataXOR:
+		return s.handler.XOR(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataPOW:
+		return s.handler.POW(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataNEW:
+		return s.handler.NEW(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataNOT:
+		return s.handler.NOT(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataSTATEMENTS_END:
+		return s.handler.STATEMENTS_END(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataSTATEMENT_EXPR_END:
+		return s.handler.STATEMENT_EXPR_END(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataIF:
+		return s.handler.IF(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataWARNING:
+		return s.handler.WARNING(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataELSE:
+		return s.handler.ELSE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataWHILE:
+		return s.handler.WHILE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataASSIGN:
+		return s.handler.ASSIGN(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataCOLON:
+		return s.handler.COLON(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataPLUS:
+		return s.handler.PLUS(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataMINUS:
+		return s.handler.MINUS(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataMUL:
+		return s.handler.MUL(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataDIV:
+		return s.handler.DIV(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataRETURN:
+		return s.handler.RETURN(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataLEFT_PAREN_1:
+		return s.handler.LEFT_PAREN_1(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataRIGHT_PAREN_1:
+		return s.handler.RIGHT_PAREN_1(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataLEFT_PAREN_2:
+		return s.handler.LEFT_PAREN_2(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataRIGHT_PAREN_2:
+		return s.handler.RIGHT_PAREN_2(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataLEFT_PAREN_3:
+		return s.handler.LEFT_PAREN_3(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataRIGHT_PAREN_3:
+		return s.handler.RIGHT_PAREN_3(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataCOMMA:
+		return s.handler.COMMA(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataTRUE:
+		return s.handler.TRUE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataFALSE:
+		return s.handler.FALSE(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataREF_CONST:
+		return s.handler.REF_CONST(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataNUMBER:
+		return s.handler.NUMBER(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataVARNAME:
+		return s.handler.VARNAME(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataSTRING_CONST:
+		return s.handler.STRING_CONST(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataFUNCNAME:
+		return s.handler.FUNCNAME(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataCHAR_CONST:
+		return s.handler.CHAR_CONST(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataCOMMENT:
+		return s.handler.COMMENT(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true

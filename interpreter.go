@@ -5,6 +5,7 @@ type Regexp struct {
 	ActionName          string
 	SwitchConditionName string
 	Continued           bool
+	Edit                bool
 }
 
 type Condition struct {
@@ -57,6 +58,7 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 			ActionName:          rule.name.val,
 			SwitchConditionName: switchCond,
 			Continued:           rule.contin != nil,
+			Edit:                rule.edit != nil,
 		}
 
 		conds[startCondName] = append(conds[startCondName], reg)
@@ -97,6 +99,7 @@ func (r *Program) Process() *GeneratorInfo {
 			ActionName:          rule.name.val,
 			SwitchConditionName: switchCond,
 			Continued:           rule.contin != nil,
+			Edit:                rule.edit != nil,
 		}
 
 		conds[startCondName] = append(conds[startCondName], reg)
