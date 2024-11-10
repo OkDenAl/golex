@@ -11,7 +11,7 @@ var (
 	inputFile       = flag.String("i", "./examples/testing/example.gl", "input file location")
 	lexerOutputFile = flag.String("lo", "./examples/testing/golexgen/lexer.go", "lexer output file location")
 	mainOutputFile  = flag.String("mo", "./examples/testing/main.go", "main output file location")
-	regenerateMain  = flag.Bool("rg", false, "if true -> regenerate main")
+	regenerateMain  = flag.Bool("rg", true, "if true -> regenerate main")
 	printTree       = flag.Bool("t", false, "if true -> print tree")
 )
 

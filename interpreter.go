@@ -36,9 +36,9 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 	res := NewAutomata()
 	for _, rule := range r.rules.ruleArr {
 		automata := rule.expr.Compile()
-		//automata.setLexemName(rule.name.val)
-		//
-		//res.Union(automata.copy())
+		automata.setLexemName(rule.name.val)
+
+		res.Union(automata.copy())
 		startCondName := InitialCond
 		if rule.startCondition != nil {
 			startCondName = rule.startCondition.condition.val

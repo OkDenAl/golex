@@ -8,6 +8,7 @@ import (
 	"golex/examples/lab3.2/golexgen"
 	"log"
 	"os"
+	"time"
 )
 
 type Handler struct {
@@ -637,9 +638,12 @@ func main() {
 	}
 	scn := golexgen.NewScanner([]rune(string(content)), &Handler{})
 
+	tm := time.Now()
 	t := scn.NextToken()
 	for t.Tag() != golexgen.EOP {
 		fmt.Println(t.String())
 		t = scn.NextToken()
 	}
+
+	fmt.Println(time.Since(tm))
 }
