@@ -97,6 +97,48 @@ func TestFiniteState_Execute(t *testing.T) {
 			count:  100,
 			maxLen: 100,
 		},
+		{
+			name:   "a{1}",
+			args:   args{reg: "a{1}"},
+			count:  100,
+			maxLen: 100,
+		},
+		{
+			name:   "a{0}",
+			args:   args{reg: "a{0}bc"},
+			count:  100,
+			maxLen: 100,
+		},
+		{
+			name:   "(abc){3}",
+			args:   args{reg: "(abc){3}"},
+			count:  100,
+			maxLen: 100,
+		},
+		{
+			name:   "(abc){2,}",
+			args:   args{reg: "(abc){2,}"},
+			count:  100,
+			maxLen: 100,
+		},
+		{
+			name:   "(abc){2,p}",
+			args:   args{reg: "(abc){2,p}"},
+			count:  100,
+			maxLen: 100,
+		},
+		{
+			name:   "a{2,4}",
+			args:   args{reg: "a{2,4}"},
+			count:  100,
+			maxLen: 100,
+		},
+		{
+			name:   "ab|ab",
+			args:   args{reg: "(ab|abab)c"},
+			count:  100,
+			maxLen: 100,
+		},
 	}
 
 	for _, tt := range tests {

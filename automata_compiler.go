@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 type AutomataCompiler interface {
 	Compile() *FiniteState
@@ -53,11 +56,43 @@ func (be *BasicExpr) Compile() *FiniteState {
 		case TagStar:
 			a.Loop()
 		case TagPlus:
-			b := be.element.Compile()
+			b := a.copy()
 			b.Loop()
 			a.Append(b)
 		case TagQuestion:
 			a.TerminalStates = append(a.TerminalStates, 0)
+		}
+	}
+
+	if be.repetition != nil {
+		if be.repetition.max < be.repetition.min {
+			panic("invalid min and max repetition")
+		}
+		init := a.copy()
+		for i := 0; i < be.repetition.min-2; i++ {
+			b := init.copy()
+			a.Append(b)
+		}
+		if be.repetition.max == math.MaxInt {
+			b := init.copy()
+			a.Append(b)
+			b.Loop()
+			a.Append(b)
+		} else if be.repetition.max == be.repetition.min && be.repetition.min != 1 && be.repetition.min != 0 {
+			b := init.copy()
+			a.Append(b)
+		} else if be.repetition.min != 1 && be.repetition.min != 0 {
+			b := init.copy()
+			a.Append(b)
+			b.Append(init)
+			for i := 0; i < be.repetition.max-2; i++ {
+				b.Append(init)
+				a.Union(b)
+			}
+		}
+
+		if be.repetition.min == 0 && be.repetition.max == be.repetition.min {
+			return NewAutomata()
 		}
 	}
 

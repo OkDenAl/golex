@@ -61,13 +61,20 @@ type Concatenation struct {
 	basic  *BasicExpr
 }
 
-// BasicExpr ::= Element ("*"|"+"|"?")?
+// BasicExpr ::= Element ("*"|"+"|"?"|Repetition)?
 type BasicExpr struct {
-	op      *Token
-	element *Element
+	op         *Token
+	repetition *Repetition
+	element    *Element
 }
 
-// Element ::= Character | Group | Set
+// Repetition      ::= "{" Number ("}" | "," ("}" | Number "}"))
+type Repetition struct {
+	max int
+	min int
+}
+
+// Element         ::= Group | Set | Escape | ValidIndependentCharacter
 type Element struct {
 	// Value     rune
 	character *Token

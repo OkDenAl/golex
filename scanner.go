@@ -184,6 +184,8 @@ func (scn *Scanner) nextTokenRegular() Token {
 			token = NewToken(TagDash, start, start, string(rune(scn.curPos.Cp())))
 		case '.':
 			token = NewToken(TagAnyCharacter, start, start, string(rune(scn.curPos.Cp())))
+		case ',':
+			token = NewToken(TagComma, start, start, string(rune(scn.curPos.Cp())))
 		case '\n':
 			scn.regularMode = false
 			scn.compiler.addMessage(true, start, "invalid syntax: expected /")

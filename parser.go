@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 type Parser struct {
 	cursor int
@@ -243,10 +246,9 @@ func (p *Parser) concatenation() (*Concatenation, bool) {
 	}
 
 	return &Concatenation{simple, basic}, true
-
 }
 
-// BasicExpr       ::= Element ("*"|"+"|"?")?
+// BasicExpr       ::= Element ("*"|"+"|"?"|Repetition)?
 func (p *Parser) basicExpr() (*BasicExpr, bool) {
 	base, ok := p.element()
 	if !ok {
@@ -258,10 +260,72 @@ func (p *Parser) basicExpr() (*BasicExpr, bool) {
 		return &BasicExpr{element: base, op: &token}, true
 	}
 
+	if p.cursor < len(p.tokens) && p.tokens[p.cursor].Tag() == TagOpenBrace {
+		reset := p.reset()
+		repetition, ok := p.repetition()
+		if ok {
+			return &BasicExpr{element: base, repetition: repetition}, true
+		}
+		reset()
+	}
+
 	return &BasicExpr{element: base}, true
 }
 
-// Element         ::= Group | Set | Escape | AnyCharacter
+func (p *Parser) findNum() (int, bool) {
+	defer func() {
+		p.cursor--
+	}()
+	res := 0
+	wasNum := false
+	factor := 10
+	for {
+		token, ok := p.nextToken()
+		if !ok {
+			return 0, false
+		}
+		number, ok := p.numeric(token)
+		if !ok && !wasNum {
+			return 0, false
+		} else if !ok {
+			break
+		}
+
+		wasNum = true
+		res *= factor
+		res += number
+	}
+	return res, true
+}
+
+func (p *Parser) repetition() (*Repetition, bool) {
+	p.mustExpectTag(TagOpenBrace)
+
+	minNum, ok := p.findNum()
+	if !ok || minNum < 0 {
+		return nil, false
+	}
+
+	maxNum := minNum
+	if p.tokens[p.cursor].Tag() == TagComma {
+		p.mustExpectTag(TagComma)
+		maxNum, ok = p.findNum()
+		if maxNum < 0 {
+			return nil, false
+		}
+		if !ok {
+			maxNum = math.MaxInt
+		}
+	}
+
+	if _, ok := p.expectTags(TagCloseBrace); !ok {
+		return nil, false
+	}
+
+	return &Repetition{min: minNum, max: maxNum}, true
+}
+
+// Element         ::= Group | Set | Escape | ValidIndependentCharacter
 func (p *Parser) element() (*Element, bool) {
 	group, ok := p.group()
 	if ok {
@@ -314,7 +378,6 @@ func (p *Parser) escape() (*Escape, bool) {
 	}
 
 	return &Escape{base}, true
-
 }
 
 // Set             ::= "[" ("^")? SetItems "]"
@@ -344,7 +407,6 @@ func (p *Parser) set() (*Set, bool) {
 
 	reset()
 	return nil, false
-
 }
 
 // SetItems        ::= SetItem (SetItem)*
@@ -358,7 +420,6 @@ func (p *Parser) setItems(isFirst bool) (*SetItems, bool) {
 	items, ok := p.setItems(isFirst)
 
 	return &SetItems{item: item, items: items}, true
-
 }
 
 // SetItem         ::= Range | Escape | SetCharacter
@@ -558,4 +619,13 @@ func (p *Parser) reset() func() {
 	return func() {
 		p.cursor = cursor
 	}
+}
+
+func (p *Parser) numeric(token Token) (int, bool) {
+	switch []rune(token.val)[0] {
+	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+		return int([]rune(token.val)[0] - '0'), true
+	}
+
+	return 0, false
 }

@@ -32,6 +32,29 @@ func Create(chars []rune) *FiniteState {
 	return f
 }
 
+func (f *FiniteState) copy() *FiniteState {
+	copyState := &FiniteState{
+		nextState:      f.nextState,
+		CurrentState:   f.CurrentState,
+		TerminalStates: make([]int, len(f.TerminalStates)),
+		Transitions:    make(map[int]map[rune]int),
+		equivalents:    make(map[int]int),
+	}
+
+	copy(copyState.TerminalStates, f.TerminalStates)
+	for key, value := range f.Transitions {
+		copyState.Transitions[key] = make(map[rune]int)
+		for k, v := range value {
+			copyState.Transitions[key][k] = v
+		}
+	}
+	for key, value := range f.equivalents {
+		copyState.equivalents[key] = value
+	}
+
+	return copyState
+}
+
 func (f *FiniteState) addTerminal(terminal int) {
 	for _, val := range f.TerminalStates {
 		if val == terminal {
