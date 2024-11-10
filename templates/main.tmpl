@@ -29,7 +29,7 @@ type Handler struct {
                    golexgen.Tag{{ .ActionName }},
                     start,end,
                     string(text[start.Index():end.Index()]),
-                   ),false{{ end }}
+                   ), {{ .Continued }}{{ end }}
 }
 
 {{ end }}

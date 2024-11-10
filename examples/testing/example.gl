@@ -1,5 +1,64 @@
+LATIN /[A-Za-z]/
 %%
 
-/\w/ Test
+/[\t ]+/ Skip
+
+/[\n]+/ NewLine
+
+/int/  INT
+/char/  CHAR
+/bool/ BOOL
+
+/_and_/  AND
+/_eq_/  EQ
+/_ge_/  GE
+/_gt_/  GT
+/_lt_/  LT
+/_le_/  LE
+/_mod_/  MOD
+/_ne_/  NE
+/_or_/  OR
+/_xor_/  XOR
+/_pow_/  POW
+/new_/  NEW
+/not_/  NOT
+
+/(%%)/  STATEMENTS_END
+/(%)/  STATEMENT_EXPR_END
+/\?/  IF
+/\\/  WARNING
+/\+\+\+/  ELSE
+/\&/  WHILE
+/:=/   ASSIGN
+/\:/  COLON
+/\+/   PLUS
+/\-/   MINUS
+/\*/   MUL
+/\//   DIV
+/\^/   RETURN
+/\(/   LEFT_PAREN_1
+/\)/   RIGHT_PAREN_1
+/\[/   LEFT_PAREN_2
+/\]/   RIGHT_PAREN_2
+/\</   LEFT_PAREN_3
+/\>/   RIGHT_PAREN_3
+/,/  COMMA
+/true/  TRUE
+/false/  FALSE
+
+/nothing/  REF_CONST
+
+/(([A-Za-z0-9]+\{[0-9]+\})|[0-9]+)/ NUMBER
+
+/([_|!|@|.|#][A-Za-z]+)/ VARNAME
+
+
+/(\'[A-Za-z ]*\')/ STRING_CONST
+
+/[A-Za-z]*/ FUNCNAME
+
+/\"{LATIN}?\"/ CHAR_CONST
+
+/\{.*\}/  COMMENT
 
 %%

@@ -3,23 +3,27 @@ package main
 import (
 	"fmt"
 	"io"
-	"sort"
 )
 
 // FiniteState struct
 type FiniteState struct {
 	nextState      int
 	CurrentState   int
-	TerminalStates []int
+	TerminalStates []TerminalState
 	Transitions    map[int]map[rune]int
 	equivalents    map[int]int
+}
+
+type TerminalState struct {
+	State     int
+	LexemName string
 }
 
 func NewAutomata() *FiniteState {
 	return &FiniteState{
 		nextState:      1,
 		CurrentState:   0,
-		TerminalStates: []int{0},
+		TerminalStates: []TerminalState{{State: 0}},
 		Transitions:    make(map[int]map[rune]int),
 		equivalents:    map[int]int{},
 	}
@@ -28,15 +32,21 @@ func NewAutomata() *FiniteState {
 func Create(chars []rune) *FiniteState {
 	f := NewAutomata()
 	f.AddTransition(0, 1, chars)
-	f.TerminalStates = []int{1}
+	f.TerminalStates = []TerminalState{{State: 1}}
 	return f
+}
+
+func (f *FiniteState) setLexemName(name string) {
+	for i := range f.TerminalStates {
+		f.TerminalStates[i].LexemName = name
+	}
 }
 
 func (f *FiniteState) copy() *FiniteState {
 	copyState := &FiniteState{
 		nextState:      f.nextState,
 		CurrentState:   f.CurrentState,
-		TerminalStates: make([]int, len(f.TerminalStates)),
+		TerminalStates: make([]TerminalState, len(f.TerminalStates)),
 		Transitions:    make(map[int]map[rune]int),
 		equivalents:    make(map[int]int),
 	}
@@ -57,11 +67,11 @@ func (f *FiniteState) copy() *FiniteState {
 
 func (f *FiniteState) addTerminal(terminal int) {
 	for _, val := range f.TerminalStates {
-		if val == terminal {
+		if val.State == terminal {
 			return
 		}
 	}
-	f.TerminalStates = append(f.TerminalStates, terminal)
+	f.TerminalStates = append(f.TerminalStates, TerminalState{State: terminal})
 }
 
 func (f *FiniteState) AddTransition(from, to int, chars []rune) {
@@ -121,18 +131,18 @@ func (f *FiniteState) Append(other *FiniteState) {
 		nextState:      statesNumF + statesNumOther,
 		CurrentState:   0,
 		Transitions:    make(map[int]map[rune]int),
-		TerminalStates: make([]int, 0),
+		TerminalStates: make([]TerminalState, 0),
 		equivalents:    map[int]int{},
 	}
 
-	newFinalStates := make(map[int]struct{})
+	newFinalStates := make(map[TerminalState]struct{})
 	for _, finalState := range other.TerminalStates {
-		if finalState == 0 {
+		if finalState.State == 0 {
 			for _, fs := range f.TerminalStates {
 				newFinalStates[fs] = struct{}{}
 			}
 		}
-		newFinalStates[finalState+statesNumF] = struct{}{}
+		newFinalStates[TerminalState{State: finalState.State + statesNumF}] = struct{}{}
 	}
 
 	for finalState := range newFinalStates {
@@ -148,7 +158,7 @@ func (f *FiniteState) Append(other *FiniteState) {
 	for _, finalState := range f.TerminalStates {
 		if transitions, ok := other.Transitions[0]; ok {
 			for symbol, nextState := range transitions {
-				result.AddTransition(finalState, nextState+statesNumF, []rune{symbol})
+				result.AddTransition(finalState.State, nextState+statesNumF, []rune{symbol})
 			}
 		}
 	}
@@ -172,25 +182,25 @@ func (f *FiniteState) Union(other *FiniteState) {
 	newFSM := &FiniteState{
 		nextState:      statesNumF + statesNumOther,
 		CurrentState:   0,
-		TerminalStates: []int{},
+		TerminalStates: []TerminalState{},
 		Transitions:    make(map[int]map[rune]int),
 		equivalents:    map[int]int{},
 	}
 
 	newFSM.TerminalStates = append(newFSM.TerminalStates, f.TerminalStates...)
 	for _, tState := range other.TerminalStates {
-		if tState == 0 {
+		if tState.State == 0 {
 			newFSM.TerminalStates = append(newFSM.TerminalStates, tState)
 		} else {
-			newFSM.TerminalStates = append(newFSM.TerminalStates, tState+statesNumF)
+			newFSM.TerminalStates = append(newFSM.TerminalStates, TerminalState{State: tState.State + statesNumF, LexemName: tState.LexemName})
 		}
 	}
 
-	uniqueTerminalStates := make(map[int]struct{})
+	uniqueTerminalStates := make(map[TerminalState]struct{})
 	for _, tState := range newFSM.TerminalStates {
 		uniqueTerminalStates[tState] = struct{}{}
 	}
-	newFSM.TerminalStates = []int{}
+	newFSM.TerminalStates = []TerminalState{}
 	for tState := range uniqueTerminalStates {
 		newFSM.TerminalStates = append(newFSM.TerminalStates, tState)
 	}
@@ -222,7 +232,7 @@ func (f *FiniteState) Loop() {
 		if from == 0 {
 			for _, state := range f.TerminalStates {
 				for ch, to := range transition {
-					f.AddTransition(state, to, []rune{ch})
+					f.AddTransition(state.State, to, []rune{ch})
 				}
 			}
 		}
@@ -232,16 +242,16 @@ func (f *FiniteState) Loop() {
 }
 
 func (f *FiniteState) Negate() {
-	var terminals []int
+	var terminals []TerminalState
 
 	for from, transition := range f.Transitions {
 		if !f.isTerminal(from) {
-			terminals = append(terminals, from)
+			terminals = append(terminals, TerminalState{State: from})
 		}
 
 		for _, to := range transition {
 			if !f.isTerminal(to) {
-				terminals = append(terminals, to)
+				terminals = append(terminals, TerminalState{State: to})
 			}
 		}
 	}
@@ -249,29 +259,19 @@ func (f *FiniteState) Negate() {
 	f.TerminalStates = terminals
 }
 
-func (f *FiniteState) String() string {
-	sort.Ints(f.TerminalStates)
-	str := fmt.Sprintf("Terminals: %v\n", f.TerminalStates)
-	for from, transition := range f.Transitions {
-		tran := ""
-		for ch, to := range transition {
-			tran += fmt.Sprintf("\n    %c => %d", ch, to)
-		}
-		str += fmt.Sprintf("%d: %s\n", from, tran)
-	}
-	return str
-}
-
 func (f *FiniteState) ToGraph(out io.Writer) {
 	fmt.Fprintln(out, "digraph {")
 	fmt.Fprintln(out, "0 [color=\"green\"]")
 
 	for _, state := range f.TerminalStates {
-		fmt.Fprintf(out, "%d [peripheries = 2]\n", state)
+		fmt.Fprintf(out, "%d [peripheries = 2]\n", state.State)
 	}
 
 	for from, trans := range f.Transitions {
 		for label, to := range trans {
+			if label == '\n' {
+				label = 'n'
+			}
 			fmt.Fprintf(out, "%d -> %d [label=\"%c\"]\n", from, to, label)
 		}
 	}
@@ -325,7 +325,7 @@ func (f *FiniteState) canMoveBy(ch rune) bool {
 
 func (f *FiniteState) isTerminal(state int) bool {
 	for _, val := range f.TerminalStates {
-		if state == val {
+		if state == val.State {
 			return true
 		}
 	}

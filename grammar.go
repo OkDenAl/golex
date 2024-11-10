@@ -26,6 +26,7 @@ type Rule struct {
 	startCondition  *StartCondition
 	name            Token
 	expr            RegExpr
+	contin          *Token
 	switchCondition *SwitchCondition
 }
 

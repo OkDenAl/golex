@@ -115,7 +115,13 @@ func (scn *Scanner) nextToken() Token {
 			return NewToken(TagRegularMarker, start, start, "/")
 		default:
 			var pos Position
-			if scn.curPos.IsUpperLetter() {
+			if scn.curPos.IsLowerLetter() {
+				for scn.curPos.IsLowerLetter() {
+					curWord += string(scn.curPos.GetSymbol())
+					pos = scn.curPos
+					scn.curPos.Next()
+				}
+			} else if scn.curPos.IsUpperLetter() {
 				curWord += string(scn.curPos.GetSymbol())
 				pos = scn.curPos
 				scn.curPos.Next()
@@ -135,14 +141,21 @@ func (scn *Scanner) nextToken() Token {
 				return NewToken(TagErr, scn.curPos, scn.curPos, "")
 			}
 
-			if curWord == "BEGIN" {
-				scn.prevToken = NewToken(TagBegin, start, pos, "BEGIN")
+			const (
+				begin        = "begin"
+				continueName = "continue"
+			)
 
-				return NewToken(TagBegin, start, pos, "BEGIN")
+			switch curWord {
+			case begin:
+				scn.prevToken = NewToken(TagBegin, start, pos, begin)
+				return NewToken(TagBegin, start, pos, begin)
+			case continueName:
+				scn.prevToken = NewToken(TagContinue, start, pos, continueName)
+				return NewToken(TagContinue, start, pos, continueName)
 			}
 
-			scn.prevToken = NewToken(TagName, start, pos, curWord)
-
+			scn.prevToken = NewToken(TagName, scn.curPos, scn.curPos, curWord)
 			return NewToken(TagName, start, pos, curWord)
 		}
 	}

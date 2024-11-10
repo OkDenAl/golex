@@ -122,7 +122,7 @@ func (p *Parser) rules() (Rules, error) {
 	return Rules{ruleArr: rules}, nil
 }
 
-// Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)? (NewLine)+
+// Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)? (Continue)? (NewLine)+
 func (p *Parser) rule() (Rule, error) {
 	var startCond *StartCondition
 	if p.tokens[p.cursor].Tag() == TagOpenStartCondition {
@@ -144,9 +144,16 @@ func (p *Parser) rule() (Rule, error) {
 	}
 	p.ruleNames[token.val] = token
 
-	var switchCond *SwitchCondition
-	if p.tokens[p.cursor].Tag() == TagBegin {
+	var (
+		switchCond *SwitchCondition
+		cont       *Token
+	)
+	switch p.tokens[p.cursor].Tag() {
+	case TagBegin:
 		switchCond = p.switchCondition()
+	case TagContinue:
+		tok, _ := p.nextToken()
+		cont = &tok
 	}
 
 	p.mustExpectTag(TagNL)
@@ -154,7 +161,7 @@ func (p *Parser) rule() (Rule, error) {
 		p.mustExpectTag(TagNL)
 	}
 
-	return Rule{startCondition: startCond, expr: *expr, name: token, switchCondition: switchCond}, nil
+	return Rule{startCondition: startCond, expr: *expr, name: token, switchCondition: switchCond, contin: cont}, nil
 }
 
 // StartCondition ::= "<" Name ">"

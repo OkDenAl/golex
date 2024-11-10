@@ -56,8 +56,13 @@ func (t DefaultTag) GetTag() string {
 type FiniteState struct {
 	NextState      int
 	CurrentState   int
-	TerminalStates []int
+	TerminalStates []TerminalState
 	Transitions    map[int]map[rune]int
+}
+
+type TerminalState struct {
+	state     int
+	lexemName string
 }
 
 func (f *FiniteState) FindMatchEndIndex(input string) int {
@@ -89,7 +94,7 @@ func (f *FiniteState) canMoveBy(ch rune) bool {
 
 func (f *FiniteState) isTerminal(state int) bool {
 	for _, val := range f.TerminalStates {
-		if state == val {
+		if state == val.state {
 			return true
 		}
 	}
@@ -98,13 +103,23 @@ func (f *FiniteState) isTerminal(state int) bool {
 var(
     {{ range .AllRegexps }}automata{{ .ActionName }} *FiniteState = &FiniteState{
     CurrentState:  {{ .RegexpVal.CurrentState }},
-    TerminalStates: []int{ {{ range .RegexpVal.TerminalStates }}{{ . }}, {{ end }}},
+    TerminalStates: []TerminalState{ {{ range .RegexpVal.TerminalStates }}{state: {{.State}}, lexemName: "{{.LexemName}}" }, {{ end }}},
     Transitions: map[int]map[rune]int{
             {{ range $key, $value := .RegexpVal.Transitions }}{{ $key }}: { {{ range $char, $nextState := $value }}{{ $char }}: {{ $nextState }},{{ end }}},
             {{ end }}
         },
         }
     {{ end }}
+
+    {{ range .UnionRegexps }}automata{{ .ActionName }} *FiniteState = &FiniteState{
+        CurrentState:  {{ .RegexpVal.CurrentState }},
+        TerminalStates: []TerminalState{ {{ range .RegexpVal.TerminalStates }}{state: {{.State}}, lexemName: "{{.LexemName}}" }, {{ end }}},
+        Transitions: map[int]map[rune]int{
+                {{ range $key, $value := .RegexpVal.Transitions }}{{ $key }}: { {{ range $char, $nextState := $value }}{{ $char }}: {{ $nextState }},{{ end }}},
+                {{ end }}
+            },
+            }
+        {{ end }}
 )
 
 type ErrHandlerBase struct{}

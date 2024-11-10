@@ -134,8 +134,8 @@ func TestFiniteState_Execute(t *testing.T) {
 			maxLen: 100,
 		},
 		{
-			name:   "ab|ab",
-			args:   args{reg: "(ab|abab)c"},
+			name:   "[A-Za-z]",
+			args:   args{reg: "[A-Za-z]"},
 			count:  100,
 			maxLen: 100,
 		},

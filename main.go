@@ -39,7 +39,7 @@ func main() {
 		automatas = append(automatas, rule.expr.Compile())
 	}
 
-	gen := parse.Process()
+	gen := parse.ProcessOneAutomata()
 
 	generateFile("templates/lexer.tmpl", *lexerOutputFile, gen, true)
 	generateFile("templates/main.tmpl", *mainOutputFile, gen, *regenerateMain)

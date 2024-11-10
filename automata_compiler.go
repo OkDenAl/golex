@@ -60,7 +60,7 @@ func (be *BasicExpr) Compile() *FiniteState {
 			b.Loop()
 			a.Append(b)
 		case TagQuestion:
-			a.TerminalStates = append(a.TerminalStates, 0)
+			a.TerminalStates = append(a.TerminalStates, TerminalState{State: 0})
 		}
 	}
 
