@@ -15,11 +15,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const runeRangeEnd = 0x10ffff
-const printableChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r"
-
-var printableCharsNoNL = printableChars[:len(printableChars)-2]
-
 type state struct {
 	limit int
 }
@@ -235,14 +230,22 @@ func setup(t *testing.T, regexp string) *FiniteState {
 	scn := NewScanner(bufio.NewReader(strings.NewReader(regexp)), NewCompiler())
 	scn.regularMode = true
 	tokens := scn.GetTokens()
+	tokens = append(tokens, Token{
+		val: "#",
+		tag: TagCharacter,
+	})
 	parser := New(tokens)
-
 	expr, ok := parser.regExpr()
 	require.True(t, ok)
 
 	res := expr.Compile()
+	r := res.CompileV2()
+
+	r.ToGraph(os.Stdout)
 	res.ToGraph(os.Stdout)
-	return res
+	flPos = make(map[int]Pos)
+	letters = make(map[rune][]int)
+	return r
 }
 
 func TestFiniteState_Execute(t *testing.T) {
@@ -294,14 +297,14 @@ func TestFiniteState_Execute(t *testing.T) {
 			maxLen: 100,
 		},
 		{
-			name:   "[\\^1 ]*",
-			args:   args{reg: "[\\^1 ]*"},
+			name:   "[\\^1 ]+",
+			args:   args{reg: "[\\^1 ]+"},
 			count:  100,
 			maxLen: 100,
 		},
 		{
-			name:   "(ab)*ac",
-			args:   args{reg: "(ab)*acge"},
+			name:   "(ab)*acge",
+			args:   args{reg: "(ab)*ac"},
 			count:  100,
 			maxLen: 100,
 		},
@@ -324,7 +327,7 @@ func TestFiniteState_Execute(t *testing.T) {
 			maxLen: 100,
 		},
 		{
-			name:   "a{0}",
+			name:   "a{0}bc",
 			args:   args{reg: "a{0}bc"},
 			count:  100,
 			maxLen: 100,
@@ -354,8 +357,14 @@ func TestFiniteState_Execute(t *testing.T) {
 			maxLen: 100,
 		},
 		{
-			name:   "[A-Za-z]",
-			args:   args{reg: "[A-Za-z]"},
+			name:   "1",
+			args:   args{reg: "(a|b)*abb"},
+			count:  100,
+			maxLen: 100,
+		},
+		{
+			name:   "2",
+			args:   args{reg: "((abc)+b)+"},
 			count:  100,
 			maxLen: 100,
 		},

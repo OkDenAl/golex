@@ -26,3 +26,23 @@ func getSortedPositionKeys(m map[Position]Message) []Position {
 
 	return keys
 }
+
+func mergeUnique(arr1, arr2 []int) []int {
+	// Создание карты для отслеживания уникальных элементов
+	uniqueMap := make(map[int]bool)
+	for _, num := range arr1 {
+		uniqueMap[num] = true
+	}
+	for _, num := range arr2 {
+		uniqueMap[num] = true
+	}
+
+	// Создание массива с уникальными элементами
+	var mergedArray []int
+	for num := range uniqueMap {
+		mergedArray = append(mergedArray, num)
+	}
+	sort.Ints(mergedArray)
+
+	return mergedArray
+}

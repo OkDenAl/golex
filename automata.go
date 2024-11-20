@@ -12,6 +12,10 @@ type FiniteState struct {
 	TerminalStates []TerminalState
 	Transitions    map[int]map[rune]int
 	equivalents    map[int]int
+
+	nullable bool
+	firstpos []int
+	lastpos  []int
 }
 
 type TerminalState struct {
@@ -26,13 +30,28 @@ func NewAutomata() *FiniteState {
 		TerminalStates: []TerminalState{{State: 0}},
 		Transitions:    make(map[int]map[rune]int),
 		equivalents:    map[int]int{},
+		nullable:       true,
+		firstpos:       make([]int, 0),
+		lastpos:        make([]int, 0),
 	}
 }
 
-func Create(chars []rune) *FiniteState {
+func Create(chars []rune, pos int) *FiniteState {
 	f := NewAutomata()
 	f.AddTransition(0, 1, chars)
 	f.TerminalStates = []TerminalState{{State: 1}}
+	f.firstpos = append(f.firstpos, pos)
+	f.lastpos = append(f.lastpos, pos)
+	f.nullable = false
+	flPos[pos] = Pos{
+		followPos: make([]int, 0),
+	}
+	for _, ch := range chars {
+		if _, ok := letters[ch]; !ok {
+			letters[ch] = make([]int, 0)
+		}
+		letters[ch] = append(letters[ch], pos)
+	}
 	return f
 }
 
@@ -49,6 +68,9 @@ func (f *FiniteState) copy() *FiniteState {
 		TerminalStates: make([]TerminalState, len(f.TerminalStates)),
 		Transitions:    make(map[int]map[rune]int),
 		equivalents:    make(map[int]int),
+		nullable:       f.nullable,
+		firstpos:       f.firstpos,
+		lastpos:        f.lastpos,
 	}
 
 	copy(copyState.TerminalStates, f.TerminalStates)
@@ -133,6 +155,21 @@ func (f *FiniteState) Append(other *FiniteState) {
 		Transitions:    make(map[int]map[rune]int),
 		TerminalStates: make([]TerminalState, 0),
 		equivalents:    map[int]int{},
+		nullable:       f.nullable && other.nullable,
+		firstpos:       f.firstpos,
+		lastpos:        other.lastpos,
+	}
+
+	if f.nullable {
+		result.firstpos = mergeUnique(f.firstpos, other.firstpos)
+	}
+	if other.nullable {
+		result.lastpos = mergeUnique(f.lastpos, other.lastpos)
+	}
+
+	for _, p := range f.lastpos {
+		r := mergeUnique(flPos[p].followPos, other.firstpos)
+		flPos[p] = Pos{followPos: r}
 	}
 
 	newFinalStates := make(map[TerminalState]struct{})
@@ -185,6 +222,9 @@ func (f *FiniteState) Union(other *FiniteState) {
 		TerminalStates: []TerminalState{},
 		Transitions:    make(map[int]map[rune]int),
 		equivalents:    map[int]int{},
+		nullable:       f.nullable || other.nullable,
+		firstpos:       mergeUnique(f.firstpos, other.firstpos),
+		lastpos:        mergeUnique(f.lastpos, other.lastpos),
 	}
 
 	newFSM.TerminalStates = append(newFSM.TerminalStates, f.TerminalStates...)
@@ -228,6 +268,7 @@ func (f *FiniteState) Union(other *FiniteState) {
 }
 
 func (f *FiniteState) Loop() {
+	f.nullable = true
 	for from, transition := range f.Transitions {
 		if from == 0 {
 			for _, state := range f.TerminalStates {
@@ -236,6 +277,10 @@ func (f *FiniteState) Loop() {
 				}
 			}
 		}
+	}
+	for _, p := range f.lastpos {
+		r := mergeUnique(flPos[p].followPos, f.firstpos)
+		flPos[p] = Pos{followPos: r}
 	}
 
 	f.addTerminal(0)

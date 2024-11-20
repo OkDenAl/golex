@@ -5,33 +5,12 @@ package main
 
 import (
 	"fmt"
-	"golex/examples/testing/golexgen"
 	"log"
 	"os"
 )
 
 type Handler struct {
 	golexgen.HandlerBase
-}
-
-func (h *Handler) Skip(
-	text string,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	panic("edit me") // TODO: edit this
-	return golexgen.Token{}, true
-}
-
-func (h *Handler) NewLine(
-	text string,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	panic("edit me") // TODO: edit this
-	return golexgen.NewToken(golexgen.TagNewLine, start, end, text), false
 }
 
 func main() {

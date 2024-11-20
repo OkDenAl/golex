@@ -1,5 +1,7 @@
 package main
 
+import "os"
+
 type Regexp struct {
 	RegexpVal           *FiniteState
 	ActionName          string
@@ -40,6 +42,7 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 		automata.setLexemName(rule.name.val)
 
 		res.Union(automata.copy())
+		res.ToGraph(os.Stdout)
 		startCondName := InitialCond
 		if rule.startCondition != nil {
 			startCondName = rule.startCondition.condition.val
@@ -64,7 +67,7 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 		conds[startCondName] = append(conds[startCondName], reg)
 		gi.AllRegexps = append(gi.AllRegexps, reg)
 	}
-
+	//res.ToGraph(os.Stdout)
 	for key, val := range conds {
 		gi.UnionRegexps = append(gi.UnionRegexps, Regexp{
 			RegexpVal:  res,

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"os"
 )
 
 type AutomataCompiler interface {
@@ -44,8 +45,29 @@ func (s *SimpleExpr) Compile() *FiniteState {
 
 func (c *Concatenation) Compile() *FiniteState {
 	a := c.basic.Compile()
-	b := c.simple.Compile()
-	a.Append(b)
+
+	var rec func(simple *SimpleExpr)
+	rec = func(simple *SimpleExpr) {
+		if simple.concatenation != nil {
+			b := simple.concatenation.basic.Compile()
+			a.Append(b)
+			simple.lastpos = a.lastpos
+			simple.firstpos = a.firstpos
+			simple.nullable = a.nullable
+			rec(simple.concatenation.simple)
+		} else {
+			b := simple.basic.Compile()
+			a.Append(b)
+			simple.lastpos = a.lastpos
+			simple.firstpos = a.firstpos
+			simple.nullable = a.nullable
+		}
+	}
+	rec(c.simple)
+
+	c.lastpos = a.lastpos
+	c.firstpos = a.firstpos
+	c.nullable = a.nullable
 	return a
 }
 
@@ -54,13 +76,16 @@ func (be *BasicExpr) Compile() *FiniteState {
 	if be.op != nil {
 		switch be.op.tag {
 		case TagStar:
+			a.ToGraph(os.Stdout)
 			a.Loop()
+			a.ToGraph(os.Stdout)
 		case TagPlus:
 			b := a.copy()
 			b.Loop()
 			a.Append(b)
 		case TagQuestion:
 			a.TerminalStates = append(a.TerminalStates, TerminalState{State: 0})
+			a.nullable = true
 		}
 	}
 
@@ -96,6 +121,10 @@ func (be *BasicExpr) Compile() *FiniteState {
 		}
 	}
 
+	be.lastpos = a.lastpos
+	be.firstpos = a.firstpos
+	be.nullable = a.nullable
+
 	return a
 }
 
@@ -125,27 +154,27 @@ func (g *Group) Compile() *FiniteState {
 }
 
 func (e *Escape) Compile() *FiniteState {
-	switch e.base.val {
+	switch e.base.tok.val {
 	case "t":
-		return Create([]rune{'\t'})
+		return Create([]rune{'\t'}, e.base.pos)
 	case "n":
-		return Create([]rune{'\n'})
-	case "r":
-		return Create([]rune{'\r'})
-	case "f":
-		return Create([]rune{'\f'})
-	case "d":
-		return Create(genRuneInRange('0', '9'))
-	case "s":
-		return Create([]rune{'\n', '\r', '\f', '\t', ' '})
-	case "w":
-		lowerLetters := genRuneInRange('a', 'z')
-		letters := append(lowerLetters, genRuneInRange('A', 'Z')...)
-		lettersAndNums := append(letters, genRuneInRange('0', '9')...)
-		return Create(append(lettersAndNums, '_'))
+		return Create([]rune{'\n'}, e.base.pos)
+		//case "r":
+		//	return Create([]rune{'\r'})
+		//case "f":
+		//	return Create([]rune{'\f'})
+		//case "d":
+		//	return Create(genRuneInRange('0', '9'))
+		//case "s":
+		//	return Create([]rune{'\n', '\r', '\f', '\t', ' '})
+		//case "w":
+		//	lowerLetters := genRuneInRange('a', 'z')
+		//	letters := append(lowerLetters, genRuneInRange('A', 'Z')...)
+		//	lettersAndNums := append(letters, genRuneInRange('0', '9')...)
+		//	return Create(append(lettersAndNums, '_'))
 	}
 
-	return Create([]rune(e.base.val))
+	return Create([]rune(e.base.tok.val), e.base.pos)
 }
 
 func (s *Set) Compile() *FiniteState {
@@ -170,6 +199,10 @@ func (s *SetItems) Compile() *FiniteState {
 		b := s.items.Compile()
 		a.Union(b)
 	}
+
+	s.lastpos = a.lastpos
+	s.firstpos = a.firstpos
+	s.nullable = a.nullable
 
 	return a
 }
@@ -197,7 +230,7 @@ func (r *Range) Compile() *FiniteState {
 		startChar = []rune(r.startToken.val)[0]
 	}
 	if r.startEscape != nil {
-		startChar = []rune(r.startEscape.base.val)[0]
+		startChar = []rune(r.startEscape.base.tok.val)[0]
 	}
 
 	if startChar > []rune(r.end.val)[0] {
@@ -207,7 +240,11 @@ func (r *Range) Compile() *FiniteState {
 
 	chars := genRuneInRange(startChar, []rune(r.end.val)[0])
 
-	return Create(chars)
+	a := Create(chars, r.pos)
+	r.lastpos = a.lastpos
+	r.firstpos = a.firstpos
+	r.nullable = a.nullable
+	return a
 }
 
 func genRuneInRange(startChar, endChar rune) []rune {
@@ -226,6 +263,11 @@ var anyRuneNotNL = genAnyRuneNotNL()
 //	maxRune = 100
 //)
 
+const runeRangeEnd = 0x10ffff
+const printableChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r"
+
+var printableCharsNoNL = printableChars[:len(printableChars)-2]
+
 func genAnyRuneNotNL() []rune {
 	var res []rune
 	//for i = minRune; i < '\n'; i++ {
@@ -242,15 +284,36 @@ func genAnyRuneNotNL() []rune {
 	return res
 }
 
-func (t *Token) Compile() *FiniteState {
-	if t.tag == TagAnyCharacter {
+//func (t *Token) Compile() *FiniteState {
+//	if t.tag == TagAnyCharacter {
+//		res := NewAutomata()
+//		for _, i := range anyRuneNotNL {
+//			res.Union(Create([]rune{i}, 0))
+//		}
+//
+//		return res
+//	}
+//
+//	return Create([]rune(t.val), 0)
+//}
+
+func (t *Character) Compile() *FiniteState {
+	if t.tok.tag == TagAnyCharacter {
 		res := NewAutomata()
 		for _, i := range anyRuneNotNL {
-			res.Union(Create([]rune{i}))
+			res.Union(Create([]rune{i}, t.pos))
 		}
+
+		t.lastpos = res.lastpos
+		t.firstpos = res.firstpos
+		t.nullable = res.nullable
 
 		return res
 	}
+	a := Create([]rune(t.tok.val), t.pos)
+	t.lastpos = a.lastpos
+	t.firstpos = a.firstpos
+	t.nullable = a.nullable
 
-	return Create([]rune(t.val))
+	return a
 }

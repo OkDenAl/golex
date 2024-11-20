@@ -10,6 +10,7 @@ type Parser struct {
 	cursor int
 	tokens []Token
 
+	regRuleNum          int
 	startConditionNames map[string]struct{}
 	ruleNames           map[string]Token
 }
@@ -132,6 +133,7 @@ func (p *Parser) rule() (Rule, error) {
 
 	p.mustExpectTag(TagRegularMarker)
 	reset := p.reset()
+	p.regRuleNum = 0
 	expr, ok := p.regExpr()
 	if !ok {
 		reset()
@@ -230,7 +232,7 @@ func (p *Parser) union() (*Union, bool) {
 		return nil, false
 	}
 
-	return &Union{regex, simple}, true
+	return &Union{regex: regex, simple: simple}, true
 }
 
 // SimpleExpr      ::= Concatenation | BasicExpr
@@ -266,7 +268,7 @@ func (p *Parser) concatenation() (*Concatenation, bool) {
 		return nil, false
 	}
 
-	return &Concatenation{simple, basic}, true
+	return &Concatenation{simple: simple, basic: basic}, true
 }
 
 // BasicExpr       ::= Element ("*"|"+"|"?"|Repetition)?
@@ -365,7 +367,8 @@ func (p *Parser) element() (*Element, bool) {
 
 	character, ok := p.validIndependentCharacter()
 	if ok {
-		return &Element{character: character}, true
+		p.regRuleNum++
+		return &Element{character: &Character{tok: character, pos: p.regRuleNum}}, true
 	}
 
 	return nil, false
@@ -383,7 +386,7 @@ func (p *Parser) group() (*Group, bool) {
 		reset()
 		return nil, false
 	}
-	return &Group{regex}, true
+	return &Group{regExpr: regex}, true
 }
 
 // Escape          ::= "\" EscapeCharacter
@@ -398,7 +401,8 @@ func (p *Parser) escape() (*Escape, bool) {
 		return nil, false
 	}
 
-	return &Escape{base}, true
+	p.regRuleNum++
+	return &Escape{base: &Character{tok: base, pos: p.regRuleNum}}, true
 }
 
 // Set             ::= "[" ("^")? SetItems "]"
@@ -460,7 +464,8 @@ func (p *Parser) setItem(isFirst bool) (*SetItem, bool) {
 	reset()
 	token, ok := p.setCharacter(isFirst)
 	if ok {
-		return &SetItem{base: token}, true
+		p.regRuleNum++
+		return &SetItem{base: &Character{tok: token, pos: p.regRuleNum}}, true
 	}
 
 	reset()
@@ -495,7 +500,8 @@ func (p *Parser) rangeExpr() (*Range, bool) {
 		panic("unexpected token " + p.tokens[p.cursor].String())
 	}
 
-	return &Range{startToken: startToken, startEscape: startEscape, end: end}, true
+	p.regRuleNum++
+	return &Range{startToken: startToken, startEscape: startEscape, end: end, pos: p.regRuleNum}, true
 }
 
 // ValidIndependentCharacter ::= [^()|/]
@@ -637,8 +643,10 @@ func (p *Parser) expectTags(tags ...DomainTag) (Token, bool) {
 
 func (p *Parser) reset() func() {
 	cursor := p.cursor
+	num := p.regRuleNum
 	return func() {
 		p.cursor = cursor
+		p.regRuleNum = num
 	}
 }
 
