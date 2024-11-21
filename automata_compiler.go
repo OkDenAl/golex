@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
-	"os"
 )
 
 type AutomataCompiler interface {
@@ -76,9 +74,7 @@ func (be *BasicExpr) Compile() *FiniteState {
 	if be.op != nil {
 		switch be.op.tag {
 		case TagStar:
-			a.ToGraph(os.Stdout)
 			a.Loop()
-			a.ToGraph(os.Stdout)
 		case TagPlus:
 			b := a.copy()
 			b.Loop()
@@ -88,42 +84,6 @@ func (be *BasicExpr) Compile() *FiniteState {
 			a.nullable = true
 		}
 	}
-
-	if be.repetition != nil {
-		if be.repetition.max < be.repetition.min {
-			panic("invalid min and max repetition")
-		}
-		init := a.copy()
-		for i := 0; i < be.repetition.min-2; i++ {
-			b := init.copy()
-			a.Append(b)
-		}
-		if be.repetition.max == math.MaxInt {
-			b := init.copy()
-			a.Append(b)
-			b.Loop()
-			a.Append(b)
-		} else if be.repetition.max == be.repetition.min && be.repetition.min != 1 && be.repetition.min != 0 {
-			b := init.copy()
-			a.Append(b)
-		} else if be.repetition.min != 1 && be.repetition.min != 0 {
-			b := init.copy()
-			a.Append(b)
-			b.Append(init)
-			for i := 0; i < be.repetition.max-2; i++ {
-				b.Append(init)
-				a.Union(b)
-			}
-		}
-
-		if be.repetition.min == 0 && be.repetition.max == be.repetition.min {
-			return NewAutomata()
-		}
-	}
-
-	be.lastpos = a.lastpos
-	be.firstpos = a.firstpos
-	be.nullable = a.nullable
 
 	return a
 }
@@ -159,19 +119,19 @@ func (e *Escape) Compile() *FiniteState {
 		return Create([]rune{'\t'}, e.base.pos)
 	case "n":
 		return Create([]rune{'\n'}, e.base.pos)
-		//case "r":
-		//	return Create([]rune{'\r'})
-		//case "f":
-		//	return Create([]rune{'\f'})
-		//case "d":
-		//	return Create(genRuneInRange('0', '9'))
-		//case "s":
-		//	return Create([]rune{'\n', '\r', '\f', '\t', ' '})
-		//case "w":
-		//	lowerLetters := genRuneInRange('a', 'z')
-		//	letters := append(lowerLetters, genRuneInRange('A', 'Z')...)
-		//	lettersAndNums := append(letters, genRuneInRange('0', '9')...)
-		//	return Create(append(lettersAndNums, '_'))
+	case "r":
+		return Create([]rune{'\r'}, e.base.pos)
+	case "f":
+		return Create([]rune{'\f'}, e.base.pos)
+	case "d":
+		return Create(genRuneInRange('0', '9'), e.base.pos)
+	case "s":
+		return Create([]rune{'\n', '\r', '\f', '\t', ' '}, e.base.pos)
+	case "w":
+		lowerLetters := genRuneInRange('a', 'z')
+		lts := append(lowerLetters, genRuneInRange('A', 'Z')...)
+		lettersAndNums := append(lts, genRuneInRange('0', '9')...)
+		return Create(append(lettersAndNums, '_'), e.base.pos)
 	}
 
 	return Create([]rune(e.base.tok.val), e.base.pos)

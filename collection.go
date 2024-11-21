@@ -46,3 +46,20 @@ func mergeUnique(arr1, arr2 []int) []int {
 
 	return mergedArray
 }
+
+func copyMap[K comparable, V any](original map[K]V) map[K]V {
+	cpy := make(map[K]V)
+	for key, value := range original {
+		cpy[key] = value
+	}
+
+	return cpy
+}
+
+func copyWithAdd(arr []int, add int) []int {
+	res := make([]int, 0, len(arr))
+	for _, el := range arr {
+		res = append(res, el+add)
+	}
+	return res
+}

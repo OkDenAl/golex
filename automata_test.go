@@ -231,7 +231,7 @@ func setup(t *testing.T, regexp string) *FiniteState {
 	scn.regularMode = true
 	tokens := scn.GetTokens()
 	tokens = append(tokens, Token{
-		val: "#",
+		val: string([]rune{endSymbol}),
 		tag: TagCharacter,
 	})
 	parser := New(tokens)
@@ -243,8 +243,6 @@ func setup(t *testing.T, regexp string) *FiniteState {
 
 	r.ToGraph(os.Stdout)
 	res.ToGraph(os.Stdout)
-	flPos = make(map[int]Pos)
-	letters = make(map[rune][]int)
 	return r
 }
 
@@ -321,50 +319,8 @@ func TestFiniteState_Execute(t *testing.T) {
 			maxLen: 100,
 		},
 		{
-			name:   "a{1}",
-			args:   args{reg: "a{1}"},
-			count:  100,
-			maxLen: 100,
-		},
-		{
-			name:   "a{0}bc",
-			args:   args{reg: "a{0}bc"},
-			count:  100,
-			maxLen: 100,
-		},
-		{
-			name:   "(abc){3}",
-			args:   args{reg: "(abc){3}"},
-			count:  100,
-			maxLen: 100,
-		},
-		{
-			name:   "(abc){2,}",
-			args:   args{reg: "(abc){2,}"},
-			count:  100,
-			maxLen: 100,
-		},
-		{
-			name:   "(abc){2,p}",
-			args:   args{reg: "(abc){2,p}"},
-			count:  100,
-			maxLen: 100,
-		},
-		{
-			name:   "a{2,4}",
-			args:   args{reg: "a{2,4}"},
-			count:  100,
-			maxLen: 100,
-		},
-		{
-			name:   "1",
-			args:   args{reg: "(a|b)*abb"},
-			count:  100,
-			maxLen: 100,
-		},
-		{
-			name:   "2",
-			args:   args{reg: "((abc)+b)+"},
+			name:   "[0-9]*|([0-9]*h)",
+			args:   args{reg: "([0-9]*|([0-9]*h))"},
 			count:  100,
 			maxLen: 100,
 		},

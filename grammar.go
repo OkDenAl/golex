@@ -75,21 +75,10 @@ type Concatenation struct {
 	lastpos  []int
 }
 
-// BasicExpr ::= Element ("*"|"+"|"?"|Repetition)?
+// BasicExpr ::= Element ("*"|"+"|"?")?
 type BasicExpr struct {
-	op         *Token
-	repetition *Repetition
-	element    *Element
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
-}
-
-// Repetition      ::= "{" Number ("}" | "," ("}" | Number "}"))
-type Repetition struct {
-	max int
-	min int
+	op      *Token
+	element *Element
 
 	nullable bool
 	firstpos []int

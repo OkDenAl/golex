@@ -13,9 +13,12 @@ type FiniteState struct {
 	Transitions    map[int]map[rune]int
 	equivalents    map[int]int
 
-	nullable bool
-	firstpos []int
-	lastpos  []int
+	nullable     bool
+	firstpos     []int
+	lastpos      []int
+	flPos        map[int]Pos
+	letters      map[rune]map[int]struct{}
+	lettersCount int
 }
 
 type TerminalState struct {
@@ -33,6 +36,7 @@ func NewAutomata() *FiniteState {
 		nullable:       true,
 		firstpos:       make([]int, 0),
 		lastpos:        make([]int, 0),
+		lettersCount:   0,
 	}
 }
 
@@ -48,10 +52,11 @@ func Create(chars []rune, pos int) *FiniteState {
 	}
 	for _, ch := range chars {
 		if _, ok := letters[ch]; !ok {
-			letters[ch] = make([]int, 0)
+			letters[ch] = make(map[int]struct{})
 		}
-		letters[ch] = append(letters[ch], pos)
+		letters[ch][pos] = struct{}{}
 	}
+	f.lettersCount = 1
 	return f
 }
 
@@ -71,6 +76,9 @@ func (f *FiniteState) copy() *FiniteState {
 		nullable:       f.nullable,
 		firstpos:       f.firstpos,
 		lastpos:        f.lastpos,
+		lettersCount:   f.lettersCount,
+		flPos:          copyMap(f.flPos),
+		letters:        copyMap(f.letters),
 	}
 
 	copy(copyState.TerminalStates, f.TerminalStates)
@@ -158,6 +166,7 @@ func (f *FiniteState) Append(other *FiniteState) {
 		nullable:       f.nullable && other.nullable,
 		firstpos:       f.firstpos,
 		lastpos:        other.lastpos,
+		lettersCount:   f.lettersCount + other.lettersCount,
 	}
 
 	if f.nullable {
@@ -213,6 +222,54 @@ func (f *FiniteState) Append(other *FiniteState) {
 	*f = *result
 }
 
+var naming = map[int]string{}
+
+func (f *FiniteState) UnionNext(other *FiniteState) {
+	for i := range other.firstpos {
+		other.firstpos[i] += f.lettersCount
+	}
+
+	for i := range other.lastpos {
+		other.lastpos[i] += f.lettersCount
+	}
+
+	for k, v := range other.flPos {
+		f.flPos[k+f.lettersCount] = Pos{
+			followPos: copyWithAdd(v.followPos, f.lettersCount),
+		}
+	}
+
+	for k, v := range other.letters {
+		for vv := range v {
+			if _, ok := f.letters[k]; !ok {
+				f.letters[k] = make(map[int]struct{})
+			}
+			f.letters[k][vv+f.lettersCount] = struct{}{}
+		}
+
+		if k == endSymbol {
+			for vv := range v {
+				naming[vv+f.lettersCount] = other.TerminalStates[0].LexemName
+			}
+		}
+	}
+
+	newFSM := &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{},
+		Transitions:    make(map[int]map[rune]int),
+		equivalents:    map[int]int{},
+		nullable:       f.nullable || other.nullable,
+		firstpos:       mergeUnique(f.firstpos, other.firstpos),
+		lastpos:        mergeUnique(f.lastpos, other.lastpos),
+		lettersCount:   f.lettersCount + other.lettersCount,
+		flPos:          copyMap(f.flPos),
+		letters:        copyMap(f.letters),
+	}
+
+	*f = *newFSM
+}
+
 func (f *FiniteState) Union(other *FiniteState) {
 	statesNumF := f.nextState
 	statesNumOther := other.nextState
@@ -225,6 +282,7 @@ func (f *FiniteState) Union(other *FiniteState) {
 		nullable:       f.nullable || other.nullable,
 		firstpos:       mergeUnique(f.firstpos, other.firstpos),
 		lastpos:        mergeUnique(f.lastpos, other.lastpos),
+		lettersCount:   f.lettersCount + other.lettersCount,
 	}
 
 	newFSM.TerminalStates = append(newFSM.TerminalStates, f.TerminalStates...)

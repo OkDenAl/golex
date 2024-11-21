@@ -1,9 +1,9 @@
 LATIN /[A-Za-z]/
 %%
 
-/[\t ]+/ Skip
+/[\t ]+/ Skip continue
 
-/[\n]+/ NewLine
+/[\n]+/ NewLine continue
 
 /int/  INT
 /char/  CHAR

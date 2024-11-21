@@ -250,12 +250,36 @@ func (scn *Scanner) scanNameTokens(curToken Token) []Token {
 
 func (scn *Scanner) GetTokens() []Token {
 	t := scn.nextToken()
+	i := 1
 	var tokens []Token
 	for t.Tag() != TagEOP {
 		if t.Tag() == TagOpenBrace {
 			tokens = append(tokens, scn.scanNameTokens(t)...)
 		} else if t.Tag() != TagErr {
+			if t.Tag() == TagRegularMarker {
+				if i%2 == 0 {
+					tokens = append(tokens, Token{
+						tag: TagCloseParen,
+						val: string([]rune{')'}),
+					})
+					tokens = append(tokens, Token{
+						tag: TagCharacter,
+						val: string([]rune{endSymbol}),
+					})
+				}
+			}
+
 			tokens = append(tokens, t)
+
+			if t.Tag() == TagRegularMarker {
+				if i%2 == 1 {
+					tokens = append(tokens, Token{
+						tag: TagOpenParen,
+						val: string([]rune{'('}),
+					})
+				}
+				i++
+			}
 		}
 
 		t = scn.nextToken()

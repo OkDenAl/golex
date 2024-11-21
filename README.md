@@ -17,8 +17,7 @@ RegExpr         ::= Union | SimpleExpr
 Union           ::= SimpleExpr "|" RegExpr
 SimpleExpr      ::= Concatenation | BasicExpr
 Concatenation   ::= BasicExpr SimpleExpr
-BasicExpr       ::= Element ("*"|"+"|"?"|Repetition)?
-Repetition      ::= ("{" Number ("}" | "," ("}" | Number "}")))
+BasicExpr       ::= Element ("*"|"+"|"?")?
 Element         ::= Group | Set | Escape | Repetition | ValidIndependentCharacter
 Group           ::= "(" RegExpr ")"
 Escape          ::= "\" EscapeCharacter
@@ -68,8 +67,5 @@ RangeEndCharacter ::= .
 +| one or more quantifier|ye+ah|yeah, yeeeah|yah  
 *| zero or more quantifier|ye*ah|yeeah, yeeeah, yah|yeh 
 ?| zero or one quantifier|yes?|yes, ye|yess
-{n}|n times exactly|fo{2}|foo|fooo
-{n,m}|from n to m times|go{2,3}d|good,goood|gooood
-{n,}|at least n times|go{2,}|goo, gooo|go
 
 > *Supported ASCII range from 0 to 1000

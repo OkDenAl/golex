@@ -18,9 +18,9 @@ type Continued bool
 
 type LexemHandler interface {
 	ErrHandler
-	A1(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	A2(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	A3(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	Skip(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	Assembly(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	Num(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
 }
 
 type Tag interface {
@@ -41,18 +41,18 @@ type DefaultTag int
 
 const (
 	TagErr DefaultTag = iota
-	TagA1
-	TagA2
-	TagA3
+	TagSkip
+	TagAssembly
+	TagNum
 	TagINIT
 )
 
 func (t DefaultTag) GetTag() string {
 	var tagToString = map[DefaultTag]string{
-		TagA1:   "A1",
-		TagA2:   "A2",
-		TagA3:   "A3",
-		TagINIT: "INIT",
+		TagSkip:     "Skip",
+		TagAssembly: "Assembly",
+		TagNum:      "Num",
+		TagINIT:     "INIT",
 	}
 
 	return tagToString[t]
@@ -136,42 +136,36 @@ func (f *FiniteState) isTerminal(state int) bool {
 }
 
 var (
-	automataA1 *FiniteState = &FiniteState{
+	automataSkip *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "A1"}},
+		TerminalStates: []TerminalState{},
+		Transitions:    map[int]map[rune]int{},
+	}
+	automataAssembly *FiniteState = &FiniteState{
+		CurrentState:   0,
+		TerminalStates: []TerminalState{{state: 5, lexemName: "Assembly"}},
 		Transitions: map[int]map[rune]int{
-			0: {97: 1},
+			0: {101: 2, 109: 1},
+			1: {111: 3},
+			2: {97: 4},
+			3: {118: 5},
+			4: {120: 5},
 		},
 	}
-	automataA2 *FiniteState = &FiniteState{
+	automataNum *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 3, lexemName: "A2"}},
+		TerminalStates: []TerminalState{{state: 0, lexemName: "Num"}, {state: 1, lexemName: "Num"}, {state: 3, lexemName: "Num"}},
 		Transitions: map[int]map[rune]int{
-			0: {97: 1},
-			1: {98: 2},
-			2: {98: 3},
-		},
-	}
-	automataA3 *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 3, lexemName: "A3"}, {state: 2, lexemName: "A3"}},
-		Transitions: map[int]map[rune]int{
-			0: {97: 1, 98: 2},
-			1: {97: 1, 98: 2},
-			2: {98: 3},
-			3: {98: 3},
+			0: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1},
+			1: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 2, 66: 2, 67: 2, 68: 2, 69: 2, 70: 2, 97: 2, 98: 2, 99: 2, 100: 2, 101: 2, 102: 2, 104: 3},
+			2: {48: 2, 49: 2, 50: 2, 51: 2, 52: 2, 53: 2, 54: 2, 55: 2, 56: 2, 57: 2, 65: 2, 66: 2, 67: 2, 68: 2, 69: 2, 70: 2, 97: 2, 98: 2, 99: 2, 100: 2, 101: 2, 102: 2, 104: 3},
 		},
 	}
 
 	automataUnionRegexps *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: ""}, {state: 5, lexemName: "A2"}, {state: 2, lexemName: "A1"}, {state: 8, lexemName: "A3"}, {state: 7, lexemName: "A3"}, {state: 4, lexemName: ""}},
-		Transitions: map[int]map[rune]int{
-			0: {97: 2, 98: 7},
-			2: {97: 2, 98: 4},
-			4: {98: 5},
-			5: {98: 5},
-		},
+		TerminalStates: []TerminalState{},
+		Transitions:    map[int]map[rune]int{},
 	}
 )
 
@@ -181,31 +175,31 @@ func (e *HandlerBase) Error(msg string, pos Position, symbol string) {
 	fmt.Printf("ERROR%s: %s %s\n", pos.String(), msg, symbol)
 }
 
-func (h *HandlerBase) A1(
+func (h *HandlerBase) Skip(
 	text string,
 	start, end Position,
 	errFunc ErrFunc,
 	switchCond SwitchConditionFunc,
 ) (Token, Continued) {
-	return NewToken(TagA1, start, end, text), false
+	return NewToken(TagSkip, start, end, text), false
 }
 
-func (h *HandlerBase) A2(
+func (h *HandlerBase) Assembly(
 	text string,
 	start, end Position,
 	errFunc ErrFunc,
 	switchCond SwitchConditionFunc,
 ) (Token, Continued) {
-	return NewToken(TagA2, start, end, text), false
+	return NewToken(TagAssembly, start, end, text), false
 }
 
-func (h *HandlerBase) A3(
+func (h *HandlerBase) Num(
 	text string,
 	start, end Position,
 	errFunc ErrFunc,
 	switchCond SwitchConditionFunc,
 ) (Token, Continued) {
-	return NewToken(TagA3, start, end, text), false
+	return NewToken(TagNum, start, end, text), false
 }
 
 type EOPTag struct{}
@@ -302,9 +296,9 @@ func NewScanner(program []rune, handler LexemHandler) Scanner {
 	regexps := make(map[Condition][]*FiniteState)
 
 	regexps[ConditionINIT] = make([]*FiniteState, 0, 3)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataA1)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataA2)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataA3)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSkip)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataAssembly)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNum)
 
 	return Scanner{program: program, handler: handler, regexps: regexps, curPos: NewPosition(program), curCondition: ConditionINIT}
 }
@@ -334,12 +328,12 @@ func (s *Scanner) findTokenOneAutomataINIT(
 	switchCond SwitchConditionFunc,
 ) (Token, Continued) {
 	switch name {
-	case "A1":
-		return s.handler.A1(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case "A2":
-		return s.handler.A2(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case "A3":
-		return s.handler.A3(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "Skip":
+		return s.handler.Skip(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "Assembly":
+		return s.handler.Assembly(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "Num":
+		return s.handler.Num(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
@@ -366,12 +360,12 @@ func (s *Scanner) findTokenINIT(
 	switchCond SwitchConditionFunc,
 ) (Token, Continued) {
 	switch automata {
-	case automataA1:
-		return s.handler.A1(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case automataA2:
-		return s.handler.A2(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case automataA3:
-		return s.handler.A3(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataSkip:
+		return s.handler.Skip(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataAssembly:
+		return s.handler.Assembly(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataNum:
+		return s.handler.Num(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true

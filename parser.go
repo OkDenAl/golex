@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"slices"
 )
 
@@ -271,7 +270,7 @@ func (p *Parser) concatenation() (*Concatenation, bool) {
 	return &Concatenation{simple: simple, basic: basic}, true
 }
 
-// BasicExpr       ::= Element ("*"|"+"|"?"|Repetition)?
+// BasicExpr       ::= Element ("*"|"+"|"?")?
 func (p *Parser) basicExpr() (*BasicExpr, bool) {
 	base, ok := p.element()
 	if !ok {
@@ -281,15 +280,6 @@ func (p *Parser) basicExpr() (*BasicExpr, bool) {
 	token, ok := p.expectTags(TagStar, TagPlus, TagQuestion)
 	if ok {
 		return &BasicExpr{element: base, op: &token}, true
-	}
-
-	if p.cursor < len(p.tokens) && p.tokens[p.cursor].Tag() == TagOpenBrace {
-		reset := p.reset()
-		repetition, ok := p.repetition()
-		if ok {
-			return &BasicExpr{element: base, repetition: repetition}, true
-		}
-		reset()
 	}
 
 	return &BasicExpr{element: base}, true
@@ -319,33 +309,6 @@ func (p *Parser) findNum() (int, bool) {
 		res += number
 	}
 	return res, true
-}
-
-func (p *Parser) repetition() (*Repetition, bool) {
-	p.mustExpectTag(TagOpenBrace)
-
-	minNum, ok := p.findNum()
-	if !ok || minNum < 0 {
-		return nil, false
-	}
-
-	maxNum := minNum
-	if p.tokens[p.cursor].Tag() == TagComma {
-		p.mustExpectTag(TagComma)
-		maxNum, ok = p.findNum()
-		if maxNum < 0 {
-			return nil, false
-		}
-		if !ok {
-			maxNum = math.MaxInt
-		}
-	}
-
-	if _, ok := p.expectTags(TagCloseBrace); !ok {
-		return nil, false
-	}
-
-	return &Repetition{min: minNum, max: maxNum}, true
 }
 
 // Element         ::= Group | Set | Escape | ValidIndependentCharacter

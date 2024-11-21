@@ -1,6 +1,9 @@
 package main
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 type Regexp struct {
 	RegexpVal           *FiniteState
@@ -36,13 +39,22 @@ const InitialCond = "INIT"
 func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 	gi := GeneratorInfo{Conditions: make(map[string]Condition), AllRegexps: make([]Regexp, 0)}
 	conds := make(map[string][]Regexp)
-	res := NewAutomata()
+	var res *FiniteState
 	for _, rule := range r.rules.ruleArr {
-		automata := rule.expr.Compile()
+		automata := rule.expr.Compile().CompileV2()
 		automata.setLexemName(rule.name.val)
 
-		res.Union(automata.copy())
-		res.ToGraph(os.Stdout)
+		if res == nil {
+			res = automata
+			for _, a := range res.TerminalStates {
+				naming[a.State] = a.LexemName
+			}
+		} else {
+			res.UnionNext(automata.copy())
+		}
+
+		fmt.Println(res.flPos)
+		fmt.Println(res.letters)
 		startCondName := InitialCond
 		if rule.startCondition != nil {
 			startCondName = rule.startCondition.condition.val
@@ -67,10 +79,12 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 		conds[startCondName] = append(conds[startCondName], reg)
 		gi.AllRegexps = append(gi.AllRegexps, reg)
 	}
-	//res.ToGraph(os.Stdout)
+	flPos = res.flPos
+	letters = res.letters
+	fmt.Println(naming)
 	for key, val := range conds {
 		gi.UnionRegexps = append(gi.UnionRegexps, Regexp{
-			RegexpVal:  res,
+			RegexpVal:  res.CompileV2(),
 			ActionName: "UnionRegexps",
 		})
 		gi.Conditions[key] = NewCondition(key, val, len(val))
@@ -83,7 +97,8 @@ func (r *Program) Process() *GeneratorInfo {
 	gi := GeneratorInfo{Conditions: make(map[string]Condition), AllRegexps: make([]Regexp, 0)}
 	conds := make(map[string][]Regexp)
 	for _, rule := range r.rules.ruleArr {
-		automata := rule.expr.Compile()
+		automata := rule.expr.Compile().CompileV2()
+		automata.ToGraph(os.Stdout)
 		startCondName := InitialCond
 		if rule.startCondition != nil {
 			startCondName = rule.startCondition.condition.val

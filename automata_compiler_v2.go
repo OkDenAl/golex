@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"slices"
 	"strconv"
+	"unicode"
 )
+
+const endSymbol = unicode.MaxRune
 
 type Pos struct {
 	followPos []int
@@ -12,11 +13,12 @@ type Pos struct {
 
 var (
 	flPos   = make(map[int]Pos)
-	letters = make(map[rune][]int)
+	letters = make(map[rune]map[int]struct{})
 )
 
 func (f *FiniteState) CompileV2() *FiniteState {
 	res := NewAutomata()
+	usedTerminalStates := make(map[int]struct{})
 	res.TerminalStates = []TerminalState{}
 	i := 0
 	states := make(map[string]int)
@@ -24,22 +26,25 @@ func (f *FiniteState) CompileV2() *FiniteState {
 	var nextState []int
 	var stStack [][]int
 	stStack = append(stStack, f.firstpos)
-	fmt.Println(flPos)
-	fmt.Println(letters)
 	for len(stStack) != 0 {
 		curState := stStack[0]
-		if slices.Contains(curState, letters['#'][0]) {
-			res.TerminalStates = append(res.TerminalStates, TerminalState{
-				State: states[arrToString(curState)],
-			})
+		if el, ok := containsEndSymbol(curState); ok {
+			if _, ok := usedTerminalStates[states[arrToString(curState)]]; !ok {
+				res.TerminalStates = append(res.TerminalStates, TerminalState{
+					State:     states[arrToString(curState)],
+					LexemName: naming[el],
+				})
+				usedTerminalStates[states[arrToString(curState)]] = struct{}{}
+			}
 		}
+
 		stStack = stStack[1:]
 		for key := range letters {
-			if key == '#' {
+			if key == endSymbol {
 				continue
 			}
 			for _, el := range curState {
-				if slices.Contains(letters[key], el) {
+				if _, ok := letters[key][el]; ok {
 					nextState = mergeUnique(nextState, flPos[el].followPos)
 				}
 			}
@@ -55,15 +60,40 @@ func (f *FiniteState) CompileV2() *FiniteState {
 				res.Transitions[states[arrToString(curState)]] = make(map[rune]int)
 			}
 			res.Transitions[states[arrToString(curState)]][key] = states[arrToString(nextState)]
-			if slices.Contains(nextState, letters['#'][0]) {
-				res.TerminalStates = append(res.TerminalStates, TerminalState{
-					State: states[arrToString(nextState)],
-				})
+
+			if el, ok := containsEndSymbol(nextState); ok {
+				if _, ok := usedTerminalStates[states[arrToString(nextState)]]; !ok {
+					res.TerminalStates = append(res.TerminalStates, TerminalState{
+						State:     states[arrToString(nextState)],
+						LexemName: naming[el],
+					})
+					usedTerminalStates[states[arrToString(nextState)]] = struct{}{}
+				}
 			}
+
 			nextState = []int{}
 		}
 	}
+	res.flPos = copyMap(flPos)
+	res.letters = copyMap(letters)
+	res.nullable = f.nullable
+	res.firstpos = f.firstpos
+	res.lastpos = f.lastpos
+	res.lettersCount = f.lettersCount
+
+	letters = make(map[rune]map[int]struct{})
+	flPos = make(map[int]Pos)
 	return res
+}
+
+func containsEndSymbol(arr []int) (int, bool) {
+	for _, el := range arr {
+		if _, ok := letters[endSymbol][el]; ok {
+			return el, true
+		}
+	}
+
+	return 0, false
 }
 
 func arrToString(arr []int) string {
