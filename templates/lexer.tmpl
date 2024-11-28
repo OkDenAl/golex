@@ -142,7 +142,7 @@ var(
         }
     {{ end }}
 
-    {{ range .UnionRegexps }}automata{{ .ActionName }} *FiniteState = &FiniteState{
+    {{ range .UnionRegexps }}unionAutomata{{ .ActionName }} *FiniteState = &FiniteState{
         CurrentState:  {{ .RegexpVal.CurrentState }},
         TerminalStates: []TerminalState{ {{ range .RegexpVal.TerminalStates }}{state: {{.State}}, lexemName: "{{.LexemName}}" }, {{ end }}},
         Transitions: map[int]map[rune]int{
@@ -165,7 +165,7 @@ func (e *HandlerBase) Error(msg string, pos Position, symbol string) {
     errFunc ErrFunc,
     switchCond SwitchConditionFunc,
 ) (Token,Continued) {
-    {{ if .SwitchConditionName }}switchCond(golexgen.Condition{{ .SwitchConditionName }})
+    {{ if .SwitchConditionName }}switchCond(Condition{{ .SwitchConditionName }})
 
         {{ if .Continued }}return Token{},{{ .Continued }}
         }
@@ -263,6 +263,7 @@ type Scanner struct {
 	program []rune
 	handler LexemHandler
 	regexps map[Condition][]*FiniteState
+	unionRegexps map[Condition]*FiniteState
 	curPos  Position
 
 	curCondition Condition
@@ -276,8 +277,20 @@ func NewScanner(program []rune, handler LexemHandler) Scanner {
         {{ end }}
     {{ end }}
 
+    unionRegexps := make(map[Condition]*FiniteState)
+    {{ range $key, $value := .Conditions }}
+       unionRegexps[Condition{{ $key }}] = unionAutomata{{ $key }}
+    {{ end }}
 
-	return Scanner{program: program, handler: handler,regexps:regexps, curPos: NewPosition(program),curCondition:ConditionINIT}
+
+	return Scanner{
+	    program: program,
+	    handler: handler,
+	    regexps:regexps,
+	    unionRegexps: unionRegexps,
+	    curPos: NewPosition(program),
+	    curCondition:ConditionINIT,
+	}
 }
 
 func (s *Scanner) switchCondition(cond Condition) {
@@ -346,7 +359,7 @@ func (s *Scanner) NextTokenOneAutomata() Token {
 		start := s.curPos.index
 
 		maxRight:=0
-		res,name := automataUnionRegexps.FindMatchEndIndexOneAutomata(string(s.program[s.curPos.index:]))
+		res,name := s.unionRegexps[s.curCondition].FindMatchEndIndexOneAutomata(string(s.program[s.curPos.index:]))
 		if res > 0 {
 			maxRight = res
 		}

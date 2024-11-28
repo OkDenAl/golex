@@ -12,6 +12,7 @@ type Pos struct {
 }
 
 var (
+	naming  = map[int]string{}
 	flPos   = make(map[int]Pos)
 	letters = make(map[rune]map[int]struct{})
 )

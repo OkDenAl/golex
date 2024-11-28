@@ -17,13 +17,17 @@ type Condition struct {
 	Name        string
 	Regexps     []Regexp
 	RegexpsLen  int
-	UnionRegexp []Regexp
+	UnionRegexp Regexp
 }
 
-func NewCondition(name string, regxps []Regexp, regxpsLen int) Condition {
+func NewCondition(name string, regxps []Regexp, regxpsLen int, unionReg *FiniteAutomata) Condition {
 	return Condition{
-		Name:       name,
-		Regexps:    regxps,
+		Name:    name,
+		Regexps: regxps,
+		UnionRegexp: Regexp{
+			RegexpVal:  unionReg,
+			ActionName: name,
+		},
 		RegexpsLen: regxpsLen,
 	}
 }
@@ -34,34 +38,28 @@ type GeneratorInfo struct {
 	UnionRegexps []Regexp
 }
 
+type AutomataWithNaming struct {
+	automata *FiniteAutomata
+	naming   map[int]string
+}
+
 const InitialCond = "INIT"
 
 func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 	gi := GeneratorInfo{Conditions: make(map[string]Condition), AllRegexps: make([]Regexp, 0)}
 	conds := make(map[string][]Regexp)
-	var res *FiniteAutomata
+	condsUnionAutomata := make(map[string]AutomataWithNaming)
 	for _, rule := range r.rules.ruleArr {
-		automata := rule.expr.Compile().CompileV2()
-		automata.setLexemName(rule.name.val)
-
-		if res == nil {
-			res = automata
-			for _, a := range res.TerminalStates {
-				naming[a.State] = a.LexemName
-			}
-		} else {
-			res.UnionNext(automata.copy())
+		if rule.name.val == "RegularStart" {
+			fmt.Println("here")
 		}
-
-		fmt.Println(res.flPos)
-		fmt.Println(res.letters)
 		startCondName := InitialCond
 		if rule.startCondition != nil {
 			startCondName = rule.startCondition.condition.val
 		}
-		if _, ok := conds[startCondName]; !ok {
-			conds[startCondName] = make([]Regexp, 0)
-		}
+
+		automata := rule.expr.Compile().CompileV2()
+		automata.setLexemName(rule.name.val)
 
 		var switchCond string
 		if rule.switchCondition != nil {
@@ -78,16 +76,38 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 
 		conds[startCondName] = append(conds[startCondName], reg)
 		gi.AllRegexps = append(gi.AllRegexps, reg)
+
+		if _, ok := condsUnionAutomata[startCondName]; !ok {
+			naming = make(map[int]string)
+			for _, a := range automata.TerminalStates {
+				naming[a.State+1] = a.LexemName
+			}
+			condsUnionAutomata[startCondName] = AutomataWithNaming{
+				automata: automata,
+				naming:   naming,
+			}
+		} else {
+			naming = condsUnionAutomata[startCondName].naming
+			condsUnionAutomata[startCondName] = AutomataWithNaming{
+				automata: condsUnionAutomata[startCondName].automata.UnionNext(automata.copy()),
+				naming:   naming,
+			}
+		}
 	}
-	flPos = res.flPos
-	letters = res.letters
-	fmt.Println(naming)
+
 	for key, val := range conds {
+		curAutomataInfo := condsUnionAutomata[key]
+		flPos = curAutomataInfo.automata.flPos
+		letters = curAutomataInfo.automata.letters
+		naming = curAutomataInfo.naming
+		curAutomata := curAutomataInfo.automata.CompileV2()
+		curAutomata.ToGraph(os.Stdout)
+
+		gi.Conditions[key] = NewCondition(key, val, len(val), curAutomata)
 		gi.UnionRegexps = append(gi.UnionRegexps, Regexp{
-			RegexpVal:  res.CompileV2(),
-			ActionName: "UnionRegexps",
+			RegexpVal:  curAutomata,
+			ActionName: key,
 		})
-		gi.Conditions[key] = NewCondition(key, val, len(val))
 	}
 
 	return &gi
@@ -125,7 +145,7 @@ func (r *Program) Process() *GeneratorInfo {
 	}
 
 	for key, val := range conds {
-		gi.Conditions[key] = NewCondition(key, val, len(val))
+		gi.Conditions[key] = NewCondition(key, val, len(val), nil)
 	}
 
 	return &gi
