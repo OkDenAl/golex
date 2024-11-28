@@ -6,6 +6,10 @@ Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)? (
 StartCondition  ::= "<" Name ">"
 SwitchCondition ::= "BEGIN" "(" Name ")"
 
+Lexems
+Name ::= [A-Z][A-z0-9_]*
+NewLine ::= \\n
+
 RegExpr         ::= Union | SimpleExpr
 Union           ::= SimpleExpr "|" RegExpr
 SimpleExpr      ::= Concatenation | BasicExpr
@@ -21,8 +25,6 @@ Range           ::=  (Escape | RangeStartCharacter) "-" RangeEndCharacter
 
 
 Lexems
-Name ::= [A-Z][A-z0-9_]*
-NewLine ::= \\n
 ValidIndependentCharacter ::= [^()|/]
 EscapeCharacter ::= .
 SetCharacter ::= .[^]]*

@@ -226,7 +226,7 @@ func Generate(regex string, limit int) (string, error) {
 	return g.Generate(limit), nil
 }
 
-func setup(t *testing.T, regexp string) *FiniteState {
+func setup(t *testing.T, regexp string) *FiniteAutomata {
 	scn := NewScanner(bufio.NewReader(strings.NewReader(regexp)), NewCompiler())
 	scn.regularMode = true
 	tokens := scn.GetTokens()
@@ -324,6 +324,12 @@ func TestFiniteState_Execute(t *testing.T) {
 			count:  100,
 			maxLen: 100,
 		},
+		//{
+		//	name:   "[^0-9]1(2)*",
+		//	args:   args{reg: "a*[^0-9]1a[kek]lol"},
+		//	count:  100,
+		//	maxLen: 100,
+		//},
 	}
 
 	for _, tt := range tests {

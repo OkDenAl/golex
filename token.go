@@ -39,6 +39,7 @@ const (
 	TagBegin
 	TagContinue
 	TagEdit
+	TagComment
 )
 
 type Token struct {

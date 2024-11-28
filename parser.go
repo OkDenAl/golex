@@ -285,32 +285,6 @@ func (p *Parser) basicExpr() (*BasicExpr, bool) {
 	return &BasicExpr{element: base}, true
 }
 
-func (p *Parser) findNum() (int, bool) {
-	defer func() {
-		p.cursor--
-	}()
-	res := 0
-	wasNum := false
-	factor := 10
-	for {
-		token, ok := p.nextToken()
-		if !ok {
-			return 0, false
-		}
-		number, ok := p.numeric(token)
-		if !ok && !wasNum {
-			return 0, false
-		} else if !ok {
-			break
-		}
-
-		wasNum = true
-		res *= factor
-		res += number
-	}
-	return res, true
-}
-
 // Element         ::= Group | Set | Escape | ValidIndependentCharacter
 func (p *Parser) element() (*Element, bool) {
 	group, ok := p.group()
@@ -375,16 +349,18 @@ func (p *Parser) set() (*Set, bool) {
 		return nil, false
 	}
 
+	pos := p.regRuleNum + 1
 	var set *Set
 	if _, ok := p.expectTags(TagCaret); !ok {
 		positive, ok := p.setItems(true)
 		if ok {
-			set = &Set{positive: positive}
+			set = &Set{positive: positive, pos: pos}
 		}
 	} else {
 		negative, ok := p.setItems(true)
 		if ok {
-			set = &Set{negative: negative}
+			p.regRuleNum = pos
+			set = &Set{negative: negative, pos: pos}
 		}
 	}
 

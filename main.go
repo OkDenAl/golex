@@ -33,12 +33,6 @@ func main() {
 		panic(err.Error())
 	}
 
-	//var automatas []*FiniteState
-	//for _, rule := range parse.rules.ruleArr {
-	//	rule.expr.Print("")
-	//	automatas = append(automatas, rule.expr.Compile())
-	//}
-
 	gen := parse.ProcessOneAutomata()
 
 	generateFile("templates/lexer.tmpl", *lexerOutputFile, gen, true)

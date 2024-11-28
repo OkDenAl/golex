@@ -39,6 +39,10 @@ func (scn *Scanner) printComments() {
 	}
 }
 
+func (scn *Scanner) addComment(start, end Position, val string) {
+	scn.comments = append(scn.comments, newComment(start, end, val))
+}
+
 func (scn *Scanner) nextToken() Token {
 	if scn.regularMode && (scn.wasEscape || scn.curPos.Cp() != '/') {
 		return scn.nextTokenRegular()
@@ -76,6 +80,15 @@ func (scn *Scanner) nextToken() Token {
 			scn.prevToken = NewToken(TagDefaultCloseBracket, start, start, ")")
 
 			return NewToken(TagDefaultCloseBracket, start, start, ")")
+		case '#':
+			scn.curPos.Next()
+			var pos Position
+			for scn.curPos.Cp() != -1 && scn.curPos.Cp() != '\n' {
+				curWord += string(scn.curPos.GetSymbol())
+				pos = scn.curPos
+				scn.curPos.Next()
+			}
+			scn.addComment(start, pos, curWord)
 		case '%':
 			curWord += string(rune(scn.curPos.Cp()))
 			scn.curPos.Next()

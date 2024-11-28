@@ -6,7 +6,7 @@ import (
 )
 
 type Regexp struct {
-	RegexpVal           *FiniteState
+	RegexpVal           *FiniteAutomata
 	ActionName          string
 	SwitchConditionName string
 	Continued           bool
@@ -39,7 +39,7 @@ const InitialCond = "INIT"
 func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 	gi := GeneratorInfo{Conditions: make(map[string]Condition), AllRegexps: make([]Regexp, 0)}
 	conds := make(map[string][]Regexp)
-	var res *FiniteState
+	var res *FiniteAutomata
 	for _, rule := range r.rules.ruleArr {
 		automata := rule.expr.Compile().CompileV2()
 		automata.setLexemName(rule.name.val)

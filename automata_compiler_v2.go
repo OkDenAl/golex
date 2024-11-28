@@ -16,7 +16,7 @@ var (
 	letters = make(map[rune]map[int]struct{})
 )
 
-func (f *FiniteState) CompileV2() *FiniteState {
+func (f *FiniteAutomata) CompileV2() *FiniteAutomata {
 	res := NewAutomata()
 	usedTerminalStates := make(map[int]struct{})
 	res.TerminalStates = []TerminalState{}

@@ -49,40 +49,24 @@ type RegExpr struct {
 type Union struct {
 	regex  *RegExpr
 	simple *SimpleExpr
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
 
 // SimpleExpr ::= Concatenation | BasicExpr
 type SimpleExpr struct {
 	concatenation *Concatenation
 	basic         *BasicExpr
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
 
 // Concatenation ::= SimpleExpr BasicExpr
 type Concatenation struct {
 	simple *SimpleExpr
 	basic  *BasicExpr
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
 
 // BasicExpr ::= Element ("*"|"+"|"?")?
 type BasicExpr struct {
 	op      *Token
 	element *Element
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
 
 // Element         ::= Group | Set | Escape | ValidIndependentCharacter
@@ -92,49 +76,30 @@ type Element struct {
 	group     *Group
 	set       *Set
 	escape    *Escape
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
 
 // Group ::= (RegExpr)
 type Group struct {
 	regExpr *RegExpr
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
 
 // Escape ::= "\" Character
 type Escape struct {
 	// character *Character
 	base *Character
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
 
 // Set ::= "[" ("^")? SetItems "]"
 type Set struct {
 	positive *SetItems
 	negative *SetItems
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
+	pos      int
 }
 
 // SetItems ::= SetItem SetItems
 type SetItems struct {
 	item  *SetItem
 	items *SetItems
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
 
 // SetItem ::= Range | Character
@@ -142,10 +107,6 @@ type SetItem struct {
 	rnge   *Range
 	base   *Character
 	escape *Escape
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
 
 // Range ::= Character "-" Character
@@ -154,17 +115,9 @@ type Range struct {
 	startEscape *Escape
 	end         *Token
 	pos         int
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
 
 type Character struct {
 	tok *Token
 	pos int
-
-	nullable bool
-	firstpos []int
-	lastpos  []int
 }
