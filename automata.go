@@ -18,8 +18,6 @@ type FiniteAutomata struct {
 	lettersCount int
 }
 
-var naming = map[int]string{}
-
 type TerminalState struct {
 	State     int
 	LexemName string
@@ -110,7 +108,7 @@ func (f *FiniteAutomata) Concat(other *FiniteAutomata) {
 	*f = *result
 }
 
-func (f *FiniteAutomata) UnionNext(other *FiniteAutomata) {
+func (f *FiniteAutomata) UnionNext(other *FiniteAutomata) *FiniteAutomata {
 	for i := range other.firstpos {
 		other.firstpos[i] += f.lettersCount
 	}
@@ -152,7 +150,7 @@ func (f *FiniteAutomata) UnionNext(other *FiniteAutomata) {
 		letters:        copyMap(f.letters),
 	}
 
-	*f = *newFSM
+	return newFSM
 }
 
 func (f *FiniteAutomata) Union(other *FiniteAutomata) {
