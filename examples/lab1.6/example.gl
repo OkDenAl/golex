@@ -6,11 +6,11 @@ NUM             /(0|(1)+)/
 
 /[\n\t ]+/ Skip
 
-/\"/ RegularStart BEGIN(REGULAR)
+/\"/ RegularStart begin(REGULAR)
 
-<REGULAR>/\"/ RegularEnd BEGIN(INIT)
+<REGULAR>/\"/ RegularEnd begin(INIT)
 
-<REGULAR>/\n/ RegularNewLine BEGIN(INIT)
+<REGULAR>/\n/ RegularNewLine begin(INIT)
 
 <REGULAR>/\\n/ RegularEscapeNewLine
 
@@ -20,11 +20,11 @@ NUM             /(0|(1)+)/
 
 <REGULAR>/./ RegularSymb
 
-/@\"/ StartLiteral BEGIN(LITERAL)
+/@\"/ StartLiteral begin(LITERAL)
 
 <LITERAL>/\"\"/ Literal1
 
-<LITERAL>/\"/ LiteralEnd BEGIN(INIT)
+<LITERAL>/\"/ LiteralEnd begin(INIT)
 
 <LITERAL>/\n/ LiteralNewLine
 

@@ -1,12 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+)
 
 type AutomataCompiler interface {
-	Compile() *FiniteState
+	Compile() *FiniteAutomata
 }
 
-func (r *RegExpr) Compile() *FiniteState {
+func (r *RegExpr) Compile() *FiniteAutomata {
 	if r.union != nil {
 		return r.union.Compile()
 	}
@@ -19,14 +22,14 @@ func (r *RegExpr) Compile() *FiniteState {
 	return nil
 }
 
-func (u *Union) Compile() *FiniteState {
+func (u *Union) Compile() *FiniteAutomata {
 	a := u.simple.Compile()
 	b := u.regex.Compile()
 	a.Union(b)
 	return a
 }
 
-func (s *SimpleExpr) Compile() *FiniteState {
+func (s *SimpleExpr) Compile() *FiniteAutomata {
 	if s.concatenation != nil {
 		return s.concatenation.Compile()
 	}
@@ -39,32 +42,45 @@ func (s *SimpleExpr) Compile() *FiniteState {
 	return nil
 }
 
-func (c *Concatenation) Compile() *FiniteState {
+func (c *Concatenation) Compile() *FiniteAutomata {
 	a := c.basic.Compile()
-	b := c.simple.Compile()
-	a.Append(b)
+
+	var rec func(simple *SimpleExpr)
+	rec = func(simple *SimpleExpr) {
+		if simple.concatenation != nil {
+			b := simple.concatenation.basic.Compile()
+			a.Concat(b)
+			rec(simple.concatenation.simple)
+		} else {
+			b := simple.basic.Compile()
+			a.Concat(b)
+		}
+	}
+	rec(c.simple)
+
 	return a
 }
 
-func (be *BasicExpr) Compile() *FiniteState {
+func (be *BasicExpr) Compile() *FiniteAutomata {
 	a := be.element.Compile()
 	if be.op != nil {
 		switch be.op.tag {
 		case TagStar:
 			a.Loop()
 		case TagPlus:
-			b := be.element.Compile()
+			b := a.copy()
 			b.Loop()
-			a.Append(b)
+			a.Concat(b)
 		case TagQuestion:
-			a.TerminalStates = append(a.TerminalStates, 0)
+			a.TerminalStates = append(a.TerminalStates, TerminalState{State: 0})
+			a.nullable = true
 		}
 	}
 
 	return a
 }
 
-func (e *Element) Compile() *FiniteState {
+func (e *Element) Compile() *FiniteAutomata {
 	if e.group != nil {
 		return e.group.Compile()
 	}
@@ -85,42 +101,48 @@ func (e *Element) Compile() *FiniteState {
 	return nil
 }
 
-func (g *Group) Compile() *FiniteState {
+func (g *Group) Compile() *FiniteAutomata {
 	return g.regExpr.Compile()
 }
 
-func (e *Escape) Compile() *FiniteState {
-	switch e.base.val {
+func (e *Escape) Compile() *FiniteAutomata {
+	switch e.base.tok.val {
 	case "t":
-		return Create([]rune{'\t'})
+		return Create([]rune{'\t'}, e.base.pos)
 	case "n":
-		return Create([]rune{'\n'})
+		return Create([]rune{'\n'}, e.base.pos)
 	case "r":
-		return Create([]rune{'\r'})
+		return Create([]rune{'\r'}, e.base.pos)
 	case "f":
-		return Create([]rune{'\f'})
+		return Create([]rune{'\f'}, e.base.pos)
 	case "d":
-		return Create(genRuneInRange('0', '9'))
+		return Create(genRuneInRange('0', '9'), e.base.pos)
 	case "s":
-		return Create([]rune{'\n', '\r', '\f', '\t', ' '})
+		return Create([]rune{'\n', '\r', '\f', '\t', ' '}, e.base.pos)
 	case "w":
 		lowerLetters := genRuneInRange('a', 'z')
-		letters := append(lowerLetters, genRuneInRange('A', 'Z')...)
-		lettersAndNums := append(letters, genRuneInRange('0', '9')...)
-		return Create(append(lettersAndNums, '_'))
+		lts := append(lowerLetters, genRuneInRange('A', 'Z')...)
+		lettersAndNums := append(lts, genRuneInRange('0', '9')...)
+		return Create(append(lettersAndNums, '_'), e.base.pos)
 	}
 
-	return Create([]rune(e.base.val))
+	return Create([]rune(e.base.tok.val), e.base.pos)
 }
 
-func (s *Set) Compile() *FiniteState {
+func (s *Set) Compile() *FiniteAutomata {
 	if s.positive != nil {
 		return s.positive.Compile()
 	}
 
 	if s.negative != nil {
+		letCpy := copyMap(letters)
+		flPosCpy := copyMap(flPos)
+
 		a := s.negative.Compile()
-		a.Negate()
+
+		letters = letCpy
+		flPos = flPosCpy
+		Negate(a, s.pos)
 		return a
 	}
 
@@ -128,7 +150,7 @@ func (s *Set) Compile() *FiniteState {
 	return nil
 }
 
-func (s *SetItems) Compile() *FiniteState {
+func (s *SetItems) Compile() *FiniteAutomata {
 	a := s.item.Compile()
 
 	if s.items != nil {
@@ -139,7 +161,7 @@ func (s *SetItems) Compile() *FiniteState {
 	return a
 }
 
-func (s *SetItem) Compile() *FiniteState {
+func (s *SetItem) Compile() *FiniteAutomata {
 	if s.rnge != nil {
 		return s.rnge.Compile()
 	}
@@ -156,13 +178,13 @@ func (s *SetItem) Compile() *FiniteState {
 	return nil
 }
 
-func (r *Range) Compile() *FiniteState {
+func (r *Range) Compile() *FiniteAutomata {
 	startChar := ' '
 	if r.startToken != nil {
 		startChar = []rune(r.startToken.val)[0]
 	}
 	if r.startEscape != nil {
-		startChar = []rune(r.startEscape.base.val)[0]
+		startChar = []rune(r.startEscape.base.tok.val)[0]
 	}
 
 	if startChar > []rune(r.end.val)[0] {
@@ -172,7 +194,8 @@ func (r *Range) Compile() *FiniteState {
 
 	chars := genRuneInRange(startChar, []rune(r.end.val)[0])
 
-	return Create(chars)
+	a := Create(chars, r.pos)
+	return a
 }
 
 func genRuneInRange(startChar, endChar rune) []rune {
@@ -191,6 +214,14 @@ var anyRuneNotNL = genAnyRuneNotNL()
 //	maxRune = 100
 //)
 
+const runeRangeEnd = 0x10ffff
+
+const printableChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r"
+
+//const printableChars = "012abc\n\r"
+
+var printableCharsNoNL = printableChars[:len(printableChars)-2]
+
 func genAnyRuneNotNL() []rune {
 	var res []rune
 	//for i = minRune; i < '\n'; i++ {
@@ -207,15 +238,28 @@ func genAnyRuneNotNL() []rune {
 	return res
 }
 
-func (t *Token) Compile() *FiniteState {
-	if t.tag == TagAnyCharacter {
+func genAnyRuneExcept(except []rune) []rune {
+	var res []rune
+	for _, i := range printableCharsNoNL {
+		if slices.Contains(except, i) {
+			continue
+		}
+		res = append(res, i)
+	}
+
+	return res
+}
+
+func (t *Character) Compile() *FiniteAutomata {
+	if t.tok.tag == TagAnyCharacter {
 		res := NewAutomata()
 		for _, i := range anyRuneNotNL {
-			res.Union(Create([]rune{i}))
+			res.Union(Create([]rune{i}, t.pos))
 		}
 
 		return res
 	}
+	a := Create([]rune(t.tok.val), t.pos)
 
-	return Create([]rune(t.val))
+	return a
 }

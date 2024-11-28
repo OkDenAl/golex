@@ -39,6 +39,10 @@ func (scn *Scanner) printComments() {
 	}
 }
 
+func (scn *Scanner) addComment(start, end Position, val string) {
+	scn.comments = append(scn.comments, newComment(start, end, val))
+}
+
 func (scn *Scanner) nextToken() Token {
 	if scn.regularMode && (scn.wasEscape || scn.curPos.Cp() != '/') {
 		return scn.nextTokenRegular()
@@ -76,6 +80,15 @@ func (scn *Scanner) nextToken() Token {
 			scn.prevToken = NewToken(TagDefaultCloseBracket, start, start, ")")
 
 			return NewToken(TagDefaultCloseBracket, start, start, ")")
+		case '#':
+			scn.curPos.Next()
+			var pos Position
+			for scn.curPos.Cp() != -1 && scn.curPos.Cp() != '\n' {
+				curWord += string(scn.curPos.GetSymbol())
+				pos = scn.curPos
+				scn.curPos.Next()
+			}
+			scn.addComment(start, pos, curWord)
 		case '%':
 			curWord += string(rune(scn.curPos.Cp()))
 			scn.curPos.Next()
@@ -115,7 +128,13 @@ func (scn *Scanner) nextToken() Token {
 			return NewToken(TagRegularMarker, start, start, "/")
 		default:
 			var pos Position
-			if scn.curPos.IsUpperLetter() {
+			if scn.curPos.IsLowerLetter() {
+				for scn.curPos.IsLowerLetter() {
+					curWord += string(scn.curPos.GetSymbol())
+					pos = scn.curPos
+					scn.curPos.Next()
+				}
+			} else if scn.curPos.IsUpperLetter() {
 				curWord += string(scn.curPos.GetSymbol())
 				pos = scn.curPos
 				scn.curPos.Next()
@@ -135,14 +154,25 @@ func (scn *Scanner) nextToken() Token {
 				return NewToken(TagErr, scn.curPos, scn.curPos, "")
 			}
 
-			if curWord == "BEGIN" {
-				scn.prevToken = NewToken(TagBegin, start, pos, "BEGIN")
+			const (
+				begin        = "begin"
+				continueName = "continue"
+				edit         = "edit"
+			)
 
-				return NewToken(TagBegin, start, pos, "BEGIN")
+			switch curWord {
+			case begin:
+				scn.prevToken = NewToken(TagBegin, start, pos, begin)
+				return NewToken(TagBegin, start, pos, begin)
+			case continueName:
+				scn.prevToken = NewToken(TagContinue, start, pos, continueName)
+				return NewToken(TagContinue, start, pos, continueName)
+			case edit:
+				scn.prevToken = NewToken(TagEdit, start, pos, edit)
+				return NewToken(TagEdit, start, pos, edit)
 			}
 
-			scn.prevToken = NewToken(TagName, start, pos, curWord)
-
+			scn.prevToken = NewToken(TagName, scn.curPos, scn.curPos, curWord)
 			return NewToken(TagName, start, pos, curWord)
 		}
 	}
@@ -184,6 +214,8 @@ func (scn *Scanner) nextTokenRegular() Token {
 			token = NewToken(TagDash, start, start, string(rune(scn.curPos.Cp())))
 		case '.':
 			token = NewToken(TagAnyCharacter, start, start, string(rune(scn.curPos.Cp())))
+		case ',':
+			token = NewToken(TagComma, start, start, string(rune(scn.curPos.Cp())))
 		case '\n':
 			scn.regularMode = false
 			scn.compiler.addMessage(true, start, "invalid syntax: expected /")
@@ -231,12 +263,36 @@ func (scn *Scanner) scanNameTokens(curToken Token) []Token {
 
 func (scn *Scanner) GetTokens() []Token {
 	t := scn.nextToken()
+	i := 1
 	var tokens []Token
 	for t.Tag() != TagEOP {
 		if t.Tag() == TagOpenBrace {
 			tokens = append(tokens, scn.scanNameTokens(t)...)
 		} else if t.Tag() != TagErr {
+			if t.Tag() == TagRegularMarker {
+				if i%2 == 0 {
+					tokens = append(tokens, Token{
+						tag: TagCloseParen,
+						val: string([]rune{')'}),
+					})
+					tokens = append(tokens, Token{
+						tag: TagCharacter,
+						val: string([]rune{endSymbol}),
+					})
+				}
+			}
+
 			tokens = append(tokens, t)
+
+			if t.Tag() == TagRegularMarker {
+				if i%2 == 1 {
+					tokens = append(tokens, Token{
+						tag: TagOpenParen,
+						val: string([]rune{'('}),
+					})
+				}
+				i++
+			}
 		}
 
 		t = scn.nextToken()

@@ -5,26 +5,12 @@ package main
 
 import (
 	"fmt"
-	"golex/examples/testing/golexgen"
 	"log"
 	"os"
 )
 
 type Handler struct {
-	golexgen.ErrHandlerBase
-}
-
-func (h *Handler) Test(
-	text []rune,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	return golexgen.NewToken(
-		golexgen.TagTest,
-		start, end,
-		string(text[start.Index():end.Index()]),
-	), false
+	golexgen.HandlerBase
 }
 
 func main() {

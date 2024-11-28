@@ -1,11 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+)
 
 type Parser struct {
 	cursor int
 	tokens []Token
 
+	regRuleNum          int
 	startConditionNames map[string]struct{}
 	ruleNames           map[string]Token
 }
@@ -119,7 +123,7 @@ func (p *Parser) rules() (Rules, error) {
 	return Rules{ruleArr: rules}, nil
 }
 
-// Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)? (NewLine)+
+// Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)? (Continue)? (Edit)? (NewLine)+
 func (p *Parser) rule() (Rule, error) {
 	var startCond *StartCondition
 	if p.tokens[p.cursor].Tag() == TagOpenStartCondition {
@@ -128,6 +132,7 @@ func (p *Parser) rule() (Rule, error) {
 
 	p.mustExpectTag(TagRegularMarker)
 	reset := p.reset()
+	p.regRuleNum = 0
 	expr, ok := p.regExpr()
 	if !ok {
 		reset()
@@ -141,9 +146,22 @@ func (p *Parser) rule() (Rule, error) {
 	}
 	p.ruleNames[token.val] = token
 
-	var switchCond *SwitchCondition
-	if p.tokens[p.cursor].Tag() == TagBegin {
-		switchCond = p.switchCondition()
+	var (
+		switchCond *SwitchCondition
+		cont       *Token
+		edit       *Token
+	)
+	for slices.Contains([]DomainTag{TagEdit, TagBegin, TagContinue}, p.tokens[p.cursor].Tag()) {
+		switch p.tokens[p.cursor].Tag() {
+		case TagBegin:
+			switchCond = p.switchCondition()
+		case TagContinue:
+			tok, _ := p.nextToken()
+			cont = &tok
+		case TagEdit:
+			tok, _ := p.nextToken()
+			edit = &tok
+		}
 	}
 
 	p.mustExpectTag(TagNL)
@@ -151,7 +169,14 @@ func (p *Parser) rule() (Rule, error) {
 		p.mustExpectTag(TagNL)
 	}
 
-	return Rule{startCondition: startCond, expr: *expr, name: token, switchCondition: switchCond}, nil
+	return Rule{
+		startCondition:  startCond,
+		expr:            *expr,
+		name:            token,
+		switchCondition: switchCond,
+		contin:          cont,
+		edit:            edit,
+	}, nil
 }
 
 // StartCondition ::= "<" Name ">"
@@ -206,7 +231,7 @@ func (p *Parser) union() (*Union, bool) {
 		return nil, false
 	}
 
-	return &Union{regex, simple}, true
+	return &Union{regex: regex, simple: simple}, true
 }
 
 // SimpleExpr      ::= Concatenation | BasicExpr
@@ -242,8 +267,7 @@ func (p *Parser) concatenation() (*Concatenation, bool) {
 		return nil, false
 	}
 
-	return &Concatenation{simple, basic}, true
-
+	return &Concatenation{simple: simple, basic: basic}, true
 }
 
 // BasicExpr       ::= Element ("*"|"+"|"?")?
@@ -261,7 +285,7 @@ func (p *Parser) basicExpr() (*BasicExpr, bool) {
 	return &BasicExpr{element: base}, true
 }
 
-// Element         ::= Group | Set | Escape | AnyCharacter
+// Element         ::= Group | Set | Escape | ValidIndependentCharacter
 func (p *Parser) element() (*Element, bool) {
 	group, ok := p.group()
 	if ok {
@@ -280,7 +304,8 @@ func (p *Parser) element() (*Element, bool) {
 
 	character, ok := p.validIndependentCharacter()
 	if ok {
-		return &Element{character: character}, true
+		p.regRuleNum++
+		return &Element{character: &Character{tok: character, pos: p.regRuleNum}}, true
 	}
 
 	return nil, false
@@ -298,7 +323,7 @@ func (p *Parser) group() (*Group, bool) {
 		reset()
 		return nil, false
 	}
-	return &Group{regex}, true
+	return &Group{regExpr: regex}, true
 }
 
 // Escape          ::= "\" EscapeCharacter
@@ -313,8 +338,8 @@ func (p *Parser) escape() (*Escape, bool) {
 		return nil, false
 	}
 
-	return &Escape{base}, true
-
+	p.regRuleNum++
+	return &Escape{base: &Character{tok: base, pos: p.regRuleNum}}, true
 }
 
 // Set             ::= "[" ("^")? SetItems "]"
@@ -324,16 +349,18 @@ func (p *Parser) set() (*Set, bool) {
 		return nil, false
 	}
 
+	pos := p.regRuleNum + 1
 	var set *Set
 	if _, ok := p.expectTags(TagCaret); !ok {
 		positive, ok := p.setItems(true)
 		if ok {
-			set = &Set{positive: positive}
+			set = &Set{positive: positive, pos: pos}
 		}
 	} else {
 		negative, ok := p.setItems(true)
 		if ok {
-			set = &Set{negative: negative}
+			p.regRuleNum = pos
+			set = &Set{negative: negative, pos: pos}
 		}
 	}
 
@@ -344,7 +371,6 @@ func (p *Parser) set() (*Set, bool) {
 
 	reset()
 	return nil, false
-
 }
 
 // SetItems        ::= SetItem (SetItem)*
@@ -358,7 +384,6 @@ func (p *Parser) setItems(isFirst bool) (*SetItems, bool) {
 	items, ok := p.setItems(isFirst)
 
 	return &SetItems{item: item, items: items}, true
-
 }
 
 // SetItem         ::= Range | Escape | SetCharacter
@@ -378,7 +403,8 @@ func (p *Parser) setItem(isFirst bool) (*SetItem, bool) {
 	reset()
 	token, ok := p.setCharacter(isFirst)
 	if ok {
-		return &SetItem{base: token}, true
+		p.regRuleNum++
+		return &SetItem{base: &Character{tok: token, pos: p.regRuleNum}}, true
 	}
 
 	reset()
@@ -413,7 +439,8 @@ func (p *Parser) rangeExpr() (*Range, bool) {
 		panic("unexpected token " + p.tokens[p.cursor].String())
 	}
 
-	return &Range{startToken: startToken, startEscape: startEscape, end: end}, true
+	p.regRuleNum++
+	return &Range{startToken: startToken, startEscape: startEscape, end: end, pos: p.regRuleNum}, true
 }
 
 // ValidIndependentCharacter ::= [^()|/]
@@ -555,7 +582,18 @@ func (p *Parser) expectTags(tags ...DomainTag) (Token, bool) {
 
 func (p *Parser) reset() func() {
 	cursor := p.cursor
+	num := p.regRuleNum
 	return func() {
 		p.cursor = cursor
+		p.regRuleNum = num
 	}
+}
+
+func (p *Parser) numeric(token Token) (int, bool) {
+	switch []rune(token.val)[0] {
+	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+		return int([]rune(token.val)[0] - '0'), true
+	}
+
+	return 0, false
 }

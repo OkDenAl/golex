@@ -26,6 +26,8 @@ type Rule struct {
 	startCondition  *StartCondition
 	name            Token
 	expr            RegExpr
+	contin          *Token
+	edit            *Token
 	switchCondition *SwitchCondition
 }
 
@@ -67,10 +69,10 @@ type BasicExpr struct {
 	element *Element
 }
 
-// Element ::= Character | Group | Set
+// Element         ::= Group | Set | Escape | ValidIndependentCharacter
 type Element struct {
 	// Value     rune
-	character *Token
+	character *Character
 	group     *Group
 	set       *Set
 	escape    *Escape
@@ -84,13 +86,14 @@ type Group struct {
 // Escape ::= "\" Character
 type Escape struct {
 	// character *Character
-	base *Token
+	base *Character
 }
 
 // Set ::= "[" ("^")? SetItems "]"
 type Set struct {
 	positive *SetItems
 	negative *SetItems
+	pos      int
 }
 
 // SetItems ::= SetItem SetItems
@@ -102,7 +105,7 @@ type SetItems struct {
 // SetItem ::= Range | Character
 type SetItem struct {
 	rnge   *Range
-	base   *Token
+	base   *Character
 	escape *Escape
 }
 
@@ -111,4 +114,10 @@ type Range struct {
 	startToken  *Token
 	startEscape *Escape
 	end         *Token
+	pos         int
+}
+
+type Character struct {
+	tok *Token
+	pos int
 }

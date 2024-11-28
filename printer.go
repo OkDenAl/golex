@@ -121,3 +121,7 @@ func (r *Range) Print(indent string) {
 func (t *Token) Print(indent string) {
 	fmt.Println(indent + t.String())
 }
+
+func (t *Character) Print(indent string) {
+	fmt.Println(indent + t.tok.String())
+}
