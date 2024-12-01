@@ -18,13 +18,8 @@ type Continued bool
 
 type LexemHandler interface {
 	ErrHandler
-	RegularStart(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	RegularEnd(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	RegularA(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	StartLiteral(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	LiteralA(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	LiteralEnd(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	Num(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	ABPC(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	ABC(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
 }
 
 type Tag interface {
@@ -39,38 +34,22 @@ const (
 	dummy = Condition(iota)
 
 	ConditionINIT
-	ConditionLITERAL
-	ConditionREGULAR
 )
 
 type DefaultTag int
 
 const (
 	TagErr DefaultTag = iota
-	TagRegularStart
-	TagRegularEnd
-	TagRegularA
-	TagStartLiteral
-	TagLiteralA
-	TagLiteralEnd
-	TagNum
+	TagABPC
+	TagABC
 	TagINIT
-	TagLITERAL
-	TagREGULAR
 )
 
 func (t DefaultTag) GetTag() string {
 	var tagToString = map[DefaultTag]string{
-		TagRegularStart: "RegularStart",
-		TagRegularEnd:   "RegularEnd",
-		TagRegularA:     "RegularA",
-		TagStartLiteral: "StartLiteral",
-		TagLiteralA:     "LiteralA",
-		TagLiteralEnd:   "LiteralEnd",
-		TagNum:          "Num",
-		TagINIT:         "INIT",
-		TagLITERAL:      "LITERAL",
-		TagREGULAR:      "REGULAR",
+		TagABPC: "ABPC",
+		TagABC:  "ABC",
+		TagINIT: "INIT",
 	}
 
 	return tagToString[t]
@@ -154,79 +133,38 @@ func (f *FiniteState) isTerminal(state int) bool {
 }
 
 var (
-	automataRegularStart *FiniteState = &FiniteState{
+	automataABPC *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "RegularStart"}},
-		Transitions: map[int]map[rune]int{
-			0: {34: 1},
-		},
-	}
-	automataRegularEnd *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "RegularEnd"}},
-		Transitions: map[int]map[rune]int{
-			0: {34: 1},
-		},
-	}
-	automataRegularA *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "RegularA"}},
+		TerminalStates: []TerminalState{{state: 3, lexemName: "ABPC"}},
 		Transitions: map[int]map[rune]int{
 			0: {97: 1},
+			1: {98: 2},
+			2: {99: 3},
 		},
 	}
-	automataStartLiteral *FiniteState = &FiniteState{
+	automataABC *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 2, lexemName: "StartLiteral"}},
-		Transitions: map[int]map[rune]int{
-			0: {64: 1},
-			1: {34: 2},
-		},
-	}
-	automataLiteralA *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "LiteralA"}},
+		TerminalStates: []TerminalState{{state: 6, lexemName: "ABC"}},
 		Transitions: map[int]map[rune]int{
 			0: {97: 1},
-		},
-	}
-	automataLiteralEnd *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "LiteralEnd"}},
-		Transitions: map[int]map[rune]int{
-			0: {34: 1},
-		},
-	}
-	automataNum *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "Num"}, {state: 2, lexemName: "Num"}},
-		Transitions: map[int]map[rune]int{
-			0: {48: 1, 49: 2},
-			2: {49: 2},
+			1: {98: 2},
+			2: {99: 3},
+			3: {97: 4},
+			4: {98: 5},
+			5: {99: 6},
 		},
 	}
 
 	unionAutomataINIT *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "Num"}, {state: 2, lexemName: "Num"}, {state: 3, lexemName: "RegularStart"}, {state: 5, lexemName: "StartLiteral"}},
+		TerminalStates: []TerminalState{{state: 3, lexemName: "ABPC"}, {state: 6, lexemName: "ABC"}},
 		Transitions: map[int]map[rune]int{
-			0: {34: 3, 48: 2, 49: 1, 64: 4},
-			1: {49: 1},
-			4: {34: 5},
-		},
-	}
-	unionAutomataREGULAR *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "RegularEnd"}, {state: 2, lexemName: "RegularA"}},
-		Transitions: map[int]map[rune]int{
-			0: {34: 1, 97: 2},
-		},
-	}
-	unionAutomataLITERAL *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "LiteralA"}, {state: 2, lexemName: "LiteralEnd"}},
-		Transitions: map[int]map[rune]int{
-			0: {34: 2, 97: 1},
+			0: {97: 1},
+			1: {98: 2},
+			2: {99: 3},
+			3: {97: 4},
+			4: {98: 5},
+			5: {99: 6},
 		},
 	}
 )
@@ -237,75 +175,22 @@ func (e *HandlerBase) Error(msg string, pos Position, symbol string) {
 	fmt.Printf("ERROR%s: %s %s\n", pos.String(), msg, symbol)
 }
 
-func (h *HandlerBase) RegularStart(
+func (h *HandlerBase) ABPC(
 	text string,
 	start, end Position,
 	errFunc ErrFunc,
 	switchCond SwitchConditionFunc,
 ) (Token, Continued) {
-	switchCond(ConditionREGULAR)
-
-	return NewToken(TagRegularStart, start, end, text), false
+	return NewToken(TagABPC, start, end, text), false
 }
 
-func (h *HandlerBase) RegularEnd(
+func (h *HandlerBase) ABC(
 	text string,
 	start, end Position,
 	errFunc ErrFunc,
 	switchCond SwitchConditionFunc,
 ) (Token, Continued) {
-	switchCond(ConditionINIT)
-
-	return NewToken(TagRegularEnd, start, end, text), false
-}
-
-func (h *HandlerBase) RegularA(
-	text string,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	return NewToken(TagRegularA, start, end, text), false
-}
-
-func (h *HandlerBase) StartLiteral(
-	text string,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switchCond(ConditionLITERAL)
-
-	return NewToken(TagStartLiteral, start, end, text), false
-}
-
-func (h *HandlerBase) LiteralA(
-	text string,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	return NewToken(TagLiteralA, start, end, text), false
-}
-
-func (h *HandlerBase) LiteralEnd(
-	text string,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switchCond(ConditionINIT)
-
-	return NewToken(TagLiteralEnd, start, end, text), false
-}
-
-func (h *HandlerBase) Num(
-	text string,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	return NewToken(TagNum, start, end, text), false
+	return NewToken(TagABC, start, end, text), false
 }
 
 type EOPTag struct{}
@@ -402,26 +287,13 @@ type Scanner struct {
 func NewScanner(program []rune, handler LexemHandler) Scanner {
 	regexps := make(map[Condition][]*FiniteState)
 
-	regexps[ConditionINIT] = make([]*FiniteState, 0, 3)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataRegularStart)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataStartLiteral)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNum)
-
-	regexps[ConditionLITERAL] = make([]*FiniteState, 0, 2)
-	regexps[ConditionLITERAL] = append(regexps[ConditionLITERAL], automataLiteralA)
-	regexps[ConditionLITERAL] = append(regexps[ConditionLITERAL], automataLiteralEnd)
-
-	regexps[ConditionREGULAR] = make([]*FiniteState, 0, 2)
-	regexps[ConditionREGULAR] = append(regexps[ConditionREGULAR], automataRegularEnd)
-	regexps[ConditionREGULAR] = append(regexps[ConditionREGULAR], automataRegularA)
+	regexps[ConditionINIT] = make([]*FiniteState, 0, 2)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataABPC)
+	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataABC)
 
 	unionRegexps := make(map[Condition]*FiniteState)
 
 	unionRegexps[ConditionINIT] = unionAutomataINIT
-
-	unionRegexps[ConditionLITERAL] = unionAutomataLITERAL
-
-	unionRegexps[ConditionREGULAR] = unionAutomataREGULAR
 
 	return Scanner{
 		program:      program,
@@ -446,10 +318,6 @@ func (s *Scanner) findTokenOneAutomata(
 	switch s.curCondition {
 	case ConditionINIT:
 		return s.findTokenOneAutomataINIT(name, start, end, errFunc, switchCond)
-	case ConditionLITERAL:
-		return s.findTokenOneAutomataLITERAL(name, start, end, errFunc, switchCond)
-	case ConditionREGULAR:
-		return s.findTokenOneAutomataREGULAR(name, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
@@ -462,44 +330,10 @@ func (s *Scanner) findTokenOneAutomataINIT(
 	switchCond SwitchConditionFunc,
 ) (Token, Continued) {
 	switch name {
-	case "RegularStart":
-		return s.handler.RegularStart(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case "StartLiteral":
-		return s.handler.StartLiteral(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case "Num":
-		return s.handler.Num(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	}
-
-	return Token{}, true
-}
-
-func (s *Scanner) findTokenOneAutomataLITERAL(
-	name string,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switch name {
-	case "LiteralA":
-		return s.handler.LiteralA(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case "LiteralEnd":
-		return s.handler.LiteralEnd(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	}
-
-	return Token{}, true
-}
-
-func (s *Scanner) findTokenOneAutomataREGULAR(
-	name string,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switch name {
-	case "RegularEnd":
-		return s.handler.RegularEnd(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case "RegularA":
-		return s.handler.RegularA(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "ABPC":
+		return s.handler.ABPC(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case "ABC":
+		return s.handler.ABC(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
@@ -514,10 +348,6 @@ func (s *Scanner) findToken(
 	switch s.curCondition {
 	case ConditionINIT:
 		return s.findTokenINIT(automata, start, end, errFunc, switchCond)
-	case ConditionLITERAL:
-		return s.findTokenLITERAL(automata, start, end, errFunc, switchCond)
-	case ConditionREGULAR:
-		return s.findTokenREGULAR(automata, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
@@ -530,44 +360,10 @@ func (s *Scanner) findTokenINIT(
 	switchCond SwitchConditionFunc,
 ) (Token, Continued) {
 	switch automata {
-	case automataRegularStart:
-		return s.handler.RegularStart(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case automataStartLiteral:
-		return s.handler.StartLiteral(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case automataNum:
-		return s.handler.Num(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	}
-
-	return Token{}, true
-}
-
-func (s *Scanner) findTokenLITERAL(
-	automata *FiniteState,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switch automata {
-	case automataLiteralA:
-		return s.handler.LiteralA(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case automataLiteralEnd:
-		return s.handler.LiteralEnd(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	}
-
-	return Token{}, true
-}
-
-func (s *Scanner) findTokenREGULAR(
-	automata *FiniteState,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switch automata {
-	case automataRegularEnd:
-		return s.handler.RegularEnd(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
-	case automataRegularA:
-		return s.handler.RegularA(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataABPC:
+		return s.handler.ABPC(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+	case automataABC:
+		return s.handler.ABC(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true

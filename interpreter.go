@@ -20,6 +20,12 @@ type Condition struct {
 	UnionRegexp Regexp
 }
 
+type GeneratorInfo struct {
+	Conditions   map[string]Condition
+	AllRegexps   []Regexp
+	UnionRegexps []Regexp
+}
+
 func NewCondition(name string, regxps []Regexp, regxpsLen int, unionReg *FiniteAutomata) Condition {
 	return Condition{
 		Name:    name,
@@ -30,12 +36,6 @@ func NewCondition(name string, regxps []Regexp, regxpsLen int, unionReg *FiniteA
 		},
 		RegexpsLen: regxpsLen,
 	}
-}
-
-type GeneratorInfo struct {
-	Conditions   map[string]Condition
-	AllRegexps   []Regexp
-	UnionRegexps []Regexp
 }
 
 type AutomataWithNaming struct {

@@ -337,10 +337,10 @@ func TestFiniteState_Execute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f := 0
 			sut := setup(t, tt.args.reg)
+			r := regexp.MustCompile("^" + tt.args.reg + "$")
 
 			for i := 1; i < tt.maxLen; i++ {
 				for j := 0; j < tt.count; j++ {
-					r := regexp.MustCompile("^" + tt.args.reg + "$")
 					str, err := Generate(tt.args.reg, i)
 					require.Nil(t, err)
 					if sut.MatchString(str) != r.MatchString(str) {

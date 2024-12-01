@@ -6,8 +6,8 @@ package main
 import (
 	"fmt"
 	"golex/examples/testing/golexgen"
-	"log"
 	"os"
+	"time"
 )
 
 type Handler struct {
@@ -15,10 +15,7 @@ type Handler struct {
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("usage must be: go run main.go <fileTag.txt>\n")
-	}
-	filePath := os.Args[1]
+	filePath := "./examples/lab3.2/test.txt"
 
 	content, err := os.ReadFile(filePath)
 	if err != nil {
@@ -26,9 +23,11 @@ func main() {
 	}
 	scn := golexgen.NewScanner([]rune(string(content)), &Handler{})
 
-	t := scn.NextToken()
+	tm := time.Now()
+	t := scn.NextTokenOneAutomata()
 	for t.Tag() != golexgen.EOP {
 		fmt.Println(t.String())
 		t = scn.NextToken()
 	}
+	fmt.Println(time.Since(tm))
 }

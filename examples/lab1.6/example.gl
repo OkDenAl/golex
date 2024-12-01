@@ -1,37 +1,27 @@
 NUM             /(0|(1)+)/
-
 %x LITERAL REGULAR
 
 %%
+/[\n\t ]+/ Skip continue
 
-/[\n\t ]+/ Skip
+/\"/ RegularStart begin(REGULAR) edit
 
-/\"/ RegularStart begin(REGULAR)
+<REGULAR>/\"/ RegularEnd begin(INIT) edit
+<REGULAR>/\n/ RegularNewLine begin(INIT) edit
+<REGULAR>/\\n/ RegularEscapeNewLine edit
+<REGULAR>/\\t/ RegularEscapeTab edit
+<REGULAR>/\\\"/ RegularEscapeQota edit
+<REGULAR>/./ RegularSymb edit
 
-<REGULAR>/\"/ RegularEnd begin(INIT)
+/@\"/ StartLiteral begin(LITERAL) edit
 
-<REGULAR>/\n/ RegularNewLine begin(INIT)
-
-<REGULAR>/\\n/ RegularEscapeNewLine
-
-<REGULAR>/\\t/ RegularEscapeTab
-
-<REGULAR>/\\\"/ RegularEscapeQota
-
-<REGULAR>/./ RegularSymb
-
-/@\"/ StartLiteral begin(LITERAL)
-
-<LITERAL>/\"\"/ Literal1
-
-<LITERAL>/\"/ LiteralEnd begin(INIT)
-
-<LITERAL>/\n/ LiteralNewLine
-
-<LITERAL>/./ LiterlaChar
+<LITERAL>/\"\"/ Literal1 edit
+<LITERAL>/\"/ LiteralEnd begin(INIT) edit
+<LITERAL>/\n/ LiteralNewLine edit
+<LITERAL>/./ LiteralChar edit
 
 /{NUM}/ Num
 
-/./ Any
+/./ Any edit
 
 %%

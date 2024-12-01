@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"golex/examples/lab1.6/golexgen"
 	"os"
+	"time"
 )
 
 type Tag string
@@ -20,32 +21,24 @@ func (t Tag) GetTag() string {
 type Handler struct {
 	str   string
 	start golexgen.Position
-	golexgen.ErrHandlerBase
-}
-
-func (h *Handler) Skip(
-	text []rune,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	return golexgen.Token{}, true
+	golexgen.HandlerBase
 }
 
 func (h *Handler) RegularStart(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
 	switchCond(golexgen.ConditionREGULAR)
+	h.str = ""
 	h.start = start
 
 	return golexgen.Token{}, true
 }
 
 func (h *Handler) RegularEnd(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
@@ -60,7 +53,7 @@ func (h *Handler) RegularEnd(
 }
 
 func (h *Handler) RegularNewLine(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
@@ -72,70 +65,71 @@ func (h *Handler) RegularNewLine(
 }
 
 func (h *Handler) RegularEscapeNewLine(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
-	h.str += string(text[start.Index():end.Index()])
+	h.str += string(text)
 
 	return golexgen.Token{}, true
 }
 
 func (h *Handler) RegularEscapeTab(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
-	h.str += string(text[start.Index():end.Index()])
+	h.str += string(text)
 	return golexgen.Token{}, true
 }
 
 func (h *Handler) RegularEscapeQota(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
-	h.str += string(text[start.Index():end.Index()])
+	h.str += string(text)
 	return golexgen.Token{}, true
 }
 
 func (h *Handler) RegularSymb(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
-	h.str += string(text[start.Index():end.Index()])
+	h.str += string(text)
 	return golexgen.Token{}, true
 }
 
 func (h *Handler) StartLiteral(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
 	switchCond(golexgen.ConditionLITERAL)
+	h.str = ""
 	h.start = start
 
 	return golexgen.Token{}, true
 }
 
 func (h *Handler) Literal1(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
-	h.str += string(text[start.Index():end.Index()])
+	h.str += string(text)
 	return golexgen.Token{}, true
 }
 
 func (h *Handler) LiteralEnd(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
@@ -150,45 +144,32 @@ func (h *Handler) LiteralEnd(
 }
 
 func (h *Handler) LiteralNewLine(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
-	h.str += string(text[start.Index():end.Index()])
+	h.str += string(text)
 	return golexgen.Token{}, true
 }
 
-func (h *Handler) LiterlaChar(
-	text []rune,
+func (h *Handler) LiteralChar(
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
-	h.str += string(text[start.Index():end.Index()])
+	h.str += string(text)
 	return golexgen.Token{}, true
-}
-
-func (h *Handler) Num(
-	text []rune,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	return golexgen.NewToken(
-		golexgen.TagNum,
-		start, end,
-		string(text[start.Index():end.Index()]),
-	), false
 }
 
 func (h *Handler) Any(
-	text []rune,
+	text string,
 	start, end golexgen.Position,
 	errFunc golexgen.ErrFunc,
 	switchCond golexgen.SwitchConditionFunc,
 ) (golexgen.Token, golexgen.Continued) {
-	errFunc("ERROR unknown symbol", start, string(text[start.Index():end.Index()]))
+	errFunc("ERROR unknown symbol", start, string(text))
 	return golexgen.Token{}, true
 }
 
@@ -201,9 +182,11 @@ func main() {
 	}
 	scn := golexgen.NewScanner([]rune(string(content)), &Handler{})
 
-	t := scn.NextToken()
+	tm := time.Now()
+	t := scn.NextTokenOneAutomata()
 	for t.Tag() != golexgen.EOP {
 		fmt.Println(t.String())
 		t = scn.NextToken()
 	}
+	fmt.Println(time.Since(tm).Microseconds())
 }

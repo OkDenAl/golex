@@ -2,13 +2,16 @@ Program         ::= (NamedRegExpr)* (NewLine)* (State)? (NewLine)* Rules
 NamedRegExpr    ::= Name "/" RegExpr "/" NewLine
 State           ::= "%x" (Name)+ NewLine
 Rules           ::= "%%" (NewLine)+ (Rule)+ "%%"
-Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)? (NewLine)+
+Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)?
+                    (Continue)? (Edit)? (NewLine)+
 StartCondition  ::= "<" Name ">"
 SwitchCondition ::= "BEGIN" "(" Name ")"
 
 Lexems
 Name ::= [A-Z][A-z0-9_]*
 NewLine ::= \\n
+Continue ::= continue
+Edit ::= edit
 
 RegExpr         ::= Union | SimpleExpr
 Union           ::= SimpleExpr "|" RegExpr

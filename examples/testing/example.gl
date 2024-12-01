@@ -1,21 +1,6 @@
-NUM             /(0|(1)+)/
-
-%x LITERAL REGULAR
-
 %%
 
-/\"/ RegularStart begin(REGULAR)
+/abc/ ABPC
 
-<REGULAR>/\"/ RegularEnd begin(INIT)
-
-<REGULAR>/a/ RegularA
-
-/@\"/ StartLiteral begin(LITERAL)
-
-<LITERAL>/a/ LiteralA
-
-<LITERAL>/\"/ LiteralEnd begin(INIT)
-
-/{NUM}/ Num
-
+/abcabc/ ABC
 %%

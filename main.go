@@ -8,11 +8,10 @@ import (
 )
 
 var (
-	inputFile       = flag.String("i", "./examples/testing/example.gl", "input file location")
-	lexerOutputFile = flag.String("lo", "./examples/testing/golexgen/lexer.go", "lexer output file location")
-	mainOutputFile  = flag.String("mo", "./examples/testing/main.go", "main output file location")
+	inputFile       = flag.String("i", "./examples/lab1.6/example.gl", "input file location")
+	lexerOutputFile = flag.String("lo", "./examples/lab1.6/golexgen/lexer.go", "lexer output file location")
+	mainOutputFile  = flag.String("mo", "./examples/lab1.6/main.go", "main output file location")
 	regenerateMain  = flag.Bool("rg", false, "if true -> regenerate main")
-	printTree       = flag.Bool("t", false, "if true -> print tree")
 )
 
 func main() {

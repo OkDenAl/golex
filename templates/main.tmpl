@@ -50,7 +50,7 @@ func main() {
 	}
 	scn := golexgen.NewScanner([]rune(string(content)), &Handler{})
 
-	t := scn.NextTokenOneAutomata()()
+	t := scn.NextTokenOneAutomata()
 	for t.Tag() != golexgen.EOP {
 		fmt.Println(t.String())
 		t = scn.NextToken()
