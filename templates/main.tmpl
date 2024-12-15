@@ -44,15 +44,18 @@ func main() {
 	}
 	filePath := os.Args[1]
 
-	content, err := os.ReadFile(filePath)
+	file, err := os.Open(filePath)
 	if err != nil {
-		panic(err)
+		log.Fatal(err.Error())
 	}
-	scn := golexgen.NewScanner([]rune(string(content)), &Handler{})
+	defer file.Close()
 
+	scn := golexgen.NewScanner(*bufio.NewReader(file), &Handler{})
+
+	tm := time.Now()
 	t := scn.NextTokenOneAutomata()
 	for t.Tag() != golexgen.EOP {
 		fmt.Println(t.String())
-		t = scn.NextToken()
+		t = scn.NextTokenOneAutomata()
 	}
 }

@@ -4,8 +4,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"golex/examples/lab1.6/golexgen"
+	"log"
 	"os"
 	"time"
 )
@@ -176,17 +178,19 @@ func (h *Handler) Any(
 func main() {
 	filePath := "./examples/lab1.6/test.txt"
 
-	content, err := os.ReadFile(filePath)
+	file, err := os.Open(filePath)
 	if err != nil {
-		panic(err)
+		log.Fatal(err.Error())
 	}
-	scn := golexgen.NewScanner([]rune(string(content)), &Handler{})
+	defer file.Close()
+
+	scn := golexgen.NewScanner(*bufio.NewReader(file), &Handler{})
 
 	tm := time.Now()
 	t := scn.NextTokenOneAutomata()
 	for t.Tag() != golexgen.EOP {
 		fmt.Println(t.String())
-		t = scn.NextToken()
+		t = scn.NextTokenOneAutomata()
 	}
 	fmt.Println(time.Since(tm).Microseconds())
 }

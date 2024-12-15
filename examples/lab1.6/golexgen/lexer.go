@@ -2,6 +2,7 @@
 package golexgen
 
 import (
+	"bufio"
 	"fmt"
 )
 
@@ -112,41 +113,29 @@ type TerminalState struct {
 	lexemName string
 }
 
-func (f *FiniteState) FindMatchEndIndex(input string) int {
+func (f *FiniteState) FindLexemOneAutomata(pos Position) (string, string, Position) {
 	f.CurrentState = 0
-	i := 0
-	for _, ch := range input {
-		if !f.canMoveBy(ch) {
-			break
-		}
-		i++
-	}
-
-	if f.isTerminal(f.CurrentState) {
-		return i
-	}
-
-	return 0
-}
-
-func (f *FiniteState) FindMatchEndIndexOneAutomata(input string) (int, string) {
-	f.CurrentState = 0
-	i := 0
-	prevI := i
+	prevWord := ""
 	prevStr := ""
-	for _, ch := range input {
+	curWord := ""
+	var prevResPos Position
+	for pos.cp() != -1 {
+		ch := rune(pos.cp())
 		if !f.canMoveBy(ch) {
 			break
 		}
-		i++
+		curWord += string(ch)
 
-		if val, ok := f.isTerminalOneAutoamta(f.CurrentState); ok {
-			prevI = i
+		if val, ok := f.isTerminalOneAutomata(f.CurrentState); ok {
+			prevResPos = pos
+			prevWord = curWord
 			prevStr = val.lexemName
 		}
+
+		pos.next()
 	}
 
-	return prevI, prevStr
+	return prevWord, prevStr, prevResPos
 }
 
 func (f *FiniteState) canMoveBy(ch rune) bool {
@@ -159,7 +148,7 @@ func (f *FiniteState) canMoveBy(ch rune) bool {
 	return false
 }
 
-func (f *FiniteState) isTerminalOneAutoamta(state int) (TerminalState, bool) {
+func (f *FiniteState) isTerminalOneAutomata(state int) (TerminalState, bool) {
 	for _, val := range f.TerminalStates {
 		if state == val.state {
 			return val, true
@@ -293,30 +282,30 @@ var (
 
 	unionAutomataINIT *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: "Any"}, {state: 1, lexemName: "Any"}, {state: 2, lexemName: "RegularStart"}, {state: 3, lexemName: "Any"}, {state: 4, lexemName: ""}, {state: 5, lexemName: "Num"}, {state: 6, lexemName: ""}, {state: 7, lexemName: "Num"}, {state: 8, lexemName: "StartLiteral"}, {state: 9, lexemName: "Num"}},
+		TerminalStates: []TerminalState{{state: 0, lexemName: "Any"}, {state: 1, lexemName: "Any"}, {state: 2, lexemName: "Skip"}, {state: 3, lexemName: "RegularStart"}, {state: 4, lexemName: "Any"}, {state: 5, lexemName: "Skip"}, {state: 6, lexemName: "Num"}, {state: 7, lexemName: "Num"}, {state: 8, lexemName: "StartLiteral"}, {state: 9, lexemName: "Num"}},
 		Transitions: map[int]map[rune]int{
-			0: {9: 6, 10: 4, 32: 6, 33: 1, 34: 2, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 5, 49: 7, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 3, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
-			3: {34: 8},
-			4: {9: 4, 10: 4, 32: 4},
-			6: {9: 4, 10: 4, 32: 4},
-			7: {49: 9},
+			0: {9: 2, 10: 5, 32: 2, 33: 1, 34: 3, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 7, 49: 6, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 4, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
+			2: {9: 5, 10: 5, 32: 5},
+			4: {34: 8},
+			5: {9: 5, 10: 5, 32: 5},
+			6: {49: 9},
 			9: {49: 9},
 		},
 	}
 	unionAutomataREGULAR *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: "RegularSymb"}, {state: 1, lexemName: "RegularSymb"}, {state: 2, lexemName: "RegularNewLine"}, {state: 3, lexemName: "RegularEnd"}, {state: 4, lexemName: "RegularSymb"}, {state: 5, lexemName: "RegularEscapeTab"}, {state: 6, lexemName: "RegularEscapeNewLine"}, {state: 7, lexemName: "RegularEscapeQota"}},
+		TerminalStates: []TerminalState{{state: 0, lexemName: "RegularSymb"}, {state: 1, lexemName: "RegularSymb"}, {state: 2, lexemName: "RegularSymb"}, {state: 3, lexemName: "RegularNewLine"}, {state: 4, lexemName: "RegularEnd"}, {state: 5, lexemName: "RegularEscapeNewLine"}, {state: 6, lexemName: "RegularEscapeQota"}, {state: 7, lexemName: "RegularEscapeTab"}},
 		Transitions: map[int]map[rune]int{
-			0: {9: 1, 10: 2, 32: 1, 33: 1, 34: 3, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 4, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
-			4: {34: 7, 110: 6, 116: 5},
+			0: {9: 1, 10: 3, 32: 1, 33: 1, 34: 4, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 2, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
+			2: {34: 6, 110: 5, 116: 7},
 		},
 	}
 	unionAutomataLITERAL *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: "LiteralChar"}, {state: 1, lexemName: "LiteralChar"}, {state: 2, lexemName: "LiteralEnd"}, {state: 3, lexemName: "LiteralNewLine"}, {state: 4, lexemName: "Literal1"}},
+		TerminalStates: []TerminalState{{state: 0, lexemName: "LiteralChar"}, {state: 1, lexemName: "LiteralChar"}, {state: 2, lexemName: "LiteralNewLine"}, {state: 3, lexemName: "LiteralEnd"}, {state: 4, lexemName: "Literal1"}},
 		Transitions: map[int]map[rune]int{
-			0: {9: 1, 10: 3, 32: 1, 33: 1, 34: 2, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
-			2: {34: 4},
+			0: {9: 1, 10: 2, 32: 1, 33: 1, 34: 3, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
+			3: {34: 4},
 		},
 	}
 )
@@ -509,15 +498,27 @@ func (f fragment) String() string {
 	return fmt.Sprintf("%s-%s", f.starting.String(), f.following.String())
 }
 
-type Position struct {
-	line  int
-	pos   int
-	index int
-	text  []rune
+type position struct {
+	symb rune
+	line int
+	pos  int
 }
 
-func NewPosition(text []rune) Position {
-	return Position{text: text, line: 1, pos: 1}
+func newPosition(symb rune) position {
+	return position{symb: symb, line: 1, pos: 1}
+}
+
+type Position struct {
+	position
+	reader bufio.Reader
+}
+
+func NewPosition(reader bufio.Reader) Position {
+	r, _, err := reader.ReadRune()
+	if err != nil {
+		r = -1
+	}
+	return Position{position: newPosition(r), reader: reader}
 }
 
 func (p *Position) String() string {
@@ -525,45 +526,41 @@ func (p *Position) String() string {
 }
 
 func (p *Position) cp() int {
-	if p.index == len(p.text) {
-		return -1
-	}
-	return int(p.text[p.index])
+	return int(p.symb)
 }
 
 func (p *Position) isNewLine() bool {
 	return p.cp() == '\n'
 }
 
-func (p *Position) Index() int {
-	return p.index
-}
-
 func (p *Position) next() Position {
-	if p.index < len(p.text) {
+	r, _, err := p.reader.ReadRune()
+	if err == nil {
 		if p.isNewLine() {
 			p.line++
 			p.pos = 1
 		} else {
 			p.pos++
 		}
-		p.index++
+		p.symb = r
+	} else {
+		p.symb = -1
 	}
 
 	return *p
 }
 
 type Scanner struct {
-	program      []rune
-	handler      LexemHandler
-	regexps      map[Condition][]*FiniteState
-	unionRegexps map[Condition]*FiniteState
-	curPos       Position
+	programReader bufio.Reader
+	handler       LexemHandler
+	regexps       map[Condition][]*FiniteState
+	unionRegexps  map[Condition]*FiniteState
+	curPos        Position
 
 	curCondition Condition
 }
 
-func NewScanner(program []rune, handler LexemHandler) Scanner {
+func NewScanner(programFile bufio.Reader, handler LexemHandler) Scanner {
 	regexps := make(map[Condition][]*FiniteState)
 
 	regexps[ConditionINIT] = make([]*FiniteState, 0, 5)
@@ -596,12 +593,12 @@ func NewScanner(program []rune, handler LexemHandler) Scanner {
 	unionRegexps[ConditionREGULAR] = unionAutomataREGULAR
 
 	return Scanner{
-		program:      program,
-		handler:      handler,
-		regexps:      regexps,
-		unionRegexps: unionRegexps,
-		curPos:       NewPosition(program),
-		curCondition: ConditionINIT,
+		programReader: programFile,
+		handler:       handler,
+		regexps:       regexps,
+		unionRegexps:  unionRegexps,
+		curPos:        NewPosition(programFile),
+		curCondition:  ConditionINIT,
 	}
 }
 
@@ -610,6 +607,7 @@ func (s *Scanner) switchCondition(cond Condition) {
 }
 
 func (s *Scanner) findTokenOneAutomata(
+	curWord string,
 	name string,
 	start, end Position,
 	errFunc ErrFunc,
@@ -617,17 +615,18 @@ func (s *Scanner) findTokenOneAutomata(
 ) (Token, Continued) {
 	switch s.curCondition {
 	case ConditionINIT:
-		return s.findTokenOneAutomataINIT(name, start, end, errFunc, switchCond)
+		return s.findTokenOneAutomataINIT(curWord, name, start, end, errFunc, switchCond)
 	case ConditionLITERAL:
-		return s.findTokenOneAutomataLITERAL(name, start, end, errFunc, switchCond)
+		return s.findTokenOneAutomataLITERAL(curWord, name, start, end, errFunc, switchCond)
 	case ConditionREGULAR:
-		return s.findTokenOneAutomataREGULAR(name, start, end, errFunc, switchCond)
+		return s.findTokenOneAutomataREGULAR(curWord, name, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
 }
 
 func (s *Scanner) findTokenOneAutomataINIT(
+	curWord string,
 	name string,
 	start, end Position,
 	errFunc ErrFunc,
@@ -635,21 +634,22 @@ func (s *Scanner) findTokenOneAutomataINIT(
 ) (Token, Continued) {
 	switch name {
 	case "Skip":
-		return s.handler.Skip(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.Skip(curWord, start, end, errFunc, switchCond)
 	case "RegularStart":
-		return s.handler.RegularStart(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularStart(curWord, start, end, errFunc, switchCond)
 	case "StartLiteral":
-		return s.handler.StartLiteral(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.StartLiteral(curWord, start, end, errFunc, switchCond)
 	case "Num":
-		return s.handler.Num(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.Num(curWord, start, end, errFunc, switchCond)
 	case "Any":
-		return s.handler.Any(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.Any(curWord, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
 }
 
 func (s *Scanner) findTokenOneAutomataLITERAL(
+	curWord string,
 	name string,
 	start, end Position,
 	errFunc ErrFunc,
@@ -657,19 +657,20 @@ func (s *Scanner) findTokenOneAutomataLITERAL(
 ) (Token, Continued) {
 	switch name {
 	case "Literal1":
-		return s.handler.Literal1(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.Literal1(curWord, start, end, errFunc, switchCond)
 	case "LiteralEnd":
-		return s.handler.LiteralEnd(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.LiteralEnd(curWord, start, end, errFunc, switchCond)
 	case "LiteralNewLine":
-		return s.handler.LiteralNewLine(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.LiteralNewLine(curWord, start, end, errFunc, switchCond)
 	case "LiteralChar":
-		return s.handler.LiteralChar(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.LiteralChar(curWord, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
 }
 
 func (s *Scanner) findTokenOneAutomataREGULAR(
+	curWord string,
 	name string,
 	start, end Position,
 	errFunc ErrFunc,
@@ -677,23 +678,24 @@ func (s *Scanner) findTokenOneAutomataREGULAR(
 ) (Token, Continued) {
 	switch name {
 	case "RegularEnd":
-		return s.handler.RegularEnd(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularEnd(curWord, start, end, errFunc, switchCond)
 	case "RegularNewLine":
-		return s.handler.RegularNewLine(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularNewLine(curWord, start, end, errFunc, switchCond)
 	case "RegularEscapeNewLine":
-		return s.handler.RegularEscapeNewLine(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularEscapeNewLine(curWord, start, end, errFunc, switchCond)
 	case "RegularEscapeTab":
-		return s.handler.RegularEscapeTab(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularEscapeTab(curWord, start, end, errFunc, switchCond)
 	case "RegularEscapeQota":
-		return s.handler.RegularEscapeQota(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularEscapeQota(curWord, start, end, errFunc, switchCond)
 	case "RegularSymb":
-		return s.handler.RegularSymb(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularSymb(curWord, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
 }
 
 func (s *Scanner) findToken(
+	curWord string,
 	automata *FiniteState,
 	start, end Position,
 	errFunc ErrFunc,
@@ -701,17 +703,18 @@ func (s *Scanner) findToken(
 ) (Token, Continued) {
 	switch s.curCondition {
 	case ConditionINIT:
-		return s.findTokenINIT(automata, start, end, errFunc, switchCond)
+		return s.findTokenINIT(curWord, automata, start, end, errFunc, switchCond)
 	case ConditionLITERAL:
-		return s.findTokenLITERAL(automata, start, end, errFunc, switchCond)
+		return s.findTokenLITERAL(curWord, automata, start, end, errFunc, switchCond)
 	case ConditionREGULAR:
-		return s.findTokenREGULAR(automata, start, end, errFunc, switchCond)
+		return s.findTokenREGULAR(curWord, automata, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
 }
 
 func (s *Scanner) findTokenINIT(
+	curWord string,
 	automata *FiniteState,
 	start, end Position,
 	errFunc ErrFunc,
@@ -719,21 +722,22 @@ func (s *Scanner) findTokenINIT(
 ) (Token, Continued) {
 	switch automata {
 	case automataSkip:
-		return s.handler.Skip(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.Skip(curWord, start, end, errFunc, switchCond)
 	case automataRegularStart:
-		return s.handler.RegularStart(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularStart(curWord, start, end, errFunc, switchCond)
 	case automataStartLiteral:
-		return s.handler.StartLiteral(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.StartLiteral(curWord, start, end, errFunc, switchCond)
 	case automataNum:
-		return s.handler.Num(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.Num(curWord, start, end, errFunc, switchCond)
 	case automataAny:
-		return s.handler.Any(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.Any(curWord, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
 }
 
 func (s *Scanner) findTokenLITERAL(
+	curWord string,
 	automata *FiniteState,
 	start, end Position,
 	errFunc ErrFunc,
@@ -741,19 +745,20 @@ func (s *Scanner) findTokenLITERAL(
 ) (Token, Continued) {
 	switch automata {
 	case automataLiteral1:
-		return s.handler.Literal1(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.Literal1(curWord, start, end, errFunc, switchCond)
 	case automataLiteralEnd:
-		return s.handler.LiteralEnd(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.LiteralEnd(curWord, start, end, errFunc, switchCond)
 	case automataLiteralNewLine:
-		return s.handler.LiteralNewLine(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.LiteralNewLine(curWord, start, end, errFunc, switchCond)
 	case automataLiteralChar:
-		return s.handler.LiteralChar(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.LiteralChar(curWord, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
 }
 
 func (s *Scanner) findTokenREGULAR(
+	curWord string,
 	automata *FiniteState,
 	start, end Position,
 	errFunc ErrFunc,
@@ -761,17 +766,17 @@ func (s *Scanner) findTokenREGULAR(
 ) (Token, Continued) {
 	switch automata {
 	case automataRegularEnd:
-		return s.handler.RegularEnd(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularEnd(curWord, start, end, errFunc, switchCond)
 	case automataRegularNewLine:
-		return s.handler.RegularNewLine(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularNewLine(curWord, start, end, errFunc, switchCond)
 	case automataRegularEscapeNewLine:
-		return s.handler.RegularEscapeNewLine(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularEscapeNewLine(curWord, start, end, errFunc, switchCond)
 	case automataRegularEscapeTab:
-		return s.handler.RegularEscapeTab(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularEscapeTab(curWord, start, end, errFunc, switchCond)
 	case automataRegularEscapeQota:
-		return s.handler.RegularEscapeQota(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularEscapeQota(curWord, start, end, errFunc, switchCond)
 	case automataRegularSymb:
-		return s.handler.RegularSymb(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+		return s.handler.RegularSymb(curWord, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true
@@ -779,71 +784,20 @@ func (s *Scanner) findTokenREGULAR(
 
 func (s *Scanner) NextTokenOneAutomata() Token {
 	for s.curPos.cp() != -1 {
-		start := s.curPos.index
-
-		maxRight := 0
-		res, name := s.unionRegexps[s.curCondition].FindMatchEndIndexOneAutomata(string(s.program[s.curPos.index:]))
-		if res > 0 {
-			maxRight = res
-		}
-
 		startPos := s.curPos
-		var pos Position
-		for s.curPos.index != start+maxRight {
-			pos = s.curPos
-			s.curPos.next()
-		}
-		pos.index++
+		res, name, pos := s.unionRegexps[s.curCondition].FindLexemOneAutomata(s.curPos)
+		s.curPos = pos
+		s.curPos.next()
 
-		if maxRight == 0 {
+		if len(name) == 0 {
 			if s.curPos.cp() != -1 {
 				s.curPos.next()
 			} else {
 				break
 			}
-			s.handler.Error("ERROR: unknown symbol", startPos, string(s.program[start]))
+			s.handler.Error("ERROR: unknown symbol", startPos, string(s.curPos.cp()))
 		} else {
-			tok, continued := s.findTokenOneAutomata(name, startPos, pos, s.handler.Error, s.switchCondition)
-			if !continued {
-				return tok
-			}
-		}
-	}
-
-	return NewToken(EOPTag{}, s.curPos, s.curPos, "")
-}
-
-func (s *Scanner) NextToken() Token {
-	for s.curPos.cp() != -1 {
-		start := s.curPos.index
-
-		var maxRightReg *FiniteState
-		maxRight := 0
-
-		for _, r := range s.regexps[s.curCondition] {
-			res := r.FindMatchEndIndex(string(s.program[s.curPos.index:]))
-			if res > maxRight {
-				maxRightReg = r
-				maxRight = res
-			}
-		}
-		startPos := s.curPos
-		var pos Position
-		for s.curPos.index != start+maxRight {
-			pos = s.curPos
-			s.curPos.next()
-		}
-		pos.index++
-
-		if maxRight == 0 {
-			if s.curPos.cp() != -1 {
-				s.curPos.next()
-			} else {
-				break
-			}
-			s.handler.Error("ERROR: unknown symbol", startPos, string(s.program[start]))
-		} else {
-			tok, continued := s.findToken(maxRightReg, startPos, pos, s.handler.Error, s.switchCondition)
+			tok, continued := s.findTokenOneAutomata(res, name, startPos, pos, s.handler.Error, s.switchCondition)
 			if !continued {
 				return tok
 			}

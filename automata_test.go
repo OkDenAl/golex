@@ -242,7 +242,6 @@ func setup(t *testing.T, regexp string) *FiniteAutomata {
 	r := res.CompileV2()
 
 	r.ToGraph(os.Stdout)
-	res.ToGraph(os.Stdout)
 	return r
 }
 
@@ -320,7 +319,7 @@ func TestFiniteState_Execute(t *testing.T) {
 		},
 		{
 			name:   "[0-9]*|([0-9]*h)",
-			args:   args{reg: "([0-9]*|([0-9]*h))"},
+			args:   args{reg: "\\\""},
 			count:  100,
 			maxLen: 100,
 		},

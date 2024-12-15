@@ -297,7 +297,7 @@ func (p *Parser) element() (*Element, bool) {
 		return &Element{set: set}, true
 	}
 
-	escape, ok := p.escape()
+	escape, ok := p.escape(false)
 	if ok {
 		return &Element{escape: escape}, true
 	}
@@ -327,7 +327,7 @@ func (p *Parser) group() (*Group, bool) {
 }
 
 // Escape          ::= "\" EscapeCharacter
-func (p *Parser) escape() (*Escape, bool) {
+func (p *Parser) escape(isSet bool) (*Escape, bool) {
 	if _, ok := p.expectTags(TagEscape); !ok {
 		return nil, false
 	}
@@ -337,8 +337,10 @@ func (p *Parser) escape() (*Escape, bool) {
 		panic("Escape: no character")
 		return nil, false
 	}
+	if !isSet {
+		p.regRuleSymbCount++
+	}
 
-	p.regRuleSymbCount++
 	return &Escape{base: &Character{tok: base, pos: p.regRuleSymbCount}}, true
 }
 
@@ -349,18 +351,17 @@ func (p *Parser) set() (*Set, bool) {
 		return nil, false
 	}
 
-	pos := p.regRuleSymbCount + 1
+	p.regRuleSymbCount++
 	var set *Set
 	if _, ok := p.expectTags(TagCaret); !ok {
 		positive, ok := p.setItems(true)
 		if ok {
-			set = &Set{positive: positive, pos: pos}
+			set = &Set{positive: positive, pos: p.regRuleSymbCount}
 		}
 	} else {
 		negative, ok := p.setItems(true)
 		if ok {
-			p.regRuleSymbCount = pos
-			set = &Set{negative: negative, pos: pos}
+			set = &Set{negative: negative, pos: p.regRuleSymbCount}
 		}
 	}
 
@@ -370,6 +371,7 @@ func (p *Parser) set() (*Set, bool) {
 	}
 
 	reset()
+	p.regRuleSymbCount--
 	return nil, false
 }
 
@@ -395,7 +397,7 @@ func (p *Parser) setItem(isFirst bool) (*SetItem, bool) {
 	}
 
 	reset()
-	escape, ok := p.escape()
+	escape, ok := p.escape(true)
 	if ok {
 		return &SetItem{escape: escape}, true
 	}
@@ -403,7 +405,6 @@ func (p *Parser) setItem(isFirst bool) (*SetItem, bool) {
 	reset()
 	token, ok := p.setCharacter(isFirst)
 	if ok {
-		p.regRuleSymbCount++
 		return &SetItem{base: &Character{tok: token, pos: p.regRuleSymbCount}}, true
 	}
 
@@ -418,7 +419,7 @@ func (p *Parser) rangeExpr() (*Range, bool) {
 		startEscape *Escape
 	)
 	reset := p.reset()
-	escape, ok := p.escape()
+	escape, ok := p.escape(true)
 	if ok {
 		startEscape = escape
 	} else {
@@ -439,7 +440,6 @@ func (p *Parser) rangeExpr() (*Range, bool) {
 		panic("unexpected token " + p.tokens[p.cursor].String())
 	}
 
-	p.regRuleSymbCount++
 	return &Range{startToken: startToken, startEscape: startEscape, end: end, pos: p.regRuleSymbCount}, true
 }
 
