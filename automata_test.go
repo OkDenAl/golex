@@ -242,7 +242,6 @@ func setup(t *testing.T, regexp string) *FiniteAutomata {
 	r := res.CompileV2()
 
 	r.ToGraph(os.Stdout)
-	res.ToGraph(os.Stdout)
 	return r
 }
 
@@ -320,7 +319,7 @@ func TestFiniteState_Execute(t *testing.T) {
 		},
 		{
 			name:   "[0-9]*|([0-9]*h)",
-			args:   args{reg: "([0-9]*|([0-9]*h))"},
+			args:   args{reg: "\\\""},
 			count:  100,
 			maxLen: 100,
 		},
@@ -337,10 +336,10 @@ func TestFiniteState_Execute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f := 0
 			sut := setup(t, tt.args.reg)
+			r := regexp.MustCompile("^" + tt.args.reg + "$")
 
 			for i := 1; i < tt.maxLen; i++ {
 				for j := 0; j < tt.count; j++ {
-					r := regexp.MustCompile("^" + tt.args.reg + "$")
 					str, err := Generate(tt.args.reg, i)
 					require.Nil(t, err)
 					if sut.MatchString(str) != r.MatchString(str) {

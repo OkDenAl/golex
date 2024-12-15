@@ -9,7 +9,7 @@ type Parser struct {
 	cursor int
 	tokens []Token
 
-	regRuleNum          int
+	regRuleSymbCount    int
 	startConditionNames map[string]struct{}
 	ruleNames           map[string]Token
 }
@@ -132,7 +132,7 @@ func (p *Parser) rule() (Rule, error) {
 
 	p.mustExpectTag(TagRegularMarker)
 	reset := p.reset()
-	p.regRuleNum = 0
+	p.regRuleSymbCount = 0
 	expr, ok := p.regExpr()
 	if !ok {
 		reset()
@@ -297,15 +297,15 @@ func (p *Parser) element() (*Element, bool) {
 		return &Element{set: set}, true
 	}
 
-	escape, ok := p.escape()
+	escape, ok := p.escape(false)
 	if ok {
 		return &Element{escape: escape}, true
 	}
 
 	character, ok := p.validIndependentCharacter()
 	if ok {
-		p.regRuleNum++
-		return &Element{character: &Character{tok: character, pos: p.regRuleNum}}, true
+		p.regRuleSymbCount++
+		return &Element{character: &Character{tok: character, pos: p.regRuleSymbCount}}, true
 	}
 
 	return nil, false
@@ -327,7 +327,7 @@ func (p *Parser) group() (*Group, bool) {
 }
 
 // Escape          ::= "\" EscapeCharacter
-func (p *Parser) escape() (*Escape, bool) {
+func (p *Parser) escape(isSet bool) (*Escape, bool) {
 	if _, ok := p.expectTags(TagEscape); !ok {
 		return nil, false
 	}
@@ -337,9 +337,11 @@ func (p *Parser) escape() (*Escape, bool) {
 		panic("Escape: no character")
 		return nil, false
 	}
+	if !isSet {
+		p.regRuleSymbCount++
+	}
 
-	p.regRuleNum++
-	return &Escape{base: &Character{tok: base, pos: p.regRuleNum}}, true
+	return &Escape{base: &Character{tok: base, pos: p.regRuleSymbCount}}, true
 }
 
 // Set             ::= "[" ("^")? SetItems "]"
@@ -349,18 +351,17 @@ func (p *Parser) set() (*Set, bool) {
 		return nil, false
 	}
 
-	pos := p.regRuleNum + 1
+	p.regRuleSymbCount++
 	var set *Set
 	if _, ok := p.expectTags(TagCaret); !ok {
 		positive, ok := p.setItems(true)
 		if ok {
-			set = &Set{positive: positive, pos: pos}
+			set = &Set{positive: positive, pos: p.regRuleSymbCount}
 		}
 	} else {
 		negative, ok := p.setItems(true)
 		if ok {
-			p.regRuleNum = pos
-			set = &Set{negative: negative, pos: pos}
+			set = &Set{negative: negative, pos: p.regRuleSymbCount}
 		}
 	}
 
@@ -370,6 +371,7 @@ func (p *Parser) set() (*Set, bool) {
 	}
 
 	reset()
+	p.regRuleSymbCount--
 	return nil, false
 }
 
@@ -395,7 +397,7 @@ func (p *Parser) setItem(isFirst bool) (*SetItem, bool) {
 	}
 
 	reset()
-	escape, ok := p.escape()
+	escape, ok := p.escape(true)
 	if ok {
 		return &SetItem{escape: escape}, true
 	}
@@ -403,8 +405,7 @@ func (p *Parser) setItem(isFirst bool) (*SetItem, bool) {
 	reset()
 	token, ok := p.setCharacter(isFirst)
 	if ok {
-		p.regRuleNum++
-		return &SetItem{base: &Character{tok: token, pos: p.regRuleNum}}, true
+		return &SetItem{base: &Character{tok: token, pos: p.regRuleSymbCount}}, true
 	}
 
 	reset()
@@ -418,7 +419,7 @@ func (p *Parser) rangeExpr() (*Range, bool) {
 		startEscape *Escape
 	)
 	reset := p.reset()
-	escape, ok := p.escape()
+	escape, ok := p.escape(true)
 	if ok {
 		startEscape = escape
 	} else {
@@ -439,8 +440,7 @@ func (p *Parser) rangeExpr() (*Range, bool) {
 		panic("unexpected token " + p.tokens[p.cursor].String())
 	}
 
-	p.regRuleNum++
-	return &Range{startToken: startToken, startEscape: startEscape, end: end, pos: p.regRuleNum}, true
+	return &Range{startToken: startToken, startEscape: startEscape, end: end, pos: p.regRuleSymbCount}, true
 }
 
 // ValidIndependentCharacter ::= [^()|/]
@@ -582,10 +582,10 @@ func (p *Parser) expectTags(tags ...DomainTag) (Token, bool) {
 
 func (p *Parser) reset() func() {
 	cursor := p.cursor
-	num := p.regRuleNum
+	num := p.regRuleSymbCount
 	return func() {
 		p.cursor = cursor
-		p.regRuleNum = num
+		p.regRuleSymbCount = num
 	}
 }
 

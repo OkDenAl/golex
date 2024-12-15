@@ -131,7 +131,8 @@ func (e *Escape) Compile() *FiniteAutomata {
 
 func (s *Set) Compile() *FiniteAutomata {
 	if s.positive != nil {
-		return s.positive.Compile()
+		a := s.positive.Compile()
+		return a
 	}
 
 	if s.negative != nil {

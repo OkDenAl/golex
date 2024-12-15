@@ -65,42 +65,29 @@ type TerminalState struct {
 	lexemName string
 }
 
-func (f *FiniteState) FindMatchEndIndex(input string) int {
+func (f *FiniteState) FindLexemOneAutomata(pos Position) (string, string, Position) {
 	f.CurrentState = 0
-	i := 0
-	for _, ch := range input {
+	prevWord := ""
+	prevStr := ""
+	curWord := ""
+	var prevResPos Position
+	for pos.cp() != -1 {
+		ch := rune(pos.cp())
 		if !f.canMoveBy(ch) {
 			break
 		}
-		i++
-	}
+		curWord += string(ch)
 
-	if f.isTerminal(f.CurrentState) {
-		return i
-	}
-
-	return 0
-}
-
-func (f *FiniteState) FindMatchEndIndexOneAutomata(input string) (int,string) {
-	f.CurrentState = 0
-	i := 0
-	prevI:=i
-	prevStr:=""
-	for _, ch := range input {
-		if !f.canMoveBy(ch) {
-			break
-		}
-		i++
-
-		if val,ok:=f.isTerminalOneAutoamta(f.CurrentState);ok {
-			prevI = i
+		if val, ok := f.isTerminalOneAutomata(f.CurrentState); ok {
+			prevResPos=pos
+			prevWord = curWord
 			prevStr = val.lexemName
 		}
+
+		pos.next()
 	}
 
-
-	return prevI,prevStr
+	return prevWord, prevStr,prevResPos
 }
 
 func (f *FiniteState) canMoveBy(ch rune) bool {
@@ -113,7 +100,7 @@ func (f *FiniteState) canMoveBy(ch rune) bool {
 	return false
 }
 
-func (f *FiniteState) isTerminalOneAutoamta(state int) (TerminalState, bool) {
+func (f *FiniteState) isTerminalOneAutomata(state int) (TerminalState, bool) {
 	for _, val := range f.TerminalStates {
 		if state == val.state {
 			return val, true
@@ -215,15 +202,27 @@ func (f fragment) String() string {
 	return fmt.Sprintf("%s-%s", f.starting.String(), f.following.String())
 }
 
-type Position struct {
-	line  int
-	pos   int
-	index int
-	text  []rune
+type position struct {
+	symb rune
+	line int
+	pos  int
 }
 
-func NewPosition(text []rune) Position {
-	return Position{text: text, line: 1, pos: 1}
+func newPosition(symb rune) position {
+	return position{symb: symb, line: 1, pos: 1}
+}
+
+type Position struct {
+	position
+	reader bufio.Reader
+}
+
+func NewPosition(reader bufio.Reader) Position {
+	r, _, err := reader.ReadRune()
+	if err != nil {
+		r = -1
+	}
+	return Position{position: newPosition(r), reader: reader}
 }
 
 func (p *Position) String() string {
@@ -231,36 +230,32 @@ func (p *Position) String() string {
 }
 
 func (p *Position) cp() int {
-	if p.index == len(p.text) {
-		return -1
-	}
-	return int(p.text[p.index])
+	return int(p.symb)
 }
 
 func (p *Position) isNewLine() bool {
 	return p.cp() == '\n'
 }
 
-func (p *Position) Index() int {
-    return p.index
-}
-
 func (p *Position) next() Position {
-	if p.index < len(p.text) {
+	r, _, err := p.reader.ReadRune()
+	if err == nil {
 		if p.isNewLine() {
 			p.line++
 			p.pos = 1
 		} else {
 			p.pos++
 		}
-		p.index++
+		p.symb = r
+	} else {
+		p.symb = -1
 	}
 
 	return *p
 }
 
 type Scanner struct {
-	program []rune
+	programReader bufio.Reader
 	handler LexemHandler
 	regexps map[Condition][]*FiniteState
 	unionRegexps map[Condition]*FiniteState
@@ -269,7 +264,7 @@ type Scanner struct {
 	curCondition Condition
 }
 
-func NewScanner(program []rune, handler LexemHandler) Scanner {
+func NewScanner(programFile bufio.Reader, handler LexemHandler) Scanner {
     regexps := make(map[Condition][]*FiniteState)
     {{ range $key, $value := .Conditions }}
        regexps[Condition{{ $key }}]=make([]*FiniteState,0, {{ $value.RegexpsLen }})
@@ -284,12 +279,12 @@ func NewScanner(program []rune, handler LexemHandler) Scanner {
 
 
 	return Scanner{
-	    program: program,
-	    handler: handler,
-	    regexps:regexps,
-	    unionRegexps: unionRegexps,
-	    curPos: NewPosition(program),
-	    curCondition:ConditionINIT,
+		programReader:      programFile,
+		handler:      handler,
+		regexps:      regexps,
+		unionRegexps: unionRegexps,
+		curPos:       NewPosition(programFile),
+		curCondition: ConditionINIT,
 	}
 }
 
@@ -298,13 +293,14 @@ func (s *Scanner) switchCondition(cond Condition) {
 }
 
 func (s *Scanner) findTokenOneAutomata(
+    curWord string,
     name string,
     start, end Position,
     errFunc ErrFunc,
     switchCond SwitchConditionFunc,
 ) (Token, Continued) {
     switch s.curCondition{
-    {{ range $key, $value := .Conditions }} case Condition{{ $key }}: return s.findTokenOneAutomata{{ $key }}(name,start,end,errFunc, switchCond)
+    {{ range $key, $value := .Conditions }} case Condition{{ $key }}: return s.findTokenOneAutomata{{ $key }}(curWord,name,start,end,errFunc, switchCond)
     {{ end }}}
 
 	return Token{}, true
@@ -312,13 +308,14 @@ func (s *Scanner) findTokenOneAutomata(
 
 {{ range $key, $value := .Conditions }}
 func (s *Scanner) findTokenOneAutomata{{ $key }}(
+    curWord string,
     name string,
     start, end Position,
     errFunc ErrFunc,
     switchCond SwitchConditionFunc,
 ) (Token, Continued) {
 	switch name {
-    {{ range $value.Regexps }}case "{{ .ActionName }}": return s.handler.{{ .ActionName }}(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+    {{ range $value.Regexps }}case "{{ .ActionName }}": return s.handler.{{ .ActionName }}(curWord, start, end, errFunc, switchCond)
     {{ end }}}
 
 	return Token{}, true
@@ -327,13 +324,14 @@ func (s *Scanner) findTokenOneAutomata{{ $key }}(
 
 
 func (s *Scanner) findToken(
+    curWord string,
     automata *FiniteState,
     start, end Position,
     errFunc ErrFunc,
     switchCond SwitchConditionFunc,
 ) (Token, Continued) {
     switch s.curCondition{
-    {{ range $key, $value := .Conditions }} case Condition{{ $key }}: return s.findToken{{ $key }}(automata,start,end,errFunc, switchCond)
+    {{ range $key, $value := .Conditions }} case Condition{{ $key }}: return s.findToken{{ $key }}(curWord, automata,start,end,errFunc, switchCond)
     {{ end }}}
 
 	return Token{}, true
@@ -341,13 +339,14 @@ func (s *Scanner) findToken(
 
 {{ range $key, $value := .Conditions }}
 func (s *Scanner) findToken{{ $key }}(
+    curWord string,
     automata *FiniteState,
     start, end Position,
     errFunc ErrFunc,
     switchCond SwitchConditionFunc,
 ) (Token, Continued) {
 	switch automata {
-    {{ range $value.Regexps }}case automata{{ .ActionName }}: return s.handler.{{ .ActionName }}(string(s.program[start.Index():end.Index()]), start, end, errFunc, switchCond)
+    {{ range $value.Regexps }}case automata{{ .ActionName }}: return s.handler.{{ .ActionName }}(curWord, start, end, errFunc, switchCond)
     {{ end }}}
 
 	return Token{}, true
@@ -356,71 +355,20 @@ func (s *Scanner) findToken{{ $key }}(
 
 func (s *Scanner) NextTokenOneAutomata() Token {
 	for s.curPos.cp() != -1 {
-		start := s.curPos.index
-
-		maxRight:=0
-		res,name := s.unionRegexps[s.curCondition].FindMatchEndIndexOneAutomata(string(s.program[s.curPos.index:]))
-		if res > 0 {
-			maxRight = res
-		}
-
 		startPos := s.curPos
-		var pos Position
-		for s.curPos.index != start+maxRight {
-			pos = s.curPos
-			s.curPos.next()
-		}
-		pos.index++
+		res, name, pos := s.unionRegexps[s.curCondition].FindLexemOneAutomata(s.curPos)
+		s.curPos=pos
+		s.curPos.next()
 
-		if maxRight == 0 {
+		if len(name) == 0 {
 			if s.curPos.cp() != -1 {
 				s.curPos.next()
 			} else {
 				break
 			}
-			s.handler.Error("ERROR: unknown symbol", startPos, string(s.program[start]))
+			s.handler.Error("ERROR: unknown symbol", startPos, string(s.curPos.cp()))
 		} else {
-			tok, continued := s.findTokenOneAutomata(name, startPos, pos, s.handler.Error, s.switchCondition)
-			if !continued {
-				return tok
-			}
-		}
-	}
-
-	return NewToken(EOPTag{}, s.curPos, s.curPos, "")
-}
-
-func (s *Scanner) NextToken() Token {
-	for s.curPos.cp() != -1 {
-		start := s.curPos.index
-
-		var maxRightReg *FiniteState
-		maxRight := 0
-
-		for _, r := range s.regexps[s.curCondition] {
-			res := r.FindMatchEndIndex(string(s.program[s.curPos.index:]))
-			if res > maxRight {
-				maxRightReg = r
-				maxRight = res
-			}
-		}
-		startPos := s.curPos
-		var pos Position
-		for s.curPos.index != start+maxRight {
-			pos=s.curPos
-			s.curPos.next()
-		}
-		pos.index++
-
-		if maxRight == 0 {
-			if s.curPos.cp() != -1 {
-				s.curPos.next()
-			} else {
-				break
-			}
-			s.handler.Error("ERROR: unknown symbol", startPos, string(s.program[start]))
-		} else {
-			tok, continued := s.findToken(maxRightReg, startPos, pos, s.handler.Error, s.switchCondition)
+			tok, continued := s.findTokenOneAutomata(res, name, startPos, pos, s.handler.Error, s.switchCondition)
 			if !continued {
 				return tok
 			}

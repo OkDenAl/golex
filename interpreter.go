@@ -20,6 +20,12 @@ type Condition struct {
 	UnionRegexp Regexp
 }
 
+type GeneratorInfo struct {
+	Conditions   map[string]Condition
+	AllRegexps   []Regexp
+	UnionRegexps []Regexp
+}
+
 func NewCondition(name string, regxps []Regexp, regxpsLen int, unionReg *FiniteAutomata) Condition {
 	return Condition{
 		Name:    name,
@@ -30,12 +36,6 @@ func NewCondition(name string, regxps []Regexp, regxpsLen int, unionReg *FiniteA
 		},
 		RegexpsLen: regxpsLen,
 	}
-}
-
-type GeneratorInfo struct {
-	Conditions   map[string]Condition
-	AllRegexps   []Regexp
-	UnionRegexps []Regexp
 }
 
 type AutomataWithNaming struct {
@@ -50,9 +50,6 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 	conds := make(map[string][]Regexp)
 	condsUnionAutomata := make(map[string]AutomataWithNaming)
 	for _, rule := range r.rules.ruleArr {
-		if rule.name.val == "RegularStart" {
-			fmt.Println("here")
-		}
 		startCondName := InitialCond
 		if rule.startCondition != nil {
 			startCondName = rule.startCondition.condition.val
@@ -86,6 +83,9 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 				automata: automata,
 				naming:   naming,
 			}
+			automata.ToGraph(os.Stdout)
+			fmt.Println(automata.letters)
+			fmt.Println(automata.flPos)
 		} else {
 			naming = condsUnionAutomata[startCondName].naming
 			condsUnionAutomata[startCondName] = AutomataWithNaming{
@@ -99,6 +99,7 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 		curAutomataInfo := condsUnionAutomata[key]
 		flPos = curAutomataInfo.automata.flPos
 		letters = curAutomataInfo.automata.letters
+		//fmt.Println(letters)
 		naming = curAutomataInfo.naming
 		curAutomata := curAutomataInfo.automata.CompileV2()
 		curAutomata.ToGraph(os.Stdout)
