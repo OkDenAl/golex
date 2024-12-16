@@ -1,10 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"os"
-)
-
 type Regexp struct {
 	RegexpVal           *FiniteAutomata
 	ActionName          string
@@ -83,9 +78,6 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 				automata: automata,
 				naming:   naming,
 			}
-			automata.ToGraph(os.Stdout)
-			fmt.Println(automata.letters)
-			fmt.Println(automata.flPos)
 		} else {
 			naming = condsUnionAutomata[startCondName].naming
 			condsUnionAutomata[startCondName] = AutomataWithNaming{
@@ -99,10 +91,8 @@ func (r *Program) ProcessOneAutomata() *GeneratorInfo {
 		curAutomataInfo := condsUnionAutomata[key]
 		flPos = curAutomataInfo.automata.flPos
 		letters = curAutomataInfo.automata.letters
-		//fmt.Println(letters)
 		naming = curAutomataInfo.naming
 		curAutomata := curAutomataInfo.automata.CompileV2()
-		curAutomata.ToGraph(os.Stdout)
 
 		gi.Conditions[key] = NewCondition(key, val, len(val), curAutomata)
 		gi.UnionRegexps = append(gi.UnionRegexps, Regexp{

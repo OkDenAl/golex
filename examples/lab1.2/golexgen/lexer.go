@@ -2,7 +2,6 @@
 package golexgen
 
 import (
-	"bufio"
 	"fmt"
 )
 
@@ -20,8 +19,8 @@ type Continued bool
 type LexemHandler interface {
 	ErrHandler
 	Skip(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
+	Assembly(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
 	Ident(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
-	Num(text string, start, end Position, errFunc ErrFunc, switchCond SwitchConditionFunc) (Token, Continued)
 }
 
 type Tag interface {
@@ -43,17 +42,17 @@ type DefaultTag int
 const (
 	TagErr DefaultTag = iota
 	TagSkip
+	TagAssembly
 	TagIdent
-	TagNum
 	TagINIT
 )
 
 func (t DefaultTag) GetTag() string {
 	var tagToString = map[DefaultTag]string{
-		TagSkip:  "Skip",
-		TagIdent: "Ident",
-		TagNum:   "Num",
-		TagINIT:  "INIT",
+		TagSkip:     "Skip",
+		TagAssembly: "Assembly",
+		TagIdent:    "Ident",
+		TagINIT:     "INIT",
 	}
 
 	return tagToString[t]
@@ -127,13 +126,16 @@ func (f *FiniteState) isTerminal(state int) bool {
 var (
 	unionAutomataINIT *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: "Num"}, {state: 1, lexemName: "Ident"}, {state: 2, lexemName: "Num"}, {state: 3, lexemName: "Skip"}, {state: 5, lexemName: "Num"}},
+		TerminalStates: []TerminalState{{state: 1, lexemName: "Ident"}, {state: 2, lexemName: "Ident"}, {state: 3, lexemName: "Ident"}, {state: 4, lexemName: "Skip"}, {state: 5, lexemName: "Ident"}, {state: 6, lexemName: "Ident"}, {state: 7, lexemName: "Assembly"}},
 		Transitions: map[int]map[rune]int{
-			0: {9: 3, 10: 3, 32: 3, 48: 2, 49: 2, 50: 2, 51: 2, 52: 2, 53: 2, 54: 2, 55: 2, 56: 2, 57: 2, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1},
+			0: {9: 4, 10: 4, 32: 4, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 2, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 3, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1},
 			1: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1},
-			2: {48: 2, 49: 2, 50: 2, 51: 2, 52: 2, 53: 2, 54: 2, 55: 2, 56: 2, 57: 2, 65: 4, 66: 4, 67: 4, 68: 4, 69: 4, 70: 4, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 104: 5},
-			3: {9: 3, 10: 3, 32: 3},
-			4: {48: 4, 49: 4, 50: 4, 51: 4, 52: 4, 53: 4, 54: 4, 55: 4, 56: 4, 57: 4, 65: 4, 66: 4, 67: 4, 68: 4, 69: 4, 70: 4, 97: 4, 98: 4, 99: 4, 100: 4, 101: 4, 102: 4, 104: 5},
+			2: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 5, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1},
+			3: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 6, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1},
+			4: {9: 4, 10: 4, 32: 4},
+			5: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 7, 121: 1, 122: 1},
+			6: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 7, 119: 1, 120: 1, 121: 1, 122: 1},
+			7: {48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1},
 		},
 	}
 )
@@ -153,6 +155,15 @@ func (h *HandlerBase) Skip(
 	return Token{}, true
 }
 
+func (h *HandlerBase) Assembly(
+	text string,
+	start, end Position,
+	errFunc ErrFunc,
+	switchCond SwitchConditionFunc,
+) (Token, Continued) {
+	return NewToken(TagAssembly, start, end, text), false
+}
+
 func (h *HandlerBase) Ident(
 	text string,
 	start, end Position,
@@ -160,15 +171,6 @@ func (h *HandlerBase) Ident(
 	switchCond SwitchConditionFunc,
 ) (Token, Continued) {
 	return NewToken(TagIdent, start, end, text), false
-}
-
-func (h *HandlerBase) Num(
-	text string,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	return NewToken(TagNum, start, end, text), false
 }
 
 type EOPTag struct{}
@@ -312,10 +314,10 @@ func (s *Scanner) findTokenOneAutomataINIT(
 	switch name {
 	case "Skip":
 		return s.handler.Skip(curWord, start, end, errFunc, switchCond)
+	case "Assembly":
+		return s.handler.Assembly(curWord, start, end, errFunc, switchCond)
 	case "Ident":
 		return s.handler.Ident(curWord, start, end, errFunc, switchCond)
-	case "Num":
-		return s.handler.Num(curWord, start, end, errFunc, switchCond)
 	}
 
 	return Token{}, true

@@ -1,7 +1,7 @@
 %%
 /[\n\t ]+/ Skip continue
 
-/[A-Za-z][A-Za-z0-9]*/ Ident
+/(mov|eax)/ Assembly
 
-/[0-9]*|([0-9][A-Fa-f0-9]*h)/ Num
+/[A-Za-z][A-Za-z0-9]*/ Ident
 %%
