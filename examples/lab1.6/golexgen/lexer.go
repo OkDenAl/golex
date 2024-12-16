@@ -167,145 +167,32 @@ func (f *FiniteState) isTerminal(state int) bool {
 }
 
 var (
-	automataSkip *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "Skip"}},
-		Transitions: map[int]map[rune]int{
-			0: {9: 1, 10: 1, 32: 1},
-			1: {9: 1, 10: 1, 32: 1},
-		},
-	}
-	automataRegularStart *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "RegularStart"}},
-		Transitions: map[int]map[rune]int{
-			0: {34: 1},
-		},
-	}
-	automataRegularEnd *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "RegularEnd"}},
-		Transitions: map[int]map[rune]int{
-			0: {34: 1},
-		},
-	}
-	automataRegularNewLine *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "RegularNewLine"}},
-		Transitions: map[int]map[rune]int{
-			0: {10: 1},
-		},
-	}
-	automataRegularEscapeNewLine *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 2, lexemName: "RegularEscapeNewLine"}},
-		Transitions: map[int]map[rune]int{
-			0: {92: 1},
-			1: {110: 2},
-		},
-	}
-	automataRegularEscapeTab *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 2, lexemName: "RegularEscapeTab"}},
-		Transitions: map[int]map[rune]int{
-			0: {92: 1},
-			1: {116: 2},
-		},
-	}
-	automataRegularEscapeQota *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 2, lexemName: "RegularEscapeQota"}},
-		Transitions: map[int]map[rune]int{
-			0: {92: 1},
-			1: {34: 2},
-		},
-	}
-	automataRegularSymb *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: "RegularSymb"}, {state: 1, lexemName: "RegularSymb"}},
-		Transitions: map[int]map[rune]int{
-			0: {9: 1, 32: 1, 33: 1, 34: 1, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
-		},
-	}
-	automataStartLiteral *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 2, lexemName: "StartLiteral"}},
-		Transitions: map[int]map[rune]int{
-			0: {64: 1},
-			1: {34: 2},
-		},
-	}
-	automataLiteral1 *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 2, lexemName: "Literal1"}},
-		Transitions: map[int]map[rune]int{
-			0: {34: 1},
-			1: {34: 2},
-		},
-	}
-	automataLiteralEnd *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "LiteralEnd"}},
-		Transitions: map[int]map[rune]int{
-			0: {34: 1},
-		},
-	}
-	automataLiteralNewLine *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "LiteralNewLine"}},
-		Transitions: map[int]map[rune]int{
-			0: {10: 1},
-		},
-	}
-	automataLiteralChar *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: "LiteralChar"}, {state: 1, lexemName: "LiteralChar"}},
-		Transitions: map[int]map[rune]int{
-			0: {9: 1, 32: 1, 33: 1, 34: 1, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
-		},
-	}
-	automataNum *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 1, lexemName: "Num"}, {state: 2, lexemName: "Num"}},
-		Transitions: map[int]map[rune]int{
-			0: {48: 1, 49: 2},
-			2: {49: 2},
-		},
-	}
-	automataAny *FiniteState = &FiniteState{
-		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: "Any"}, {state: 1, lexemName: "Any"}},
-		Transitions: map[int]map[rune]int{
-			0: {9: 1, 32: 1, 33: 1, 34: 1, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
-		},
-	}
-
 	unionAutomataINIT *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: "Any"}, {state: 1, lexemName: "Any"}, {state: 2, lexemName: "Skip"}, {state: 3, lexemName: "RegularStart"}, {state: 4, lexemName: "Any"}, {state: 5, lexemName: "Skip"}, {state: 6, lexemName: "Num"}, {state: 7, lexemName: "Num"}, {state: 8, lexemName: "StartLiteral"}, {state: 9, lexemName: "Num"}},
+		TerminalStates: []TerminalState{{state: 0, lexemName: "Any"}, {state: 1, lexemName: "Any"}, {state: 2, lexemName: "Skip"}, {state: 3, lexemName: "Skip"}, {state: 4, lexemName: "Num"}, {state: 5, lexemName: "Num"}, {state: 6, lexemName: "RegularStart"}, {state: 7, lexemName: "Any"}, {state: 8, lexemName: "Num"}, {state: 9, lexemName: "StartLiteral"}},
 		Transitions: map[int]map[rune]int{
-			0: {9: 2, 10: 5, 32: 2, 33: 1, 34: 3, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 7, 49: 6, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 4, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
-			2: {9: 5, 10: 5, 32: 5},
-			4: {34: 8},
-			5: {9: 5, 10: 5, 32: 5},
-			6: {49: 9},
-			9: {49: 9},
+			0: {9: 2, 10: 3, 32: 2, 33: 1, 34: 6, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 4, 49: 5, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 7, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
+			2: {9: 3, 10: 3, 32: 3},
+			3: {9: 3, 10: 3, 32: 3},
+			5: {49: 8},
+			7: {34: 9},
+			8: {49: 8},
 		},
 	}
 	unionAutomataREGULAR *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: "RegularSymb"}, {state: 1, lexemName: "RegularSymb"}, {state: 2, lexemName: "RegularSymb"}, {state: 3, lexemName: "RegularNewLine"}, {state: 4, lexemName: "RegularEnd"}, {state: 5, lexemName: "RegularEscapeNewLine"}, {state: 6, lexemName: "RegularEscapeQota"}, {state: 7, lexemName: "RegularEscapeTab"}},
+		TerminalStates: []TerminalState{{state: 0, lexemName: "RegularSymb"}, {state: 1, lexemName: "RegularSymb"}, {state: 2, lexemName: "RegularEnd"}, {state: 3, lexemName: "RegularNewLine"}, {state: 4, lexemName: "RegularSymb"}, {state: 5, lexemName: "RegularEscapeTab"}, {state: 6, lexemName: "RegularEscapeQota"}, {state: 7, lexemName: "RegularEscapeNewLine"}},
 		Transitions: map[int]map[rune]int{
-			0: {9: 1, 10: 3, 32: 1, 33: 1, 34: 4, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 2, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
-			2: {34: 6, 110: 5, 116: 7},
+			0: {9: 1, 10: 3, 32: 1, 33: 1, 34: 2, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 4, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
+			4: {34: 6, 110: 7, 116: 5},
 		},
 	}
 	unionAutomataLITERAL *FiniteState = &FiniteState{
 		CurrentState:   0,
-		TerminalStates: []TerminalState{{state: 0, lexemName: "LiteralChar"}, {state: 1, lexemName: "LiteralChar"}, {state: 2, lexemName: "LiteralNewLine"}, {state: 3, lexemName: "LiteralEnd"}, {state: 4, lexemName: "Literal1"}},
+		TerminalStates: []TerminalState{{state: 0, lexemName: "LiteralChar"}, {state: 1, lexemName: "LiteralChar"}, {state: 2, lexemName: "LiteralEnd"}, {state: 3, lexemName: "LiteralNewLine"}, {state: 4, lexemName: "Literal1"}},
 		Transitions: map[int]map[rune]int{
-			0: {9: 1, 10: 2, 32: 1, 33: 1, 34: 3, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
-			3: {34: 4},
+			0: {9: 1, 10: 3, 32: 1, 33: 1, 34: 2, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 91: 1, 92: 1, 93: 1, 94: 1, 95: 1, 96: 1, 97: 1, 98: 1, 99: 1, 100: 1, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 109: 1, 110: 1, 111: 1, 112: 1, 113: 1, 114: 1, 115: 1, 116: 1, 117: 1, 118: 1, 119: 1, 120: 1, 121: 1, 122: 1, 123: 1, 124: 1, 125: 1, 126: 1},
+			2: {34: 4},
 		},
 	}
 )
@@ -553,7 +440,6 @@ func (p *Position) next() Position {
 type Scanner struct {
 	programReader bufio.Reader
 	handler       LexemHandler
-	regexps       map[Condition][]*FiniteState
 	unionRegexps  map[Condition]*FiniteState
 	curPos        Position
 
@@ -561,29 +447,6 @@ type Scanner struct {
 }
 
 func NewScanner(programFile bufio.Reader, handler LexemHandler) Scanner {
-	regexps := make(map[Condition][]*FiniteState)
-
-	regexps[ConditionINIT] = make([]*FiniteState, 0, 5)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataSkip)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataRegularStart)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataStartLiteral)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataNum)
-	regexps[ConditionINIT] = append(regexps[ConditionINIT], automataAny)
-
-	regexps[ConditionLITERAL] = make([]*FiniteState, 0, 4)
-	regexps[ConditionLITERAL] = append(regexps[ConditionLITERAL], automataLiteral1)
-	regexps[ConditionLITERAL] = append(regexps[ConditionLITERAL], automataLiteralEnd)
-	regexps[ConditionLITERAL] = append(regexps[ConditionLITERAL], automataLiteralNewLine)
-	regexps[ConditionLITERAL] = append(regexps[ConditionLITERAL], automataLiteralChar)
-
-	regexps[ConditionREGULAR] = make([]*FiniteState, 0, 6)
-	regexps[ConditionREGULAR] = append(regexps[ConditionREGULAR], automataRegularEnd)
-	regexps[ConditionREGULAR] = append(regexps[ConditionREGULAR], automataRegularNewLine)
-	regexps[ConditionREGULAR] = append(regexps[ConditionREGULAR], automataRegularEscapeNewLine)
-	regexps[ConditionREGULAR] = append(regexps[ConditionREGULAR], automataRegularEscapeTab)
-	regexps[ConditionREGULAR] = append(regexps[ConditionREGULAR], automataRegularEscapeQota)
-	regexps[ConditionREGULAR] = append(regexps[ConditionREGULAR], automataRegularSymb)
-
 	unionRegexps := make(map[Condition]*FiniteState)
 
 	unionRegexps[ConditionINIT] = unionAutomataINIT
@@ -595,7 +458,6 @@ func NewScanner(programFile bufio.Reader, handler LexemHandler) Scanner {
 	return Scanner{
 		programReader: programFile,
 		handler:       handler,
-		regexps:       regexps,
 		unionRegexps:  unionRegexps,
 		curPos:        NewPosition(programFile),
 		curCondition:  ConditionINIT,
@@ -688,94 +550,6 @@ func (s *Scanner) findTokenOneAutomataREGULAR(
 	case "RegularEscapeQota":
 		return s.handler.RegularEscapeQota(curWord, start, end, errFunc, switchCond)
 	case "RegularSymb":
-		return s.handler.RegularSymb(curWord, start, end, errFunc, switchCond)
-	}
-
-	return Token{}, true
-}
-
-func (s *Scanner) findToken(
-	curWord string,
-	automata *FiniteState,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switch s.curCondition {
-	case ConditionINIT:
-		return s.findTokenINIT(curWord, automata, start, end, errFunc, switchCond)
-	case ConditionLITERAL:
-		return s.findTokenLITERAL(curWord, automata, start, end, errFunc, switchCond)
-	case ConditionREGULAR:
-		return s.findTokenREGULAR(curWord, automata, start, end, errFunc, switchCond)
-	}
-
-	return Token{}, true
-}
-
-func (s *Scanner) findTokenINIT(
-	curWord string,
-	automata *FiniteState,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switch automata {
-	case automataSkip:
-		return s.handler.Skip(curWord, start, end, errFunc, switchCond)
-	case automataRegularStart:
-		return s.handler.RegularStart(curWord, start, end, errFunc, switchCond)
-	case automataStartLiteral:
-		return s.handler.StartLiteral(curWord, start, end, errFunc, switchCond)
-	case automataNum:
-		return s.handler.Num(curWord, start, end, errFunc, switchCond)
-	case automataAny:
-		return s.handler.Any(curWord, start, end, errFunc, switchCond)
-	}
-
-	return Token{}, true
-}
-
-func (s *Scanner) findTokenLITERAL(
-	curWord string,
-	automata *FiniteState,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switch automata {
-	case automataLiteral1:
-		return s.handler.Literal1(curWord, start, end, errFunc, switchCond)
-	case automataLiteralEnd:
-		return s.handler.LiteralEnd(curWord, start, end, errFunc, switchCond)
-	case automataLiteralNewLine:
-		return s.handler.LiteralNewLine(curWord, start, end, errFunc, switchCond)
-	case automataLiteralChar:
-		return s.handler.LiteralChar(curWord, start, end, errFunc, switchCond)
-	}
-
-	return Token{}, true
-}
-
-func (s *Scanner) findTokenREGULAR(
-	curWord string,
-	automata *FiniteState,
-	start, end Position,
-	errFunc ErrFunc,
-	switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switch automata {
-	case automataRegularEnd:
-		return s.handler.RegularEnd(curWord, start, end, errFunc, switchCond)
-	case automataRegularNewLine:
-		return s.handler.RegularNewLine(curWord, start, end, errFunc, switchCond)
-	case automataRegularEscapeNewLine:
-		return s.handler.RegularEscapeNewLine(curWord, start, end, errFunc, switchCond)
-	case automataRegularEscapeTab:
-		return s.handler.RegularEscapeTab(curWord, start, end, errFunc, switchCond)
-	case automataRegularEscapeQota:
-		return s.handler.RegularEscapeQota(curWord, start, end, errFunc, switchCond)
-	case automataRegularSymb:
 		return s.handler.RegularSymb(curWord, start, end, errFunc, switchCond)
 	}
 

@@ -4,79 +4,31 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"golex/examples/lab1.2/golexgen"
+	"log"
 	"os"
 )
 
 type Handler struct {
-	golexgen.ErrHandlerBase
-}
-
-func (h *Handler) Skip(
-	text []rune,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	return golexgen.NewToken(
-		golexgen.TagSkip,
-		start, end,
-		string(text[start.Index():end.Index()]),
-	), true
-}
-
-func (h *Handler) Assembly(
-	text []rune,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	return golexgen.NewToken(
-		golexgen.TagAssembly,
-		start, end,
-		string(text[start.Index():end.Index()]),
-	), false
-}
-
-func (h *Handler) Ident(
-	text []rune,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	return golexgen.NewToken(
-		golexgen.TagIdent,
-		start, end,
-		string(text[start.Index():end.Index()]),
-	), false
-}
-
-func (h *Handler) Num(
-	text []rune,
-	start, end golexgen.Position,
-	errFunc golexgen.ErrFunc,
-	switchCond golexgen.SwitchConditionFunc,
-) (golexgen.Token, golexgen.Continued) {
-	return golexgen.NewToken(
-		golexgen.TagNum,
-		start, end,
-		string(text[start.Index():end.Index()]),
-	), false
+	golexgen.HandlerBase
 }
 
 func main() {
 	filePath := "./examples/lab1.2/test.txt"
 
-	content, err := os.ReadFile(filePath)
+	file, err := os.Open(filePath)
 	if err != nil {
-		panic(err)
+		log.Fatal(err.Error())
 	}
-	scn := golexgen.NewScanner([]rune(string(content)), &Handler{})
+	defer file.Close()
 
-	t := scn.NextToken()
+	scn := golexgen.NewScanner(*bufio.NewReader(file), &Handler{})
+
+	t := scn.NextTokenOneAutomata()
 	for t.Tag() != golexgen.EOP {
 		fmt.Println(t.String())
-		t = scn.NextToken()
+		t = scn.NextTokenOneAutomata()
 	}
 }

@@ -19,10 +19,9 @@ func (c comment) String() string {
 }
 
 type Scanner struct {
-	programReader *bufio.Reader
-	compiler      *Compiler
-	curPos        Position
-	comments      []comment
+	compiler *Compiler
+	curPos   Position
+	comments []comment
 
 	regularMode bool
 	prevToken   Token
@@ -30,7 +29,7 @@ type Scanner struct {
 }
 
 func NewScanner(programFile *bufio.Reader, compiler *Compiler) Scanner {
-	return Scanner{programReader: programFile, compiler: compiler, curPos: NewPosition(programFile)}
+	return Scanner{compiler: compiler, curPos: NewPosition(programFile)}
 }
 
 func (scn *Scanner) printComments() {

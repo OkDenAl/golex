@@ -1,7 +1,5 @@
 %%
-/[\n\t ]+/ Skip
-
-/(mov|eax)/ Assembly
+/[\n\t ]+/ Skip continue
 
 /[A-Za-z][A-Za-z0-9]*/ Ident
 

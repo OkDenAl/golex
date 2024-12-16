@@ -87,8 +87,9 @@ func (f *FiniteState) FindLexemOneAutomata(pos Position) (string, string, Positi
 		pos.next()
 	}
 
-	return prevWord, prevStr,prevResPos
+	return prevWord, prevStr, prevResPos
 }
+
 
 func (f *FiniteState) canMoveBy(ch rune) bool {
 	from := f.CurrentState
@@ -119,16 +120,6 @@ func (f *FiniteState) isTerminal(state int) bool {
 }
 
 var(
-    {{ range .AllRegexps }}automata{{ .ActionName }} *FiniteState = &FiniteState{
-    CurrentState:  {{ .RegexpVal.CurrentState }},
-    TerminalStates: []TerminalState{ {{ range .RegexpVal.TerminalStates }}{state: {{.State}}, lexemName: "{{.LexemName}}" }, {{ end }}},
-    Transitions: map[int]map[rune]int{
-            {{ range $key, $value := .RegexpVal.Transitions }}{{ $key }}: { {{ range $char, $nextState := $value }}{{ $char }}: {{ $nextState }},{{ end }}},
-            {{ end }}
-        },
-        }
-    {{ end }}
-
     {{ range .UnionRegexps }}unionAutomata{{ .ActionName }} *FiniteState = &FiniteState{
         CurrentState:  {{ .RegexpVal.CurrentState }},
         TerminalStates: []TerminalState{ {{ range .RegexpVal.TerminalStates }}{state: {{.State}}, lexemName: "{{.LexemName}}" }, {{ end }}},
@@ -257,7 +248,6 @@ func (p *Position) next() Position {
 type Scanner struct {
 	programReader bufio.Reader
 	handler LexemHandler
-	regexps map[Condition][]*FiniteState
 	unionRegexps map[Condition]*FiniteState
 	curPos  Position
 
@@ -265,13 +255,6 @@ type Scanner struct {
 }
 
 func NewScanner(programFile bufio.Reader, handler LexemHandler) Scanner {
-    regexps := make(map[Condition][]*FiniteState)
-    {{ range $key, $value := .Conditions }}
-       regexps[Condition{{ $key }}]=make([]*FiniteState,0, {{ $value.RegexpsLen }})
-       {{ range $value.Regexps }}regexps[Condition{{ $key }}] = append(regexps[Condition{{ $key }}], automata{{ .ActionName }})
-        {{ end }}
-    {{ end }}
-
     unionRegexps := make(map[Condition]*FiniteState)
     {{ range $key, $value := .Conditions }}
        unionRegexps[Condition{{ $key }}] = unionAutomata{{ $key }}
@@ -281,7 +264,6 @@ func NewScanner(programFile bufio.Reader, handler LexemHandler) Scanner {
 	return Scanner{
 		programReader:      programFile,
 		handler:      handler,
-		regexps:      regexps,
 		unionRegexps: unionRegexps,
 		curPos:       NewPosition(programFile),
 		curCondition: ConditionINIT,
@@ -323,51 +305,16 @@ func (s *Scanner) findTokenOneAutomata{{ $key }}(
 {{ end }}
 
 
-func (s *Scanner) findToken(
-    curWord string,
-    automata *FiniteState,
-    start, end Position,
-    errFunc ErrFunc,
-    switchCond SwitchConditionFunc,
-) (Token, Continued) {
-    switch s.curCondition{
-    {{ range $key, $value := .Conditions }} case Condition{{ $key }}: return s.findToken{{ $key }}(curWord, automata,start,end,errFunc, switchCond)
-    {{ end }}}
-
-	return Token{}, true
-}
-
-{{ range $key, $value := .Conditions }}
-func (s *Scanner) findToken{{ $key }}(
-    curWord string,
-    automata *FiniteState,
-    start, end Position,
-    errFunc ErrFunc,
-    switchCond SwitchConditionFunc,
-) (Token, Continued) {
-	switch automata {
-    {{ range $value.Regexps }}case automata{{ .ActionName }}: return s.handler.{{ .ActionName }}(curWord, start, end, errFunc, switchCond)
-    {{ end }}}
-
-	return Token{}, true
-}
-{{ end }}
-
 func (s *Scanner) NextTokenOneAutomata() Token {
 	for s.curPos.cp() != -1 {
 		startPos := s.curPos
 		res, name, pos := s.unionRegexps[s.curCondition].FindLexemOneAutomata(s.curPos)
-		s.curPos=pos
-		s.curPos.next()
-
 		if len(name) == 0 {
-			if s.curPos.cp() != -1 {
-				s.curPos.next()
-			} else {
-				break
-			}
 			s.handler.Error("ERROR: unknown symbol", startPos, string(s.curPos.cp()))
+			s.curPos.next()
 		} else {
+			s.curPos = pos
+			s.curPos.next()
 			tok, continued := s.findTokenOneAutomata(res, name, startPos, pos, s.handler.Error, s.switchCondition)
 			if !continued {
 				return tok
