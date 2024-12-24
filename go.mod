@@ -1,4 +1,4 @@
-module golex
+module github.com/OkDenAl/golex
 
 go 1.23
 

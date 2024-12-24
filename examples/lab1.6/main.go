@@ -6,7 +6,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"golex/examples/lab1.6/golexgen"
+	"github.com/OkDenAl/golex/examples/lab1.6/golexgen"
 	"log"
 	"os"
 	"time"

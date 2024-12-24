@@ -5,7 +5,7 @@ package main
 
 import (
 	"fmt"
-	"golex/examples/lab3.2/golexgen"
+	"github.com/OkDenAl/golex/examples/lab3.2/golexgen"
 	"log"
 	"os"
 	"time"
