@@ -14,49 +14,31 @@ func (r *RegExpr) Compile() *FiniteAutomata {
 		return r.union.Compile()
 	}
 
-	if r.simple != nil {
-		return r.simple.Compile()
-	}
-
 	// impossible case
 	return nil
 }
 
 func (u *Union) Compile() *FiniteAutomata {
-	a := u.simple.Compile()
-	b := u.regex.Compile()
-	a.Union(b)
+	if len(u.concatenations) == 0 {
+		return nil
+	}
+	a := u.concatenations[0].Compile()
+	for _, c := range u.concatenations[1:] {
+		a.Union(c.Compile())
+	}
+
 	return a
 }
 
-func (s *SimpleExpr) Compile() *FiniteAutomata {
-	if s.concatenation != nil {
-		return s.concatenation.Compile()
-	}
-
-	if s.basic != nil {
-		return s.basic.Compile()
-	}
-
-	// impossible case
-	return nil
-}
-
 func (c *Concatenation) Compile() *FiniteAutomata {
-	a := c.basic.Compile()
-
-	var rec func(simple *SimpleExpr)
-	rec = func(simple *SimpleExpr) {
-		if simple.concatenation != nil {
-			b := simple.concatenation.basic.Compile()
-			a.Concat(b)
-			rec(simple.concatenation.simple)
-		} else {
-			b := simple.basic.Compile()
-			a.Concat(b)
-		}
+	if len(c.basic) == 0 {
+		return nil
 	}
-	rec(c.simple)
+
+	a := c.basic[0].Compile()
+	for _, b := range c.basic[1:] {
+		a.Concat(b.Compile())
+	}
 
 	return a
 }
@@ -140,6 +122,8 @@ func (s *Set) Compile() *FiniteAutomata {
 		flPosCpy := copyMap(flPos)
 
 		a := s.negative.Compile()
+		a.letters = letters
+		a.flPos = flPos
 
 		letters = letCpy
 		flPos = flPosCpy
@@ -210,29 +194,24 @@ func genRuneInRange(startChar, endChar rune) []rune {
 
 var anyRuneNotNL = genAnyRuneNotNL()
 
-//const (
-//	minRune = 98
-//	maxRune = 100
-//)
+const (
+	minRune = 0
+	maxRune = 1000
+)
 
 const runeRangeEnd = 0x10ffff
 
 const printableChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r"
 
-//const printableChars = "012abc\n\r"
-
 var printableCharsNoNL = printableChars[:len(printableChars)-2]
 
 func genAnyRuneNotNL() []rune {
 	var res []rune
-	//for i = minRune; i < '\n'; i++ {
-	//	res = append(res, i)
-	//}
-	//var i rune
-	//for i = minRune; i < maxRune; i++ {
-	//	res = append(res, i)
-	//}
-	for _, i := range printableCharsNoNL {
+	var i rune
+	for i = minRune; i < maxRune; i++ {
+		if i == '\n' {
+			continue
+		}
 		res = append(res, i)
 	}
 

@@ -1,6 +1,4 @@
 NUM             /(0|(1)+)/
-%x LITERAL REGULAR
-
 %%
 /[\n\t ]+/ Skip continue
 
@@ -25,3 +23,4 @@ NUM             /(0|(1)+)/
 /./ Any edit
 
 %%
+

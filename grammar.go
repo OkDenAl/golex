@@ -37,23 +37,15 @@ type SwitchCondition struct {
 }
 
 type RegExpr struct {
-	union  *Union
-	simple *SimpleExpr
+	union *Union
 }
 
 type Union struct {
-	regex  *RegExpr
-	simple *SimpleExpr
-}
-
-type SimpleExpr struct {
-	concatenation *Concatenation
-	basic         *BasicExpr
+	concatenations []Concatenation
 }
 
 type Concatenation struct {
-	simple *SimpleExpr
-	basic  *BasicExpr
+	basic []BasicExpr
 }
 
 type BasicExpr struct {

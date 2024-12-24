@@ -13,23 +13,24 @@ NewLine ::= \\n
 Continue ::= continue
 Edit ::= edit
 
-RegExpr         ::= Union | SimpleExpr
-Union           ::= SimpleExpr "|" RegExpr
-SimpleExpr      ::= Concatenation | BasicExpr
-Concatenation   ::= BasicExpr SimpleExpr
+RegExpr         ::= Union
+Union           ::= Concatenation ("|" Concatenation)*
+Concatenation   ::= (BasicExpr)+
 BasicExpr       ::= Element ("*"|"+"|"?")?
 Element         ::= Group | Set | Escape | ValidIndependentCharacter
 Group           ::= "(" RegExpr ")"
-Escape          ::= "\" EscapeCharacter
+Escape          ::= "\" AnyCharacter
 Set             ::= "[" ("^")? FirstSetItem SetItems "]"
 SetItems        ::= SetItem SetItems
 SetItem         ::= Range | Escape | SetCharacter
-Range           ::=  (Escape | RangeStartCharacter) "-" RangeEndCharacter
+Range           ::= ("\" (AnyCharacter)? | RangeCharacter) "-"
+                    ("\" (AnyCharacter)? | RangeCharacter)
 
 
 Lexems
-ValidIndependentCharacter ::= [^()|/]
-EscapeCharacter ::= .
+ValidIndependentCharacter ::= [^()|\/]
+AnyCharacter ::= .
 SetCharacter ::= .[^]]*
-RangeStartCharacter ::= .
-RangeEndCharacter ::= .
+RangeCharacter ::= [^\]
+
+

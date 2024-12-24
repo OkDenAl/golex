@@ -38,7 +38,7 @@ func generateFile(templateFile, generateFile string, data interface{}, regen boo
 		fmt.Println("Ошибка при создании шаблона:", err)
 		os.Exit(ErrTmplCreationCode)
 	}
-	// if file main.go exists --> probably user already changed it
+
 	if _, err := os.Stat(generateFile); !errors.Is(err, os.ErrNotExist) && !regen {
 		return
 	}

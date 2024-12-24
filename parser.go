@@ -198,76 +198,56 @@ func (p *Parser) switchCondition() *SwitchCondition {
 	return &SwitchCondition{nextCondition: token}
 }
 
-// RegExpr         ::= Union | SimpleExpr
+// RegExpr         ::= Union
 func (p *Parser) regExpr() (*RegExpr, bool) {
-	reset := p.reset()
 	union, ok := p.union()
 	if ok {
 		return &RegExpr{union: union}, true
 	}
 
-	reset()
-	simple, ok := p.simpleExpr()
-	if ok {
-		return &RegExpr{simple: simple}, true
-	}
-
 	return nil, false
 }
 
-// Union           ::= SimpleExpr "|" RegExpr
+// Union           ::= Concatenation ("|" Concatenation)*
 func (p *Parser) union() (*Union, bool) {
-	simple, ok := p.simpleExpr()
+	concats := make([]Concatenation, 0)
+	conc, ok := p.concatenation()
 	if !ok {
 		return nil, false
 	}
+	concats = append(concats, *conc)
 
-	if _, ok = p.expectTags(TagPipe); !ok {
-		return nil, false
+	for p.cursor < len(p.tokens) && p.tokens[p.cursor].tag == TagPipe {
+		p.mustExpectTag(TagPipe)
+		conc, ok = p.concatenation()
+		if !ok {
+			return nil, false
+		}
+		concats = append(concats, *conc)
 	}
 
-	regex, ok := p.regExpr()
-	if !ok {
-		return nil, false
-	}
-
-	return &Union{regex: regex, simple: simple}, true
+	return &Union{concatenations: concats}, true
 }
 
-// SimpleExpr      ::= Concatenation | BasicExpr
-func (p *Parser) simpleExpr() (*SimpleExpr, bool) {
-	concatenation, ok := p.concatenation()
-	if ok {
-		return &SimpleExpr{concatenation: concatenation}, true
-	}
-
-	basic, ok := p.basicExpr()
-	if ok {
-		return &SimpleExpr{basic: basic}, true
-	}
-
-	return nil, false
-}
-
-// Concatenation   ::= BasicExpr SimpleExpr
+// Concatenation   ::= (BasicExpr)+
 func (p *Parser) concatenation() (*Concatenation, bool) {
-	reset := p.reset()
-
+	exprs := make([]BasicExpr, 0)
 	basic, ok := p.basicExpr()
-
 	if !ok {
-		reset()
 		return nil, false
 	}
+	exprs = append(exprs, *basic)
 
-	simple, ok := p.simpleExpr()
-
-	if !ok {
-		reset()
-		return nil, false
+	for p.cursor < len(p.tokens) && (p.isCurTokenValidIndependentCharacter() || p.tokens[p.cursor].tag == TagOpenParen ||
+		p.tokens[p.cursor].Tag() == TagEscape || p.tokens[p.cursor].Tag() == TagOpenBracket) {
+		basic, ok = p.basicExpr()
+		if !ok {
+			return nil, false
+		}
+		exprs = append(exprs, *basic)
 	}
 
-	return &Concatenation{simple: simple, basic: basic}, true
+	return &Concatenation{basic: exprs}, true
 }
 
 // BasicExpr       ::= Element ("*"|"+"|"?")?
@@ -455,6 +435,17 @@ func (p *Parser) validIndependentCharacter() (*Token, bool) {
 	}
 
 	return &token, true
+}
+
+func (p *Parser) isCurTokenValidIndependentCharacter() bool {
+	if p.tokens[p.cursor].Tag() == TagRegularMarker ||
+		p.tokens[p.cursor].Tag() == TagOpenParen ||
+		p.tokens[p.cursor].Tag() == TagCloseParen ||
+		p.tokens[p.cursor].Tag() == TagPipe {
+		return false
+	}
+
+	return true
 }
 
 // EscapeCharacter ::= .

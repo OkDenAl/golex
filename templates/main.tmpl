@@ -52,7 +52,6 @@ func main() {
 
 	scn := golexgen.NewScanner(*bufio.NewReader(file), &Handler{})
 
-	tm := time.Now()
 	t := scn.NextTokenOneAutomata()
 	for t.Tag() != golexgen.EOP {
 		fmt.Println(t.String())
