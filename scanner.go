@@ -54,6 +54,8 @@ func (scn *Scanner) nextToken() Token {
 		curWord := ""
 
 		switch scn.curPos.Cp() {
+		case '\r':
+			fallthrough
 		case '\n':
 			scn.curPos.Next()
 			scn.prevToken = NewToken(TagNL, start, start, "NEW_LINE")
