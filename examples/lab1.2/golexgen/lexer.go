@@ -2,7 +2,6 @@
 package golexgen
 
 import (
-	"bufio"
 	"fmt"
 )
 
