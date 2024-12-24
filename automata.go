@@ -177,10 +177,8 @@ func (f *FiniteAutomata) Loop() {
 
 func Negate(f *FiniteAutomata, pos int) *FiniteAutomata {
 	var symb []rune
-	for _, transition := range f.Transitions {
-		for r, _ := range transition {
-			symb = append(symb, r)
-		}
+	for let := range f.letters {
+		symb = append(symb, let)
 	}
 
 	return Create(genAnyRuneExcept(symb), pos)

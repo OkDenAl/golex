@@ -122,6 +122,8 @@ func (s *Set) Compile() *FiniteAutomata {
 		flPosCpy := copyMap(flPos)
 
 		a := s.negative.Compile()
+		a.letters = letters
+		a.flPos = flPos
 
 		letters = letCpy
 		flPos = flPosCpy
@@ -192,29 +194,24 @@ func genRuneInRange(startChar, endChar rune) []rune {
 
 var anyRuneNotNL = genAnyRuneNotNL()
 
-//const (
-//	minRune = 98
-//	maxRune = 100
-//)
+const (
+	minRune = 0
+	maxRune = 1000
+)
 
 const runeRangeEnd = 0x10ffff
 
 const printableChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r"
 
-//const printableChars = "012abc\n\r"
-
 var printableCharsNoNL = printableChars[:len(printableChars)-2]
 
 func genAnyRuneNotNL() []rune {
 	var res []rune
-	//for i = minRune; i < '\n'; i++ {
-	//	res = append(res, i)
-	//}
-	//var i rune
-	//for i = minRune; i < maxRune; i++ {
-	//	res = append(res, i)
-	//}
-	for _, i := range printableCharsNoNL {
+	var i rune
+	for i = minRune; i < maxRune; i++ {
+		if i == '\n' {
+			continue
+		}
 		res = append(res, i)
 	}
 

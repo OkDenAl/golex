@@ -1,6 +1,5 @@
 NUM             /(0|(1)+)/
 %%
-/{NUM}/ Num
 /[\n\t ]+/ Skip continue
 
 /\"/ RegularStart begin(REGULAR) edit
@@ -19,6 +18,7 @@ NUM             /(0|(1)+)/
 <LITERAL>/\n/ LiteralNewLine edit
 <LITERAL>/./ LiteralChar edit
 
+/{NUM}/ Num
 
 /./ Any edit
 
