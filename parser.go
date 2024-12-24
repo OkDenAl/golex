@@ -218,6 +218,7 @@ func (p *Parser) union() (*Union, bool) {
 	concats = append(concats, *conc)
 
 	for p.cursor < len(p.tokens) && p.tokens[p.cursor].tag == TagPipe {
+		p.mustExpectTag(TagPipe)
 		conc, ok = p.concatenation()
 		if !ok {
 			return nil, false
@@ -237,8 +238,8 @@ func (p *Parser) concatenation() (*Concatenation, bool) {
 	}
 	exprs = append(exprs, *basic)
 
-	for p.cursor < len(p.tokens) && p.isCurTokenValidIndependentCharacter() || p.tokens[p.cursor].tag == TagOpenParen ||
-		p.tokens[p.cursor].Tag() == TagEscape || p.tokens[p.cursor].Tag() == TagOpenBracket {
+	for p.cursor < len(p.tokens) && (p.isCurTokenValidIndependentCharacter() || p.tokens[p.cursor].tag == TagOpenParen ||
+		p.tokens[p.cursor].Tag() == TagEscape || p.tokens[p.cursor].Tag() == TagOpenBracket) {
 		basic, ok = p.basicExpr()
 		if !ok {
 			return nil, false
