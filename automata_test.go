@@ -319,7 +319,7 @@ func TestFiniteState_Execute(t *testing.T) {
 		},
 		{
 			name:   "[0-9]*|([0-9]*h)",
-			args:   args{reg: "([0-9]*|a)"},
+			args:   args{reg: "(ab)"},
 			count:  100,
 			maxLen: 100,
 		},
