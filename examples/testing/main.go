@@ -5,7 +5,7 @@ package main
 
 import (
 	"fmt"
-	"golex/examples/testing/golexgen"
+	"github.com/OkDenAl/golex/examples/testing/golexgen"
 	"os"
 	"time"
 )

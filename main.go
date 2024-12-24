@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	inputFile       = flag.String("i", "./examples/lab1.6/example.gl", "input file location")
-	lexerOutputFile = flag.String("lo", "./examples/lab1.6/golexgen/lexer.go", "lexer output file location")
-	mainOutputFile  = flag.String("mo", "./examples/lab1.6/main.go", "main output file location")
+	inputFile       = flag.String("i", "", "input file location")
+	lexerOutputFile = flag.String("lo", "lexer.go", "lexer output file location")
+	mainOutputFile  = flag.String("mo", "main.go", "main output file location")
 	regenerateMain  = flag.Bool("rg", false, "if true -> regenerate main")
 )
 
