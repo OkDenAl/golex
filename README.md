@@ -51,9 +51,10 @@ Program         ::= (NamedRegExpr)* (NewLine)* (State)? (NewLine)* Rules
 NamedRegExpr    ::= Name "/" RegExpr "/" NewLine
 State           ::= "%x" (Name)+ NewLine
 Rules           ::= "%%" (NewLine)+ (Rule)+ "%%"
-Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)? (NewLine)+
+Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)?
+                    (Continue)? (Edit)? (NewLine)+
 StartCondition  ::= "<" Name ">"
-SwitchCondition ::= "BEGIN" "(" Name ")"
+SwitchCondition ::= Begin "(" Name ")"
 
 RegExpr         ::= Union
 Union           ::= Concatenation ("|" Concatenation)*
@@ -74,6 +75,7 @@ Name ::= [A-Z][A-z0-9_]*
 NewLine ::= \\n
 Continue ::= continue
 Edit ::= edit
+Begin ::= begin
 ValidIndependentCharacter ::= [^()|\/]
 AnyCharacter ::= .
 SetCharacter ::= .[^]]*
