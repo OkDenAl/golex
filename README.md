@@ -2,6 +2,48 @@
 It is a simple lexical analyzers generator written on pure Go
 with custom regular expression parser.
 
+## Quick start
+
+1) The token is specified as a Latin word written on the same line with a regular expression. 
+If the token is found, a token with that name will be returned.
+```
+%%
+/(0|(1)+)/ Num
+%%
+```
+
+2) If a token does not imply any reaction to its detection, then it is allowed to skip this token using the `continue` 
+construction following the name of the token. However, you still need to specify the name of the token itself.
+
+```
+%%
+/[\n\t ]/ Skip continue
+%%
+```
+
+3) In the rules section, it is allowed to use regular expressions that depend on the starting conditions 
+of the following type: `<n>/r/`, where n is the starting condition, r is the regular expression. 
+Initially, the `INIT` start condition is enabled, which is not specified in the rules. 
+The starting conditions are switched by specifying the `begin` construction.
+```
+%%
+/\"/ RegularStart begin(REGULAR) edit
+<REGULAR>/\"/ RegularEnd begin(INIT) edit
+<REGULAR>/\n/ RegularNewLine begin(INIT) edit
+%%
+```
+The edit construct signals that it is necessary to make a change to the standard token handler, 
+that is, to redefine the standard lex behavior.
+
+4) In case of simplification of the work, it is possible to specify named regular expressions,
+using this expression later inside the regular expression record.
+```
+NUM             /(0|(1)+)/
+%%
+/{NUM}/ Num
+%%
+```
+
 ## Grammar (RBNF)
 
 ```
@@ -13,28 +55,29 @@ Rule            ::= (StartCondition)? "/" RegExpr "/"  Name (SwitchCondition)? (
 StartCondition  ::= "<" Name ">"
 SwitchCondition ::= "BEGIN" "(" Name ")"
 
-RegExpr         ::= Union | SimpleExpr
-Union           ::= SimpleExpr "|" RegExpr
-SimpleExpr      ::= Concatenation | BasicExpr
-Concatenation   ::= BasicExpr SimpleExpr
+RegExpr         ::= Union
+Union           ::= Concatenation ("|" Concatenation)*
+Concatenation   ::= (BasicExpr)+
 BasicExpr       ::= Element ("*"|"+"|"?")?
-Element         ::= Group | Set | Escape | Repetition | ValidIndependentCharacter
+Element         ::= Group | Set | Escape | ValidIndependentCharacter
 Group           ::= "(" RegExpr ")"
-Escape          ::= "\" EscapeCharacter
+Escape          ::= "\" AnyCharacter
 Set             ::= "[" ("^")? FirstSetItem SetItems "]"
 SetItems        ::= SetItem SetItems
 SetItem         ::= Range | Escape | SetCharacter
-Range           ::=  (Escape | RangeStartCharacter) "-" RangeEndCharacter
+Range           ::= ("\" (AnyCharacter)? | RangeCharacter) "-"
+                    ("\" (AnyCharacter)? | RangeCharacter)
 
 
 Lexems
 Name ::= [A-Z][A-z0-9_]*
 NewLine ::= \\n
-ValidIndependentCharacter ::= [^()|/]
-EscapeCharacter ::= .
+Continue ::= continue
+Edit ::= edit
+ValidIndependentCharacter ::= [^()|\/]
+AnyCharacter ::= .
 SetCharacter ::= .[^]]*
-RangeStartCharacter ::= .
-RangeEndCharacter ::= .
+RangeCharacter ::= [^\]
 ```
 
 ## Supported regular expressions features
@@ -49,9 +92,7 @@ RangeEndCharacter ::= .
 \s|white space, [\n\r\f\t ]|good\smorning|good morning|good.morning
 \S|no-white space, [^\n\r\f\t]|good\Smorning|good.morning|good morning
 \d| digit|\d{2}|23|1a
-\D| non-digit|\D{3}|foo, bar|fo1
 \w| word, [a-z-A-Z0-9_]|\w{4}|v411|v4.1
-\W|non word, [^a-z-A-Z0-9_]|.$%?|.$%?|.ab?
 
 |Special character|Description
 :---|:---
